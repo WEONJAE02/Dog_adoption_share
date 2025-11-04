@@ -16,6 +16,7 @@ public class DogResponseDto {
     private Long dogId;
     private String name;
     private String breed;
+    private String gender;
     private String foundPlace;
     private int age;
     private String status;
@@ -32,6 +33,7 @@ public class DogResponseDto {
                 .age(dog.getAge())
                 .status(dog.getStatus())
                 .memo(dog.getDogDetail() != null ? dog.getDogDetail().getMemo() : null)
+                .gender(dog.getGender())
                 .imageNames(dog.getImages() != null
                         ? dog.getImages().stream().map(DogImage::getFileName).collect(Collectors.toList())
                         : null)

@@ -37,6 +37,7 @@ public class DogService {
                 .breed(dto.getBreed())
                 .age(dto.getAge())
                 .status(dto.getStatus())
+                .gender(dto.getGender())
                 .imageName(fileName)
                 .regDate(LocalDateTime.now())
                 .build();
@@ -72,7 +73,7 @@ public class DogService {
                 .collect(Collectors.toList());
     }
 
-    // ✅ 단건 조회
+    // ✅ 상세 조회
     public DogResponseDto getDogById(Long id) {
         Dog dog = dogRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("해당 유기견 정보를 찾을 수 없습니다."));
@@ -86,6 +87,7 @@ public class DogService {
                 .breed(dog.getBreed())
                 .age(dog.getAge())
                 .status(dog.getStatus())
+                .gender(dog.getGender())
                 .foundPlace(detail != null ? detail.getFoundPlace() : null)
                 .memo(detail != null ? detail.getMemo() : null)
                 .imageNames(images.stream().map(DogImage::getFileName).collect(Collectors.toList()))
@@ -113,6 +115,7 @@ public class DogService {
         existingDog.setBreed(dto.getBreed());
         existingDog.setAge(dto.getAge());
         existingDog.setStatus(dto.getStatus());
+        existingDog.setGender(dto.getGender());
         existingDog.setImageName(fileName);
         dogRepository.update(id, existingDog);
 

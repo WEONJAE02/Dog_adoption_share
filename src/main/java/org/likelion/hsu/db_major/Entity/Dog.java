@@ -14,6 +14,7 @@ public class Dog {
     private Long dogId;
     private String name;
     private String breed;
+    private String gender;
     private int age;
     private String status;
     private String imageName;

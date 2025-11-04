@@ -17,6 +17,7 @@ public class DogRepository {
 
     private final JdbcTemplate jdbcTemplate;
 
+    // ✅ RowMapper
     private final RowMapper<Dog> dogRowMapper = new RowMapper<>() {
         @Override
         public Dog mapRow(ResultSet rs, int rowNum) throws SQLException {
@@ -27,6 +28,7 @@ public class DogRepository {
                     .age(rs.getInt("age"))
                     .status(rs.getString("status"))
                     .imageName(rs.getString("image_name"))
+                    .gender(rs.getString("gender"))
                     .regDate(rs.getTimestamp("reg_date") != null
                             ? rs.getTimestamp("reg_date").toLocalDateTime()
                             : null)
@@ -36,13 +38,14 @@ public class DogRepository {
 
     // ✅ 등록
     public int save(Dog dog) {
-        String sql = "INSERT INTO dog (name, breed, age, status, image_name, reg_date) VALUES (?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO dog (name, breed, age, status, image_name, gender, reg_date) VALUES (?, ?, ?, ?, ?, ?, ?)";
         return jdbcTemplate.update(sql,
                 dog.getName(),
                 dog.getBreed(),
                 dog.getAge(),
                 dog.getStatus(),
                 dog.getImageName(),
+                dog.getGender(),
                 dog.getRegDate() != null ? dog.getRegDate() : LocalDateTime.now()
         );
     }
@@ -82,7 +85,7 @@ public class DogRepository {
         return jdbcTemplate.query(sql.toString(), dogRowMapper, params.toArray());
     }
 
-    // ✅ 단건 조회
+    // ✅ 상세 조회
     public Optional<Dog> findById(Long id) {
         String sql = "SELECT * FROM dog WHERE dog_id = ?";
         List<Dog> result = jdbcTemplate.query(sql, dogRowMapper, id);
@@ -91,13 +94,14 @@ public class DogRepository {
 
     // ✅ 수정
     public int update(Long id, Dog dog) {
-        String sql = "UPDATE dog SET name=?, breed=?, age=?, status=?, image_name=? WHERE dog_id=?";
+        String sql = "UPDATE dog SET name=?, breed=?, age=?, status=?, image_name=?, gender=? WHERE dog_id=?";
         return jdbcTemplate.update(sql,
                 dog.getName(),
                 dog.getBreed(),
                 dog.getAge(),
                 dog.getStatus(),
                 dog.getImageName(),
+                dog.getGender(),
                 id);
     }
 
@@ -118,4 +122,5 @@ public class DogRepository {
         String sql = "SELECT breed, COUNT(*) AS count FROM dog GROUP BY breed";
         return jdbcTemplate.queryForList(sql);
     }
+
 }

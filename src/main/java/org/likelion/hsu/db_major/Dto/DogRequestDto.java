@@ -8,6 +8,7 @@ import lombok.Setter;
 public class DogRequestDto {
     private String name;
     private String breed;
+    private String gender;
     private String foundPlace;
     private int age;
     private String status;
