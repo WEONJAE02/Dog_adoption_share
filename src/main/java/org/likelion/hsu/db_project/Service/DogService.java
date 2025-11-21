@@ -8,6 +8,7 @@ import org.likelion.hsu.db_project.Entity.DogDetail;
 import org.likelion.hsu.db_project.Entity.DogImage;
 import org.likelion.hsu.db_project.Repository.DogDetailRepository;
 import org.likelion.hsu.db_project.Repository.DogImageRepository;
+
 import org.likelion.hsu.db_project.Repository.DogRepository;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -22,144 +23,74 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 public class DogService {
-
     private final DogRepository dogRepository;
-    private final DogDetailRepository dogDetailRepository;
-    private final DogImageRepository dogImageRepository;
 
     @Value("${file.upload-dir}")
     private String uploadDir;
 
-    // ✅ 등록
     public DogResponseDto createDog(DogRequestDto dto, MultipartFile imageFile) throws IOException {
-        String fileName = null;
-        if (imageFile != null && !imageFile.isEmpty()) {
-            fileName = saveImage(imageFile);
-        }
+        String fileName = (imageFile!=null && !imageFile.isEmpty()) ? saveImage(imageFile) : null;
 
         Dog dog = Dog.builder()
                 .name(dto.getName())
                 .breed(dto.getBreed())
+                .foundPlace(dto.getFoundPlace())
                 .age(dto.getAge())
                 .status(dto.getStatus())
+                .memo(dto.getMemo())
                 .gender(dto.getGender())
-                .imageName(fileName)
-                .regDate(LocalDateTime.now())
+                .imageUrl(fileName != null ? "/uploads/" + fileName : null) // 프론트에서 바로 쓸 수 있게
                 .build();
 
-        // 1. dog 테이블 저장
         dogRepository.save(dog);
-        Long dogId = dogRepository.getLastInsertId();
-
-        // 2. 상세 정보 저장
-        DogDetail detail = DogDetail.builder()
-                .foundPlace(dto.getFoundPlace())
-                .memo(dto.getMemo())
-                .build();
-        dogDetailRepository.save(detail, dogId);
-
-        // 3. 이미지 저장
-        if (imageFile != null && !imageFile.isEmpty()) {
-            DogImage image = DogImage.builder()
-                    .fileName(fileName)
-                    .filePath(uploadDir + "/" + fileName)
-                    .uploadDate(LocalDateTime.now())
-                    .build();
-            dogImageRepository.save(image, dogId);
-        }
-
-        return getDogById(dogId);
-    }
-
-    // ✅ 전체 조회 (검색 + 정렬 + 필터)
-    public List<DogResponseDto> getAllDogs(String search, String status, String sort) {
-        return dogRepository.findAllWithConditions(search, status, sort).stream()
-                .map(dog -> getDogById(dog.getDogId()))
-                .collect(Collectors.toList());
-    }
-
-    // ✅ 상세 조회
-    public DogResponseDto getDogById(Long id) {
-        Dog dog = dogRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("해당 유기견 정보를 찾을 수 없습니다."));
-
-        DogDetail detail = dogDetailRepository.findByDogId(id);
-        List<DogImage> images = dogImageRepository.findByDogId(id);
-
-        return DogResponseDto.builder()
-                .dogId(dog.getDogId())
-                .name(dog.getName())
-                .breed(dog.getBreed())
-                .age(dog.getAge())
-                .status(dog.getStatus())
-                .gender(dog.getGender())
-                .foundPlace(detail != null ? detail.getFoundPlace() : null)
-                .memo(detail != null ? detail.getMemo() : null)
-                .imageNames(images.stream().map(DogImage::getFileName).collect(Collectors.toList()))
-                .regDate(dog.getRegDate())
-                .build();
-    }
-
-    // ✅ 수정
-    public DogResponseDto updateDog(Long id, DogRequestDto dto, MultipartFile imageFile) throws IOException {
-        Dog existingDog = dogRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("해당 유기견 정보를 찾을 수 없습니다."));
-
-        String fileName = existingDog.getImageName();
-        if (imageFile != null && !imageFile.isEmpty()) {
-            fileName = saveImage(imageFile);
-            DogImage image = DogImage.builder()
-                    .fileName(fileName)
-                    .filePath(uploadDir + "/" + fileName)
-                    .uploadDate(LocalDateTime.now())
-                    .build();
-            dogImageRepository.save(image, id);
-        }
-
-        existingDog.setName(dto.getName());
-        existingDog.setBreed(dto.getBreed());
-        existingDog.setAge(dto.getAge());
-        existingDog.setStatus(dto.getStatus());
-        existingDog.setGender(dto.getGender());
-        existingDog.setImageName(fileName);
-        dogRepository.update(id, existingDog);
-
-        DogDetail detail = DogDetail.builder()
-                .foundPlace(dto.getFoundPlace())
-                .memo(dto.getMemo())
-                .build();
-        dogDetailRepository.update(id, detail);
-
+        Long id = dogRepository.getLastInsertId();
         return getDogById(id);
     }
 
-    // ✅ 삭제
-    public void deleteDog(Long id) {
-        dogImageRepository.deleteByDogId(id);
-        dogDetailRepository.deleteByDogId(id);
-        dogRepository.delete(id);
+    public List<DogResponseDto> getAllDogs(String search, String status, String sort){
+        return dogRepository.findAllWithConditions(search, status, sort)
+                .stream().map(DogResponseDto::from).toList();
     }
 
-    // ✅ 이미지 저장
+    public DogResponseDto getDogById(Long id){
+        Dog d = dogRepository.findById(id).orElseThrow(() -> new RuntimeException("데이터 없음"));
+        return DogResponseDto.from(d);
+    }
+
+    public DogResponseDto updateDog(Long id, DogRequestDto dto, MultipartFile imageFile) throws IOException {
+        Dog dog = dogRepository.findById(id).orElseThrow(() -> new RuntimeException("데이터 없음"));
+
+        if (imageFile!=null && !imageFile.isEmpty()){
+            String fileName = saveImage(imageFile);
+            dog.setImageUrl("/uploads/" + fileName);
+        }
+        dog.setName(dto.getName());
+        dog.setBreed(dto.getBreed());
+        dog.setFoundPlace(dto.getFoundPlace());
+        dog.setAge(dto.getAge());
+        dog.setStatus(dto.getStatus());
+        dog.setMemo(dto.getMemo());
+        dog.setGender(dto.getGender());
+
+        dogRepository.update(id, dog);
+        return getDogById(id);
+    }
+
+    public void deleteDog(Long id){ dogRepository.delete(id); }
+
     private String saveImage(MultipartFile file) throws IOException {
-        String originalFileName = file.getOriginalFilename();
-        String extension = originalFileName.substring(originalFileName.lastIndexOf("."));
-        String uniqueFileName = UUID.randomUUID() + extension;
-
-        Path uploadPath = Paths.get(uploadDir).toAbsolutePath().normalize();
-        Files.createDirectories(uploadPath);
-
-        Path destination = uploadPath.resolve(uniqueFileName);
-        Files.copy(file.getInputStream(), destination, StandardCopyOption.REPLACE_EXISTING);
-
-        return uniqueFileName;
+        String ext = file.getOriginalFilename().substring(file.getOriginalFilename().lastIndexOf("."));
+        String unique = java.util.UUID.randomUUID() + ext;
+        Path path = java.nio.file.Paths.get(uploadDir).toAbsolutePath().normalize();
+        java.nio.file.Files.createDirectories(path);
+        java.nio.file.Files.copy(file.getInputStream(), path.resolve(unique), java.nio.file.StandardCopyOption.REPLACE_EXISTING);
+        return unique;
     }
 
-    // ✅ 통계 (대시보드용)
-    public Map<String, Object> getStatistics() {
-        Map<String, Object> stats = new HashMap<>();
-        stats.put("statusStats", dogRepository.getStatusStats());
-        stats.put("breedStats", dogRepository.getBreedStats());
-        return stats;
+    public Map<String,Object> getStatistics(){
+        Map<String,Object> m = new java.util.HashMap<>();
+        m.put("statusStats", dogRepository.getStatusStats());
+        m.put("breedStats",  dogRepository.getBreedStats());
+        return m;
     }
 }
