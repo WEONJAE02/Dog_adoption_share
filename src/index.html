@@ -5,19 +5,14 @@
     <title>PET ROOM – 반려동물 기록장</title>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <style>
-        :root{
-            --bg:#0b0c0f; --panel:#151922; --panel-2:#1b2130; --text:#e6e7eb; --muted:#9aa3b2;
-            --brand:#8bc3ff; --chip:#e9eef7; --chip-text:#111; --gap:14px; --radius:18px;
-            --line:#222b3a;
-        }
+        :root{ --bg:#0b0c0f; --panel:#151922; --panel-2:#1b2130; --text:#e6e7eb; --muted:#9aa3b2; --brand:#8bc3ff; --chip:#e9eef7; --chip-text:#111; --gap:14px; --radius:18px; --line:#222b3a }
         *{box-sizing:border-box}
         body{margin:0; font-family:system-ui,-apple-system,"Noto Sans KR",sans-serif; background:var(--bg); color:var(--text)}
         a,button,input,select,textarea{font:inherit}
         .container{max-width:1080px; margin:0 auto; padding:24px 20px}
 
-        .hero{display:grid; grid-template-columns:1.2fr .8fr; align-items:center; gap:24px; padding:28px;
-            background:linear-gradient(180deg,#111826 0%,#0f1520 100%); border-radius:24px; border:1px solid var(--line)}
-        .title{font-size:44px; line-height:1.15; font-weight:800; letter-spacing:-0.02em; margin:0 0 8px}
+        .hero{display:grid; grid-template-columns:1.2fr .8fr; align-items:center; gap:24px; padding:28px; background:linear-gradient(180deg,#111826 0%,#0f1520 100%); border-radius:24px; border:1px solid var(--line)}
+        .title{font-size:44px; line-height:1.15; font-weight:800; letter-spacing:-.02em; margin:0 0 8px}
         .subtitle{display:flex; flex-wrap:wrap; gap:10px; margin:8px 0 0}
         .pill{padding:8px 12px; border-radius:999px; background:#222a39; color:var(--muted); font-size:13px; border:1px solid #2a3548}
         .actions3{display:flex; gap:14px; margin-top:14px}
@@ -32,9 +27,9 @@
         .tool-btn{background:#223046; cursor:pointer}
         .tool-btn.primary{background:#2b65ff}
 
-        .filters{display:none !important}
+        .filters{display:none!important}
 
-        .grid{display:grid; gap:var(--gap); grid-template-columns:repeat(auto-fill, minmax(240px,1fr)); margin:16px 0 24px}
+        .grid{display:grid; gap:var(--gap); grid-template-columns:repeat(auto-fill,minmax(240px,1fr)); margin:16px 0 24px}
         .card{background:var(--panel); border:1px solid var(--line); border-radius:20px; overflow:hidden; display:flex; flex-direction:column}
         .thumb{height:170px; width:100%; object-fit:cover; background:#0f1625; cursor:pointer}
         .meta{padding:14px}
@@ -53,10 +48,23 @@
         .panel h5{margin:4px 8px 10px; color:#aab3c3; font-weight:700; font-size:13px}
         canvas{max-height:200px}
 
+        /* 추천 패널 */
+        .rec-panel{background:var(--panel); border:1px solid var(--line); border-radius:16px; padding:14px; margin:16px 0 8px}
+        .rec-head{display:flex; gap:10px; align-items:center; flex-wrap:wrap}
+        .rec-btn{background:#2b65ff; border:none; color:#fff; border-radius:10px; padding:10px 12px; cursor:pointer}
+        .rec-btn[disabled]{opacity:.6; cursor:not-allowed}
+        details.rec-adv{margin-top:10px}
+        details.rec-adv summary{cursor:pointer; color:#cfe1ff}
+        .rec-grid{margin-top:10px; display:grid; gap:10px; grid-template-columns:repeat(auto-fit,minmax(160px,1fr))}
+        .rec-grid>label{display:flex; flex-direction:column; gap:6px; background:#0f1420; border:1px solid #223046; border-radius:12px; padding:10px}
+        .rec-note{color:#9aa3b2; font-size:12px}
+        #recList{display:grid; gap:var(--gap); grid-template-columns:repeat(auto-fill,minmax(240px,1fr)); margin:12px 0 20px}
+        .rec-reason{padding:10px 12px; border-top:1px solid var(--line); color:#aab3c3; font-size:13px; white-space:pre-wrap}
+
         dialog::backdrop{background:rgba(0,0,0,.4)}
         dialog{border:none; border-radius:16px; padding:0; overflow:hidden}
 
-        /* ▶ 등록 모달 가로 넓게(2열) */
+        /* 등록 모달 넓게 */
         .modal{background:#0f1420; color:#e6ecff; width:min(760px,96vw)}
         .modal header{padding:16px 18px; border-bottom:1px solid var(--line); font-weight:800}
         .modal .body{display:grid; grid-template-columns:1fr 1fr; gap:14px 18px; padding:16px 18px}
@@ -64,7 +72,6 @@
         .modal input,.modal textarea,.modal select{background:#0d1320; color:#e6e9f8; border:1px solid #223046; padding:10px 12px; border-radius:10px}
         .modal footer{display:flex; gap:8px; justify-content:flex-end; padding:12px 18px; border-top:1px solid var(--line)}
 
-        /* 메모 + AI 버튼 */
         .label-memo{grid-column:1 / span 2}
         .ai-row{display:flex; gap:8px; align-items:center; margin-top:6px}
         .ai-btn{background:#2b65ff; border:0; color:#fff; border-radius:10px; padding:8px 10px; cursor:pointer}
@@ -78,7 +85,7 @@
         .viewer{position:relative; border:1px solid var(--line); border-radius:12px; overflow:hidden; background:#0d1320}
         .viewer img{width:100%; height:360px; object-fit:cover; display:block}
         .nav-btn{position:absolute; top:50%; transform:translateY(-50%); background:rgba(0,0,0,.45); border:1px solid #3a4760; color:#fff; padding:8px 10px; border-radius:10px; cursor:pointer}
-        .nav-prev{left:10px} .nav-next{right:10px}
+        .nav-prev{left:10px}.nav-next{right:10px}
         .info .row{display:flex; gap:8px; align-items:center; margin:6px 0}
         .info .k{color:#9aa3b2; font-size:13px; width:86px}
         .memo{white-space:pre-wrap}
@@ -116,80 +123,102 @@
                 <a class="action" id="actNew"><b>새로 등록</b></a>
             </div>
         </div>
-        <img alt="pet" src="https://images.unsplash.com/photo-1543466835-00a7907e9de1?q=80&w=1200&auto=format&fit=crop" style="width:100%; border-radius:20px; border:1px solid var(--line);">
+        <img alt="pet" src="https://images.unsplash.com/photo-1543466835-00a7907e9de1?q=80&w=1200&auto=format&fit=crop" style="width:100%; border-radius:20px; border:1px solid var(--line)">
     </section>
 
     <!-- TOOLBAR -->
     <div class="toolbar">
-        <div class="tool-input" style="flex:2"><input id="q" placeholder="이름/품종/장소 검색" /></div>
+        <div class="tool-input" style="flex:2"><input id="q" placeholder="이름/품종/장소 검색"/></div>
         <select id="status" class="tool-sel">
-            <option value="">상태 전체</option>
-            <option value="보호중">보호중</option>
-            <option value="입양대기">입양대기</option>
-            <option value="입양완료">입양완료</option>
+            <option value="">상태 전체</option><option value="보호중">보호중</option><option value="입양대기">입양대기</option><option value="입양완료">입양완료</option>
         </select>
         <select id="sort" class="tool-sel">
-            <option value="latest">최신순</option>
-            <option value="name">이름순</option>
-            <option value="age">나이 적은순</option>
+            <option value="latest">최신순</option><option value="name">이름순</option><option value="age">나이 적은순</option>
         </select>
         <button id="btnNew" class="tool-btn primary">등록</button>
     </div>
 
-    <!-- 숨김 안내 배지 -->
-    <div class="filters" hidden aria-hidden="true"></div>
-
     <!-- DASHBOARD -->
     <section class="charts">
-        <div class="panel">
-            <h5>【 상태별 유기견 현황 】</h5>
-            <canvas id="statusChart" height="150"></canvas>
-        </div>
-        <div class="panel">
-            <h5>【 품종별 유기견 현황 】</h5>
-            <canvas id="breedChart" height="150"></canvas>
-        </div>
+        <div class="panel"><h5>【 상태별 유기견 현황 】</h5><canvas id="statusChart" height="150"></canvas></div>
+        <div class="panel"><h5>【 품종별 유기견 현황 】</h5><canvas id="breedChart" height="150"></canvas></div>
     </section>
 
-    <!-- LIST -->
+    <!-- AI 추천 패널 -->
+    <section class="rec-panel">
+        <div class="rec-head">
+            <button id="recBtn" class="rec-btn">AI 추천 (3~5마리)</button>
+            <span class="rec-note">기본 자동 추천 · 아래 “세부 조건(선택)” 입력 후 다시 누르면 재추천</span>
+        </div>
+        <details class="rec-adv">
+            <summary>세부 조건(선택)</summary>
+            <div class="rec-grid">
+                <label>활동량
+                    <select id="f_activity">
+                        <option value="">선택 안함</option><option>낮음</option><option>보통</option><option>높음</option>
+                    </select>
+                </label>
+                <label>털 알러지 민감
+                    <select id="f_allergy">
+                        <option value="">선택 안함</option><option>민감</option><option>보통</option><option>해당없음</option>
+                    </select>
+                </label>
+                <label>선호 크기
+                    <select id="f_size">
+                        <option value="">선택 안함</option><option>소형</option><option>중형</option><option>대형</option>
+                    </select>
+                </label>
+                <label>성별 선호
+                    <select id="f_gender">
+                        <option value="">선택 안함</option><option>수컷</option><option>암컷</option>
+                    </select>
+                </label>
+                <label>성격 선호
+                    <select id="f_temper">
+                        <option value="">선택 안함</option><option>차분함</option><option>활발함</option><option>사교적</option><option>독립적</option>
+                    </select>
+                </label>
+                <label>초보견주 적합
+                    <select id="f_beginner">
+                        <option value="">선택 안함</option><option>원함</option><option>상관없음</option>
+                    </select>
+                </label>
+            </div>
+        </details>
+    </section>
+
+    <!-- 추천 결과 -->
+    <ul id="recList"></ul>
+
+    <!-- 일반 리스트 -->
     <ul id="list" class="grid"></ul>
 </div>
 
-<!-- EDIT/REGISTER MODAL -->
+<!-- 등록/수정 모달 -->
 <dialog id="petDialog">
     <form id="petForm" method="dialog" class="modal">
         <header id="dlgTitle">반려동물 등록</header>
         <div class="body">
-            <input type="hidden" id="petId" />
-            <label>이름<input id="name" required /></label>
-            <label>품종<input id="breed" placeholder="말티즈, 코숏 등" /></label>
+            <input type="hidden" id="petId"/>
+            <label>이름<input id="name" required/></label>
+            <label>품종<input id="breed" placeholder="말티즈, 코숏 등"/></label>
             <label>성별
-                <select id="gender">
-                    <option value="">선택</option>
-                    <option>수컷</option><option>암컷</option>
-                </select>
+                <select id="gender"><option value="">선택</option><option>수컷</option><option>암컷</option></select>
             </label>
-            <label>구조 장소<input id="found" placeholder="예: 경기도 시흥시" /></label>
-            <label>나이(살)<input id="age" type="number" min="0" step="1" /></label>
+            <label>구조 장소<input id="found" placeholder="예: 경기도 시흥시"/></label>
+            <label>나이(살)<input id="age" type="number" min="0" step="1"/></label>
             <label>상태
-                <select id="statusIn">
-                    <option>보호중</option>
-                    <option>입양대기</option>
-                    <option>입양완료</option>
-                </select>
+                <select id="statusIn"><option>보호중</option><option>입양대기</option><option>입양완료</option></select>
             </label>
-
-            <!-- 특징 + AI 버튼 -->
             <label class="label-memo">특징
                 <textarea id="memo" rows="5" placeholder="예: 귀엽고 사람을 잘 따르며 사료를 잘 먹어요."></textarea>
                 <div class="ai-row">
                     <button type="button" id="aiBtn" class="ai-btn">AI 글쓰기</button>
-                    <span class="ai-hint">짧은 키워드를 입력해 두고 누르면 4–5줄 홍보문으로 바꿔 줍니다.</span>
+                    <span class="ai-hint">키워드만 써두고 누르면 4–5줄 홍보문으로 바꿔줍니다.</span>
                 </div>
             </label>
-
             <label style="grid-column:1 / span 2">대표 이미지 (1장)
-                <input id="photoFile" type="file" accept="image/*" />
+                <input id="photoFile" type="file" accept="image/*"/>
             </label>
         </div>
         <footer>
@@ -199,7 +228,7 @@
     </form>
 </dialog>
 
-<!-- DETAIL MODAL -->
+<!-- 상세 모달 -->
 <dialog id="detailDialog" class="detail">
     <header>상세 보기</header>
     <div class="d-wrap">
@@ -216,10 +245,7 @@
             <div class="row"><div class="k">나이</div><div id="dAge" class="v"></div></div>
             <div class="row"><div class="k">상태</div><div id="dStatus" class="v"></div></div>
             <div class="row"><div class="k">등록일</div><div id="dReg" class="v"></div></div>
-            <div class="row" style="align-items:flex-start">
-                <div class="k">특징</div>
-                <div id="dMemo" class="v memo"></div>
-            </div>
+            <div class="row" style="align-items:flex-start"><div class="k">특징</div><div id="dMemo" class="v memo"></div></div>
             <div class="thumbs" id="dThumbs"></div>
         </div>
     </div>
@@ -231,10 +257,10 @@
     </footer>
 </dialog>
 
-<!-- LIST ITEM TEMPLATE -->
+<!-- 템플릿 -->
 <template id="itemTmpl">
     <li class="card">
-        <img class="thumb" alt="사진" />
+        <img class="thumb" alt="사진"/>
         <div class="meta">
             <h3 class="name"></h3>
             <div class="sub"></div>
@@ -251,309 +277,257 @@
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1"></script>
 <script>
-    /* ===== 백엔드 API ===== */
+    /* 서버 API */
     const API_BASE = 'http://localhost:8081';
     const DOGS = API_BASE + '/dogs';
     const UPLOAD_URL = API_BASE + '/uploads/';
 
-    /* ===== 🔑 데모용 OpenAI 키(로컬 발표만) =====
-       👉 아래 문자열에 본인 키를 붙여 넣으세요.
-       절대 깃/공유 금지! */
-    const OPENAI_API_KEY = '';
+    /* OpenAI 키: 여기에 넣으면 됨 */
+    const OPENAI_FALLBACK_KEY = ''; // ← 본인 키(로컬 데모)
 
-    /* ===== 엘리먼트 ===== */
-    const $ = (s)=>document.querySelector(s);
+    /* 엘리먼트 */
+    const $ = s => document.querySelector(s);
     const listEl=$("#list"), qEl=$("#q"), statusSel=$("#status"), sortSel=$("#sort");
     const dlg=$("#petDialog"), form=$("#petForm"), fileEl=$("#photoFile"),
         btnSave=$("#btnSave"), btnCancel=$("#btnCancel"),
         aiBtn=$("#aiBtn"), memoEl=$("#memo");
     const dDlg=$("#detailDialog"), dMain=$("#dMain"), dThumbs=$("#dThumbs");
+    const recBtn=$("#recBtn"), recList=$("#recList");
     const toast=$("#toast");
     let detailTargetId=null, gallery=[], gi=0;
 
-    /* ===== 유틸 ===== */
-    const showToast = (msg)=>{ toast.textContent = msg; toast.classList.add('show'); setTimeout(()=>toast.classList.remove('show'), 1500); };
-    const badgeClass = (s)=> s==="입양대기"?"badge wait": s==="입양완료"?"badge done":"badge keep";
-    const fmtDate = (iso)=> iso? new Date(iso).toLocaleDateString('ko-KR') : "";
-    const getId = (dto)=> dto?.dogId ?? dto?.id;
+    /* 유틸 */
+    const showToast = msg => { toast.textContent = msg; toast.classList.add('show'); setTimeout(()=>toast.classList.remove('show'), 1500); };
+    const badgeClass = s => s==="입양대기"?"badge wait": s==="입양완료"?"badge done":"badge keep";
+    const fmtDate = iso => iso? new Date(iso).toLocaleDateString('ko-KR') : "";
+    const getId = dto => dto?.dogId ?? dto?.id;
 
-    const fname = (path)=>{ if(!path) return ''; try{ const p=path.split('?')[0]; const seg=p.split('/'); return seg[segl=seg.length-1]||seg[seg.length-1]; }catch{return '';} };
-    const buildUploadUrl = (x)=> !x ? '' : (/^https?:\/\//i.test(x) ? x : (UPLOAD_URL + (x.split('/').pop())));
-    const firstImageUrl = (dto)=> Array.isArray(dto?.imageNames) && dto.imageNames[0] ? buildUploadUrl(dto.imageNames[0]) : (dto?.imageUrl?buildUploadUrl(dto.imageUrl):'');
-    const imageUrls = (dto)=> Array.isArray(dto?.imageNames)&&dto.imageNames.length? dto.imageNames.map(buildUploadUrl) : (dto?.imageUrl?[buildUploadUrl(dto.imageUrl)]:[]);
+    // 업로드 경로 유틸(오타 수정 포함)
+    const fname = (path) => {
+        if(!path) return '';
+        try { const p = String(path).split('?')[0]; const segs = p.split('/'); return segs[segs.length-1] || ''; }
+        catch { return ''; }
+    };
+    const buildUploadUrl = (maybe) => /^https?:\/\//i.test(maybe||'') ? maybe : (maybe ? (UPLOAD_URL + fname(maybe)) : '');
+    const firstImageUrl = d => Array.isArray(d?.imageNames)&&d.imageNames[0]? buildUploadUrl(d.imageNames[0]) : (d?.imageUrl?buildUploadUrl(d.imageUrl):'');
+    const imageUrls = d => Array.isArray(d?.imageNames)&&d.imageNames.length? d.imageNames.map(buildUploadUrl) : (d?.imageUrl?[buildUploadUrl(d.imageUrl)]:[]);
 
-    /* ===== 공통 fetch ===== */
-    async function req(url, opt={}) {
-        const res = await fetch(url, opt);
-        if(!res.ok){
-            const msg = await res.text().catch(()=>res.statusText);
-            throw new Error(msg||('HTTP '+res.status));
-        }
+    async function req(url,opt={}) {
+        const res = await fetch(url,opt);
+        if(!res.ok){ const msg = await res.text().catch(()=>res.statusText); throw new Error(msg||('HTTP '+res.status)) }
         if(res.status===204) return null;
         const ct = res.headers.get('content-type')||'';
-        return ct.includes('application/json') ? res.json() : res.text();
+        return ct.includes('application/json')? res.json() : res.text();
     }
 
-    /* ===== API 래퍼 ===== */
     const Dogs = {
-        list: (search, status, sort)=> req(`${DOGS}?search=${encodeURIComponent(search||'')}&status=${encodeURIComponent(status||'')}&sort=${encodeURIComponent(sort||'latest')}`),
-        get: (id)=> req(`${DOGS}/${id}`),
-        stats: ()=> req(`${DOGS}/statistics`),
-        create: (payload, file)=>{
-            const fd = new FormData();
-            fd.append('dog', JSON.stringify(payload));
-            if(file) fd.append('image', file);
-            return req(DOGS, {method:'POST', body:fd});
-        },
-        update: (id, payload, file)=>{
-            const fd = new FormData();
-            fd.append('dog', JSON.stringify(payload));
-            if(file) fd.append('image', file);
-            return req(`${DOGS}/${id}`, {method:'PUT', body:fd});
-        },
-        remove: (id)=> req(`${DOGS}/${id}`, {method:'DELETE'})
+        list:(s,st,so)=>req(`${DOGS}?search=${encodeURIComponent(s||'')}&status=${encodeURIComponent(st||'')}&sort=${encodeURIComponent(so||'latest')}`),
+        get:(id)=>req(`${DOGS}/${id}`),
+        stats:()=>req(`${DOGS}/statistics`),
+        create:(payload,file)=>{ const fd=new FormData(); fd.append('dog',JSON.stringify(payload)); if(file) fd.append('image',file); return req(DOGS,{method:'POST',body:fd}) },
+        update:(id,payload,file)=>{ const fd=new FormData(); fd.append('dog',JSON.stringify(payload)); if(file) fd.append('image',file); return req(`${DOGS}/${id}`,{method:'PUT',body:fd}) },
+        remove:(id)=>req(`${DOGS}/${id}`,{method:'DELETE'})
     };
 
-    /* ===== 리스트 렌더 ===== */
+    /* 리스트 렌더 */
     async function renderList(){
         const rows = await Dogs.list(qEl.value, statusSel.value, sortSel.value);
-        listEl.innerHTML = '';
-        const t = $("#itemTmpl").content;
+        listEl.innerHTML='';
+        const t=$("#itemTmpl").content;
         rows.forEach(p=>{
-            const n = document.importNode(t,true);
-            const img = n.querySelector('.thumb');
-            let src = firstImageUrl(p) || 'https://placehold.co/600x400?text=No+Image';
-            img.src = src.includes('placehold') ? src : `${src}?v=${Date.now()}`;
-            img.alt = p.name||'사진';
-            img.onerror = ()=>{ img.src='https://placehold.co/600x400?text=No+Image'; };
+            const n=document.importNode(t,true);
+            const img=n.querySelector('.thumb');
+            let src=firstImageUrl(p)||'https://placehold.co/600x400?text=No+Image';
+            img.src = src.includes('placehold')? src : `${src}?v=${Date.now()}`;
+            img.alt=p.name||'사진';
+            img.onerror=()=>{img.src='https://placehold.co/600x400?text=No+Image'};
             img.addEventListener('click',()=>openDetail(getId(p)));
-
-            n.querySelector('.name').textContent = p.name || '이름없음';
-            n.querySelector('.sub').textContent =
-                [p.breed, p.foundPlace, (Number.isFinite(p.age)?`${p.age}살`:null)].filter(Boolean).join(' · ');
-            const bd = n.querySelector('.badge');
-            bd.textContent = p.status || '보호중';
-            bd.className = badgeClass(p.status||'보호중');
-
+            n.querySelector('.name').textContent=p.name||'이름없음';
+            n.querySelector('.sub').textContent=[p.breed,p.foundPlace,(Number.isFinite(p.age)?`${p.age}살`:null)].filter(Boolean).join(' · ');
+            const bd=n.querySelector('.badge'); bd.textContent=p.status||'보호중'; bd.className=badgeClass(p.status||'보호중');
             n.querySelector('.edit').addEventListener('click',()=>openDialog(p));
             n.querySelector('.del').addEventListener('click',()=>onDelete(getId(p)));
             listEl.appendChild(n);
         });
     }
 
-    /* ===== 상세 ===== */
-    function setMain(idx){
-        if(!gallery.length){ dMain.src='https://placehold.co/800x600?text=No+Image'; return; }
-        gi = (idx+gallery.length)%gallery.length;
-        dMain.src = gallery[gi];
-    }
-    function buildThumbs(){
-        dThumbs.innerHTML='';
-        gallery.forEach((src,i)=>{
-            const im = new Image();
-            im.src=src; im.alt='thumb';
-            im.style.width='100%'; im.style.height='70px'; im.style.objectFit='cover';
-            im.addEventListener('click',()=>setMain(i));
-            dThumbs.appendChild(im);
-        });
-    }
+    /* 상세 */
+    function setMain(idx){ if(!gallery.length){ dMain.src='https://placehold.co/800x600?text=No+Image'; return } gi=(idx+gallery.length)%gallery.length; dMain.src=gallery[gi] }
+    function buildThumbs(){ dThumbs.innerHTML=''; gallery.forEach((src,i)=>{ const im=new Image(); im.src=src; im.alt='thumb'; im.style.width='100%'; im.style.height='70px'; im.style.objectFit='cover'; im.addEventListener('click',()=>setMain(i)); dThumbs.appendChild(im) }) }
     async function openDetail(id){
-        const p = await Dogs.get(id);
-        detailTargetId = id;
-        gallery = imageUrls(p);
-        setMain(0); buildThumbs();
-
-        $("#dName").textContent = p.name || '-';
-        $("#dBreed").textContent = p.breed || '-';
-        $("#dGender").textContent = p.gender || '-';
-        $("#dFound").textContent = p.foundPlace || '-';
-        $("#dAge").textContent = Number.isFinite(p.age)?`${p.age}살`:'-';
-        $("#dStatus").textContent = p.status || '-';
-        $("#dReg").textContent = fmtDate(p.regDate);
-        $("#dMemo").textContent = p.memo || '';
-        dDlg.showModal();
+        const p=await Dogs.get(id); detailTargetId=id; gallery=imageUrls(p); setMain(0); buildThumbs();
+        $("#dName").textContent=p.name||'-'; $("#dBreed").textContent=p.breed||'-'; $("#dGender").textContent=p.gender||'-';
+        $("#dFound").textContent=p.foundPlace||'-'; $("#dAge").textContent=Number.isFinite(p.age)?`${p.age}살`:'-';
+        $("#dStatus").textContent=p.status||'-'; $("#dReg").textContent=fmtDate(p.regDate); $("#dMemo").textContent=p.memo||''; dDlg.showModal();
     }
     $("#dPrev").addEventListener("click",()=>setMain(gi-1));
     $("#dNext").addEventListener("click",()=>setMain(gi+1));
     $("#dClose").addEventListener("click",()=>dDlg.close());
-    $("#dEdit").addEventListener("click",async ()=>{
-        if(!detailTargetId) return;
-        const dto = await Dogs.get(detailTargetId);
-        dDlg.close();
-        openDialog(dto);
-    });
-    $("#dDel").addEventListener("click",async ()=>{
-        if(!detailTargetId) return;
-        if(confirm("정말 삭제할까요?")){
-            await Dogs.remove(detailTargetId);
-            dDlg.close();
-            await renderList(); await loadCharts();
-            window.scrollTo(0,0);
-            showToast('삭제되었습니다.');
-        }
-    });
+    $("#dEdit").addEventListener("click",async()=>{ if(!detailTargetId) return; const dto=await Dogs.get(detailTargetId); dDlg.close(); openDialog(dto) });
+    $("#dDel").addEventListener("click",async()=>{ if(!detailTargetId) return; if(confirm("정말 삭제할까요?")){ await Dogs.remove(detailTargetId); dDlg.close(); await renderList(); await loadCharts(); window.scrollTo(0,0); showToast('삭제되었습니다.') } });
 
-    /* ===== 등록/수정 ===== */
+    /* 등록/수정 */
     function openDialog(p){
         form.reset();
-        $("#dlgTitle").textContent = p? "반려동물 수정" : "반려동물 등록";
-        $("#petId").value = getId(p) ?? '';
-        $("#name").value = p?.name ?? '';
-        $("#breed").value = p?.breed ?? '';
-        $("#gender").value = p?.gender ?? '';
-        $("#found").value = p?.foundPlace ?? '';
-        $("#age").value = Number.isFinite(p?.age)? p.age : '';
-        $("#statusIn").value = p?.status || '보호중';
-        $("#memo").value = p?.memo ?? '';
-        fileEl.value = '';
-        dlg.showModal();
+        $("#dlgTitle").textContent=p? "반려동물 수정":"반려동물 등록";
+        $("#petId").value=getId(p)??''; $("#name").value=p?.name??''; $("#breed").value=p?.breed??'';
+        $("#gender").value=p?.gender??''; $("#found").value=p?.foundPlace??''; $("#age").value=Number.isFinite(p?.age)?p.age:'';
+        $("#statusIn").value=p?.status||'보호중'; $("#memo").value=p?.memo??''; fileEl.value=''; dlg.showModal();
     }
-    btnCancel.addEventListener('click', ()=> dlg.close());
+    btnCancel.addEventListener('click',()=>dlg.close());
 
-    form.addEventListener('submit', async (e)=>{
+    form.addEventListener('submit',async e=>{
         e.preventDefault();
-        const id = $("#petId").value;
-        const payload = {
-            name: $("#name").value.trim(),
-            breed: $("#breed").value.trim(),
-            gender: $("#gender").value,
-            foundPlace: $("#found").value.trim(),
-            age: $("#age").value ? Number($("#age").value) : 0,
-            status: $("#statusIn").value,
-            memo: $("#memo").value.trim(),
-        };
-        if(!payload.name){ showToast('이름은 필수입니다.'); return; }
-
-        const file = fileEl.files?.[0];
-        btnSave.disabled = true;
-
+        const id=$("#petId").value;
+        const payload={ name:$("#name").value.trim(), breed:$("#breed").value.trim(), gender:$("#gender").value, foundPlace:$("#found").value.trim(), age:$("#age").value?Number($("#age").value):0, status:$("#statusIn").value, memo:$("#memo").value.trim() };
+        if(!payload.name){ showToast('이름은 필수입니다.'); return }
+        const file=fileEl.files?.[0]; btnSave.disabled=true;
         try{
-            if(id) await Dogs.update(id, payload, file);
-            else   await Dogs.create(payload, file);
-
-            dlg.close();
-            await new Promise(r=>setTimeout(r, 30));
-            await renderList();
-            await loadCharts();
-            window.scrollTo(0,0);
-            showToast('저장되었습니다.');
-        }catch(err){
-            alert(err.message || '저장 중 오류가 발생했습니다.');
-        }finally{
-            btnSave.disabled = false;
-        }
+            if(id) await Dogs.update(id,payload,file); else await Dogs.create(payload,file);
+            dlg.close(); await new Promise(r=>setTimeout(r,30)); await renderList(); await loadCharts(); window.scrollTo(0,0); showToast('저장되었습니다.');
+        }catch(err){ alert('저장 중 오류: '+(err.message||err)) } finally{ btnSave.disabled=false }
     });
 
-    /* ===== 삭제 ===== */
-    async function onDelete(id){
-        if(!confirm("정말 삭제할까요?")) return;
-        await Dogs.remove(id);
-        await renderList(); await loadCharts();
-        window.scrollTo(0,0);
-        showToast('삭제되었습니다.');
-    }
+    async function onDelete(id){ if(!confirm("정말 삭제할까요?")) return; await Dogs.remove(id); await renderList(); await loadCharts(); window.scrollTo(0,0); showToast('삭제되었습니다.') }
 
-    /* ===== 차트 ===== */
-    let statusChart, breedChart, chartTimer=null;
-    function makeStatusBar(labels, values){
-        const ctx = document.getElementById('statusChart');
-        if(statusChart) statusChart.destroy();
-        statusChart = new Chart(ctx, {
-            type:'bar',
-            data:{ labels, datasets:[{ label:'유기견 수', data:values }] },
-            options:{ responsive:true, plugins:{ legend:{ display:false } }, scales:{ y:{ beginAtZero:true } } }
-        });
-    }
-    function makeBreedPie(labels, values){
-        const ctx = document.getElementById('breedChart');
-        if(breedChart) breedChart.destroy();
-        breedChart = new Chart(ctx, {
-            type:'pie',
-            data:{ labels, datasets:[{ data:values }] },
-            options:{ responsive:true, plugins:{ legend:{ position:'bottom' } } }
-        });
-    }
-    async function loadCharts(){
-        const s = await Dogs.stats();
-        const order = ['보호중','입양대기','입양완료'];
-        const mapS = new Map((s.statusStats||[]).map(x=>[x.status, x.count]));
-        const sLabels = order;
-        const sValues = order.map(k=> Number(mapS.get(k)||0));
-        makeStatusBar(sLabels, sValues);
+    /* 차트 */
+    let statusChart,breedChart,chartTimer=null;
+    function makeStatusBar(labels,values){ const ctx=document.getElementById('statusChart'); if(statusChart) statusChart.destroy(); statusChart=new Chart(ctx,{type:'bar',data:{labels,datasets:[{label:'유기견 수',data:values}]},options:{responsive:true,plugins:{legend:{display:false}},scales:{y:{beginAtZero:true}}}}) }
+    function makeBreedPie(labels,values){ const ctx=document.getElementById('breedChart'); if(breedChart) breedChart.destroy(); breedChart=new Chart(ctx,{type:'pie',data:{labels,datasets:[{data:values}]},options:{responsive:true,plugins:{legend:{position:'bottom'}}}}) }
+    async function loadCharts(){ const s=await Dogs.stats(); const order=['보호중','입양대기','입양완료']; const mapS=new Map((s.statusStats||[]).map(x=>[x.status,x.count])); makeStatusBar(order,order.map(k=>Number(mapS.get(k)||0))); const bL=(s.breedStats||[]).map(x=>x.breed); const bV=(s.breedStats||[]).map(x=>Number(x.count||0)); makeBreedPie(bL,bV) }
+    function startAutoRefresh(){ clearInterval(chartTimer); chartTimer=setInterval(loadCharts,5000) }
 
-        const bLabels = (s.breedStats||[]).map(x=>x.breed);
-        const bValues = (s.breedStats||[]).map(x=>Number(x.count||0));
-        makeBreedPie(bLabels, bValues);
-    }
-    function startAutoRefresh(){ clearInterval(chartTimer); chartTimer = setInterval(loadCharts, 5000); }
+    /* OpenAI 키 헬퍼 */
+    function getKey(){ return localStorage.getItem('OPENAI_API_KEY') || OPENAI_FALLBACK_KEY || window.OPENAI_API_KEY || '' }
+    function setKey(k){ if(k) localStorage.setItem('OPENAI_API_KEY',k) }
+    async function ensureKey(){ let k=getKey(); if(!k){ const inKey=prompt('OpenAI API Key를 입력하세요 (로컬에 1회 저장됨):'); if(!inKey) throw new Error('API Key 필요'); setKey(inKey.trim()); k=getKey() } return k }
 
-    /* ===== 🔹 AI 글쓰기(키 하드코딩, 결과로 덮어쓰기) ===== */
+    /* AI 글쓰기 */
     async function aiWrite(){
-        if(!OPENAI_API_KEY || OPENAI_API_KEY.startsWith('REPLACE_')){
-            alert('OpenAI API Key가 설정되지 않았습니다. 코드 상단 OPENAI_API_KEY에 키를 넣어주세요.');
-            return;
-        }
-        const base = 'https://api.openai.com/v1/chat/completions';
-        const memo = memoEl.value.trim() || '귀엽고 사람을 잘 따르고 사료를 잘 먹음';
-        const name = $("#name").value.trim() || '아이';
-        const breed = $("#breed").value.trim() || '믹스';
-        const age = $("#age").value || '';
-        const gender = $("#gender").value || '';
-
-        const prompt = `다음 특징을 바탕으로 입양 홍보 문구 4~5줄을 한국어로 작성해줘.
+        try{ await ensureKey() }catch{ return }
+        const base='https://api.openai.com/v1/chat/completions';
+        const memo=memoEl.value.trim()||'귀엽고 사람을 잘 따르고 사료를 잘 먹음';
+        const name=$("#name").value.trim()||'아이';
+        const breed=$("#breed").value.trim()||'믹스';
+        const age=$("#age").value||''; const gender=$("#gender").value||'';
+        const prompt=`다음 특징을 바탕으로 입양 홍보 문구 4~5줄을 한국어로 작성해줘.
 - 이름: ${name}
 - 품종: ${breed}
 - 나이: ${age?age+'살':'정보없음'}
 - 성별: ${gender||'정보없음'}
 - 키워드/특징: ${memo}
 요구사항: 1) 따뜻하고 믿음 가는 톤, 2) 문장 4~5개, 3) 과장/거짓 금지, 4) 입양 문의를 자연스럽게 유도.`;
-
-        aiBtn.disabled = true; aiBtn.textContent = '작성 중…';
+        aiBtn.disabled=true; aiBtn.textContent='작성 중…';
         try{
-            const res = await fetch(base, {
+            const res=await fetch(base,{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+getKey()},body:JSON.stringify({model:'gpt-4o-mini',messages:[{role:'system',content:'You are a helpful assistant that writes concise Korean adoption blurbs.'},{role:'user',content:prompt}],temperature:0.8})});
+            if(!res.ok) throw new Error(await res.text());
+            const data=await res.json(); const text=data.choices?.[0]?.message?.content?.trim()||''; memoEl.value=text; showToast('AI 글쓰기가 적용되었습니다.');
+        }catch(err){ alert('AI 글쓰기 실패: '+(err.message||err)) } finally{ aiBtn.disabled=false; aiBtn.textContent='AI 글쓰기' }
+    }
+    aiBtn?.addEventListener('click',aiWrite);
+
+    /* AI 추천(하이브리드) */
+    function readFilters(){
+        const v = id => (document.getElementById(id)?.value || '').trim();
+        return {
+            activity: v('f_activity'),
+            allergy:  v('f_allergy'),
+            size:     v('f_size'),
+            gender:   v('f_gender'),
+            temper:   v('f_temper'),
+            beginner: v('f_beginner')
+        };
+    }
+    function compactDogs(rows){ return rows.map(r=>({ id:getId(r), name:r.name||'', breed:r.breed||'', gender:r.gender||'', age:Number.isFinite(r.age)?r.age:null, memo:(r.memo||'').slice(0,300), foundPlace:r.foundPlace, imageUrl:r.imageUrl, imageNames:r.imageNames })) }
+
+    // 백틱 코드펜스/앞뒤 잡설 방어 파서 + JSON 전용 요청 병행
+    function parseJsonLoose(text){
+        if(!text) return null;
+        const stripped = text.replace(/^```json\s*/i,'').replace(/^```\s*/i,'').replace(/```$/,'').trim();
+        try { return JSON.parse(stripped); } catch {}
+        const m = stripped.match(/\{[\s\S]*\}|\[[\s\S]*\]/);
+        if(m){ try{ return JSON.parse(m[0]); }catch{} }
+        return null;
+    }
+
+    function recCard(dog,reason){
+        const li=document.createElement('li'); li.className='card';
+        const img=document.createElement('img'); const src=firstImageUrl(dog)||'https://placehold.co/600x400?text=No+Image';
+        img.className='thumb'; img.src=src.includes('placehold')?src:`${src}?v=${Date.now()}`; img.alt=dog.name||'사진'; img.addEventListener('click',()=>openDetail(getId(dog)));
+        const meta=document.createElement('div'); meta.className='meta';
+        const h=document.createElement('h3'); h.className='name'; h.textContent=dog.name||'이름없음';
+        const sub=document.createElement('div'); sub.className='sub'; sub.textContent=[dog.breed,dog.foundPlace,Number.isFinite(dog.age)?`${dog.age}살`:null].filter(Boolean).join(' · ');
+        meta.append(h,sub);
+        const reasonDiv=document.createElement('div'); reasonDiv.className='rec-reason'; reasonDiv.textContent=reason||'';
+        li.append(img,meta,reasonDiv); return li;
+    }
+
+    async function aiRecommend(){
+        try{ await ensureKey() }catch{ return }
+        recBtn.disabled=true; recBtn.textContent='추천 중…';
+        try{
+            const all=await Dogs.list('','', 'latest');
+            const wait=all.filter(x=>x.status==='입양대기');
+            const pool=wait.length?wait:all;
+            if(!pool.length){ showToast('추천할 데이터가 없습니다.'); return }
+
+            const filters=readFilters();
+            const candidates=compactDogs(pool).slice(0,50);
+
+            const system=`You are a helpful assistant that recommends adoptable dogs for Korean users.
+Return STRICT JSON only in the following schema:
+{"recommendations":[{"id":<number>,"score":<0..100>,"title":"<short one-line>","reason":"<2~3 sentences in Korean>"}]}
+Rules: pick 3~5 items; id must be from provided candidates; reason must be kind and specific; no extra prose.`;
+
+            const user=`User preference (optional):
+${JSON.stringify(filters,null,2)}
+
+Candidates:
+${JSON.stringify(candidates,null,2)}
+`;
+
+            const res=await fetch('https://api.openai.com/v1/chat/completions',{
                 method:'POST',
-                headers:{
-                    'Content-Type':'application/json',
-                    'Authorization':'Bearer ' + OPENAI_API_KEY
-                },
-                body: JSON.stringify({
+                headers:{'Content-Type':'application/json','Authorization':'Bearer '+getKey()},
+                body:JSON.stringify({
                     model:'gpt-4o-mini',
-                    messages:[
-                        {role:'system', content:'You are a helpful assistant that writes concise Korean adoption blurbs.'},
-                        {role:'user', content: prompt}
-                    ],
-                    temperature:0.8
+                    messages:[{role:'system',content:system},{role:'user',content:user}],
+                    temperature:0.4,
+                    response_format:{ type:'json_object' } // ← JSON만 받기
                 })
             });
-            if(!res.ok){ throw new Error(await res.text()); }
-            const data = await res.json();
-            const text = data.choices?.[0]?.message?.content?.trim() || '';
-            memoEl.value = text;                 // ▶ 기존 내용 제거하고 결과만 반영
-            showToast('AI 글쓰기가 적용되었습니다.');
+            if(!res.ok) throw new Error(await res.text());
+            const data=await res.json();
+            // response_format 사용 시 content가 순수 JSON 문자열
+            const raw = data.choices?.[0]?.message?.content || '';
+            const json = parseJsonLoose(raw);
+            if(!json?.recommendations?.length) throw new Error('JSON 파싱 실패: '+raw);
+
+            const map=new Map(pool.map(p=>[getId(p),p]));
+            recList.innerHTML='';
+            json.recommendations.slice(0,5).forEach(rec=>{
+                const dog=map.get(rec.id);
+                if(dog) recList.appendChild(recCard(dog,`(${rec.score??'—'}점) ${rec.title||''}\n${rec.reason||''}`))
+            });
+            showToast('AI 추천을 업데이트했습니다.');
+            recList.scrollIntoView({behavior:'smooth',block:'start'});
         }catch(err){
-            alert('AI 글쓰기 실패: '+(err.message||err));
+            alert('AI 추천 실패: '+(err.message||err));
         }finally{
-            aiBtn.disabled = false; aiBtn.textContent = 'AI 글쓰기';
+            recBtn.disabled=false; recBtn.textContent='AI 추천 (3~5마리)';
         }
     }
-    aiBtn?.addEventListener('click', aiWrite);
+    recBtn.addEventListener('click',aiRecommend);
 
-    /* ===== 초기 구동 ===== */
-    document.addEventListener('DOMContentLoaded', async ()=>{
+    /* 초기 구동 */
+    document.addEventListener('DOMContentLoaded',async()=>{
         $("#btnNew").addEventListener("click",()=>openDialog());
         $("#actNew").addEventListener("click",()=>openDialog());
-        $("#actWait").addEventListener("click",()=>{ statusSel.value="입양대기"; renderList(); });
-        $("#actList").addEventListener("click",()=>{ statusSel.value=""; qEl.value=""; renderList(); });
-
-        qEl.addEventListener("input",renderList);
-        statusSel.addEventListener("change",renderList);
-        sortSel.addEventListener("change",renderList);
-
-        dlg.addEventListener('close', ()=> form.reset());
-
-        await renderList();
-        await loadCharts();
-        startAutoRefresh();
+        $("#actWait").addEventListener("click",()=>{ statusSel.value="입양대기"; renderList() });
+        $("#actList").addEventListener("click",()=>{ statusSel.value=""; qEl.value=""; renderList() });
+        qEl.addEventListener("input",renderList); statusSel.addEventListener("change",renderList); sortSel.addEventListener("change",renderList);
+        dlg.addEventListener('close',()=>form.reset());
+        await renderList(); await loadCharts(); startAutoRefresh();
     });
 </script>
 </body>
