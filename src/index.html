@@ -24,7 +24,7 @@
         .toolbar{display:flex; flex-wrap:wrap; gap:10px; align-items:center; margin:22px 0 6px}
         .tool-input{flex:1; min-width:200px; display:flex; align-items:center; gap:8px; background:#111725; border:1px solid #223046; color:var(--text); padding:10px 12px; border-radius:12px}
         .tool-input input{all:unset; flex:1}
-        .tool-sel,.tool-btn{background:#111725; border:1px solid #223046; color:#fff; padding:10px 12px; border-radius:12px}
+        .tool-sel,.tool-btn{background:#111725; border:1px solid #223046; color:var(--text); padding:10px 12px; border-radius:12px}
         .tool-btn{background:#223046; cursor:pointer}
         .tool-btn.primary{background:#2b65ff}
 
@@ -35,7 +35,7 @@
         .thumb{height:170px; width:100%; object-fit:cover; background:#0f1625; cursor:pointer}
         .meta{padding:14px}
         .name{margin:0; font-size:18px; font-weight:700}
-        .sub{margin:6px 0 8px; color:#muted; font-size:13px}
+        .sub{margin:6px 0 8px; color:var(--muted); font-size:13px}
         .badge{display:inline-block; padding:4px 9px; border-radius:999px; font-size:12px; border:1px solid #2a3548}
         .badge.wait{background:#2a3652; color:#cfe1ff}
         .badge.done{background:#233626; color:#b7f6be}
@@ -49,6 +49,7 @@
         .panel h5{margin:4px 8px 10px; color:#aab3c3; font-weight:700; font-size:13px}
         canvas{max-height:200px}
 
+        /* 추천 패널 */
         .rec-panel{background:var(--panel); border:1px solid var(--line); border-radius:16px; padding:14px; margin:16px 0 8px}
         .rec-head{display:flex; gap:10px; align-items:center; flex-wrap:wrap}
         .rec-btn{background:#2b65ff; border:none; color:#fff; border-radius:10px; padding:10px 12px; cursor:pointer}
@@ -64,6 +65,7 @@
         dialog::backdrop{background:rgba(0,0,0,.4)}
         dialog{border:none; border-radius:16px; padding:0; overflow:hidden}
 
+        /* 등록 모달 넓게 */
         .modal{background:#0f1420; color:#e6ecff; width:min(760px,96vw)}
         .modal header{padding:16px 18px; border-bottom:1px solid var(--line); font-weight:800}
         .modal .body{display:grid; grid-template-columns:1fr 1fr; gap:14px 18px; padding:16px 18px}
@@ -104,10 +106,11 @@
         }
     </style>
 
-    <!-- Chart.js -->
+    <!-- Chart.js (한 번만) -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1"></script>
 
-    <!-- Kakao Maps SDK (도메인 등록 + 본인 JS 키 필요) -->
+    <!-- Kakao Maps SDK: 반드시 본인 JavaScript 키로 교체 (REST 키 아님) -->
+    <!-- 사이트 도메인에 http://localhost:63342, http://localhost, http://127.0.0.1 등록 필요 -->
     <script src="https://dapi.kakao.com/v2/maps/sdk.js?appkey=키값&autoload=false&libraries=services"></script>
 </head>
 
@@ -222,9 +225,8 @@
                     <span class="ai-hint">키워드만 써두고 누르면 4–5줄 홍보문으로 바꿔줍니다.</span>
                 </div>
             </label>
-            <!-- 여러 장 업로드 (최대 5장) -->
-            <label style="grid-column:1 / span 2">이미지 (최대 5장)
-                <input id="photoFiles" type="file" accept="image/*" multiple />
+            <label style="grid-column:1 / span 2">대표 이미지 (1장)
+                <input id="photoFile" type="file" accept="image/*"/>
             </label>
         </div>
         <footer>
@@ -297,13 +299,13 @@
     const DOGS = API_BASE + '/dogs';
     const UPLOAD_URL = API_BASE + '/uploads/';
 
-    /* OpenAI 키 하드코딩 금지 (빈 값 유지) */
+    /* OpenAI 키는 하드코딩 금지! (빈 값 유지) */
     const OPENAI_FALLBACK_KEY = '';
 
     /* 엘리먼트 */
     const $ = s => document.querySelector(s);
     const listEl=$("#list"), qEl=$("#q"), statusSel=$("#status"), sortSel=$("#sort");
-    const dlg=$("#petDialog"), form=$("#petForm"), filesEl=$("#photoFiles"),
+    const dlg=$("#petDialog"), form=$("#petForm"), fileEl=$("#photoFile"),
         btnSave=$("#btnSave"), btnCancel=$("#btnCancel"),
         aiBtn=$("#aiBtn"), memoEl=$("#memo");
     const dDlg=$("#detailDialog"), dMain=$("#dMain"), dThumbs=$("#dThumbs");
@@ -335,25 +337,12 @@
         return ct.includes('application/json')? res.json() : res.text();
     }
 
-    /* 다중 이미지 업로드 */
     const Dogs = {
         list:(s,st,so)=>req(`${DOGS}?search=${encodeURIComponent(s||'')}&status=${encodeURIComponent(st||'')}&sort=${encodeURIComponent(so||'latest')}`),
         get:(id)=>req(`${DOGS}/${id}`),
         stats:()=>req(`${DOGS}/statistics`),
-
-        // 백엔드가 multipart에서 'images' 배열을 받는다고 가정
-        create:(payload, files=[])=>{
-            const fd=new FormData();
-            fd.append('dog', JSON.stringify(payload));
-            files.forEach(f => fd.append('images', f));
-            return req(DOGS,{method:'POST',body:fd});
-        },
-        update:(id, payload, files=[])=>{
-            const fd=new FormData();
-            fd.append('dog', JSON.stringify(payload));
-            files.forEach(f => fd.append('images', f));
-            return req(`${DOGS}/${id}`,{method:'PUT',body:fd});
-        },
+        create:(payload,file)=>{ const fd=new FormData(); fd.append('dog',JSON.stringify(payload)); if(file) fd.append('image',file); return req(DOGS,{method:'POST',body:fd}) },
+        update:(id,payload,file)=>{ const fd=new FormData(); fd.append('dog',JSON.stringify(payload)); if(file) fd.append('image',file); return req(`${DOGS}/${id}`,{method:'PUT',body:fd}) },
         remove:(id)=>req(`${DOGS}/${id}`,{method:'DELETE'})
     };
 
@@ -380,149 +369,59 @@
     }
 
     /* 상세 */
-    function setMain(idx){
-        if(!gallery.length){ dMain.src='https://placehold.co/800x600?text=No+Image'; return }
-        gi=(idx+gallery.length)%gallery.length; dMain.src=gallery[gi]
-    }
-    function buildThumbs(){
-        dThumbs.innerHTML='';
-        gallery.forEach((src,i)=>{
-            const im=new Image();
-            im.src=src; im.alt='thumb';
-            im.style.width='100%'; im.style.height='70px'; im.style.objectFit='cover';
-            im.addEventListener('click',()=>setMain(i));
-            dThumbs.appendChild(im)
-        })
-    }
+    function setMain(idx){ if(!gallery.length){ dMain.src='https://placehold.co/800x600?text=No+Image'; return } gi=(idx+gallery.length)%gallery.length; dMain.src=gallery[gi] }
+    function buildThumbs(){ dThumbs.innerHTML=''; gallery.forEach((src,i)=>{ const im=new Image(); im.src=src; im.alt='thumb'; im.style.width='100%'; im.style.height='70px'; im.style.objectFit='cover'; im.addEventListener('click',()=>setMain(i)); dThumbs.appendChild(im) }) }
 
     async function openDetail(id){
-        const p=await Dogs.get(id);
-        detailTargetId=id;
-        gallery=imageUrls(p);
-        setMain(0);
-        buildThumbs();
+        const p=await Dogs.get(id); detailTargetId=id; gallery=imageUrls(p); setMain(0); buildThumbs();
+        $("#dName").textContent=p.name||'-'; $("#dBreed").textContent=p.breed||'-'; $("#dGender").textContent=p.gender||'-';
+        $("#dFound").textContent=p.foundPlace||'-'; $("#dAge").textContent=Number.isFinite(p.age)?`${p.age}살`:'-';
+        $("#dStatus").textContent=p.status||'-'; $("#dReg").textContent=fmtDate(p.regDate); $("#dMemo").textContent=p.memo||'';
 
-        $("#dName").textContent=p.name||'-';
-        $("#dBreed").textContent=p.breed||'-';
-        $("#dGender").textContent=p.gender||'-';
-        $("#dFound").textContent=p.foundPlace||'-';
-        $("#dAge").textContent=Number.isFinite(p.age)?`${p.age}살`:'-';
-        $("#dStatus").textContent=p.status||'-';
-        $("#dReg").textContent=fmtDate(p.regDate);
-        $("#dMemo").textContent=p.memo||'';
-
+        // 1) 모달 먼저 표시
         dDlg.showModal();
+        // 2) 모달이 화면에 그려진 뒤 지도 렌더
         setTimeout(()=>renderKakaoMapByAddress(p.foundPlace||''),0);
     }
     $("#dPrev").addEventListener("click",()=>setMain(gi-1));
     $("#dNext").addEventListener("click",()=>setMain(gi+1));
     $("#dClose").addEventListener("click",()=>dDlg.close());
-    $("#dEdit").addEventListener("click",async()=>{
-        if(!detailTargetId) return;
-        const dto=await Dogs.get(detailTargetId);
-        dDlg.close();
-        openDialog(dto)
-    });
-    $("#dDel").addEventListener("click",async()=>{
-        if(!detailTargetId) return;
-        if(confirm("정말 삭제할까요?")){
-            await Dogs.remove(detailTargetId);
-            dDlg.close();
-            await renderList(); await loadCharts();
-            window.scrollTo(0,0);
-            showToast('삭제되었습니다.')
-        }
-    });
+    $("#dEdit").addEventListener("click",async()=>{ if(!detailTargetId) return; const dto=await Dogs.get(detailTargetId); dDlg.close(); openDialog(dto) });
+    $("#dDel").addEventListener("click",async()=>{ if(!detailTargetId) return; if(confirm("정말 삭제할까요?")){ await Dogs.remove(detailTargetId); dDlg.close(); await renderList(); await loadCharts(); window.scrollTo(0,0); showToast('삭제되었습니다.') } });
 
     /* 등록/수정 */
     function openDialog(p){
         form.reset();
         $("#dlgTitle").textContent=p? "반려동물 수정":"반려동물 등록";
-        $("#petId").value=getId(p)??'';
-        $("#name").value=p?.name??'';
-        $("#breed").value=p?.breed??'';
-        $("#gender").value=p?.gender??'';
-        $("#found").value=p?.foundPlace??'';
-        $("#age").value=Number.isFinite(p?.age)?p.age:'';
-        $("#statusIn").value=p?.status||'보호중';
-        $("#memo").value=p?.memo??'';
-        filesEl.value='';
+        $("#petId").value=getId(p)??''; $("#name").value=p?.name??''; $("#breed").value=p?.breed??'';
+        $("#gender").value=p?.gender??''; $("#found").value=p?.foundPlace??''; $("#age").value=Number.isFinite(p?.age)?p.age:'';
+        $("#statusIn").value=p?.status||'보호중'; $("#memo").value=p?.memo??''; fileEl.value='';
         dlg.showModal();
     }
     btnCancel.addEventListener('click',()=>dlg.close());
 
-    // 선택 제한(최대 5장)
-    filesEl.addEventListener('change', ()=>{
-        if(filesEl.files.length>5){
-            const arr = Array.from(filesEl.files).slice(0,5);
-            const dt = new DataTransfer();
-            arr.forEach(f=>dt.items.add(f));
-            filesEl.files = dt.files;
-            showToast('이미지는 최대 5장까지 업로드됩니다.');
-        }
-    });
-
     form.addEventListener('submit',async e=>{
         e.preventDefault();
         const id=$("#petId").value;
-        const payload={
-            name:$("#name").value.trim(),
-            breed:$("#breed").value.trim(),
-            gender:$("#gender").value,
-            foundPlace:$("#found").value.trim(),
-            age:$("#age").value?Number($("#age").value):0,
-            status:$("#statusIn").value,
-            memo:$("#memo").value.trim()
-        };
+        const payload={ name:$("#name").value.trim(), breed:$("#breed").value.trim(), gender:$("#gender").value, foundPlace:$("#found").value.trim(), age:$("#age").value?Number($("#age").value):0, status:$("#statusIn").value, memo:$("#memo").value.trim() };
         if(!payload.name){ showToast('이름은 필수입니다.'); return }
-        const files = Array.from(filesEl.files || []); // 여러 장(최대 5장)
-        btnSave.disabled=true;
+        const file=fileEl.files?.[0]; btnSave.disabled=true;
         try{
-            if(id) await Dogs.update(id,payload,files); else await Dogs.create(payload,files);
-            dlg.close();
-            await new Promise(r=>setTimeout(r,30));
-            await renderList(); await loadCharts();
-            window.scrollTo(0,0);
-            showToast('저장되었습니다.');
-        }catch(err){
-            alert('저장 중 오류: '+(err.message||err));
-        } finally{
-            btnSave.disabled=false;
-        }
+            if(id) await Dogs.update(id,payload,file); else await Dogs.create(payload,file);
+            dlg.close(); await new Promise(r=>setTimeout(r,30)); await renderList(); await loadCharts(); window.scrollTo(0,0); showToast('저장되었습니다.');
+        }catch(err){ alert('저장 중 오류: '+(err.message||err)) } finally{ btnSave.disabled=false }
     });
 
-    async function onDelete(id){
-        if(!confirm("정말 삭제할까요?")) return;
-        await Dogs.remove(id);
-        await renderList(); await loadCharts();
-        window.scrollTo(0,0);
-        showToast('삭제되었습니다.');
-    }
+    async function onDelete(id){ if(!confirm("정말 삭제할까요?")) return; await Dogs.remove(id); await renderList(); await loadCharts(); window.scrollTo(0,0); showToast('삭제되었습니다.') }
 
     /* 차트 */
     let statusChart,breedChart,chartTimer=null;
-    function makeStatusBar(labels,values){
-        const ctx=document.getElementById('statusChart');
-        if(statusChart) statusChart.destroy();
-        statusChart=new Chart(ctx,{type:'bar',data:{labels,datasets:[{label:'유기견 수',data:values}]},options:{responsive:true,plugins:{legend:{display:false}},scales:{y:{beginAtZero:true}}}});
-    }
-    function makeBreedPie(labels,values){
-        const ctx=document.getElementById('breedChart');
-        if(breedChart) breedChart.destroy();
-        breedChart=new Chart(ctx,{type:'pie',data:{labels,datasets:[{data:values}]},options:{responsive:true,plugins:{legend:{position:'bottom'}}}});
-    }
-    async function loadCharts(){
-        const s=await Dogs.stats();
-        const order=['보호중','입양대기','입양완료'];
-        const mapS=new Map((s.statusStats||[]).map(x=>[x.status,x.count]));
-        makeStatusBar(order,order.map(k=>Number(mapS.get(k)||0)));
-        const bL=(s.breedStats||[]).map(x=>x.breed);
-        const bV=(s.breedStats||[]).map(x=>Number(x.count||0));
-        makeBreedPie(bL,bV);
-    }
+    function makeStatusBar(labels,values){ const ctx=document.getElementById('statusChart'); if(statusChart) statusChart.destroy(); statusChart=new Chart(ctx,{type:'bar',data:{labels,datasets:[{label:'유기견 수',data:values}]},options:{responsive:true,plugins:{legend:{display:false}},scales:{y:{beginAtZero:true}}}}); }
+    function makeBreedPie(labels,values){ const ctx=document.getElementById('breedChart'); if(breedChart) breedChart.destroy(); breedChart=new Chart(ctx,{type:'pie',data:{labels,datasets:[{data:values}]},options:{responsive:true,plugins:{legend:{position:'bottom'}}}}); }
+    async function loadCharts(){ const s=await Dogs.stats(); const order=['보호중','입양대기','입양완료']; const mapS=new Map((s.statusStats||[]).map(x=>[x.status,x.count])); makeStatusBar(order,order.map(k=>Number(mapS.get(k)||0))); const bL=(s.breedStats||[]).map(x=>x.breed); const bV=(s.breedStats||[]).map(x=>Number(x.count||0)); makeBreedPie(bL,bV) }
     function startAutoRefresh(){ clearInterval(chartTimer); chartTimer=setInterval(loadCharts,5000) }
 
-    /* OpenAI 키 헬퍼 */
+    /* OpenAI 키 헬퍼 (로컬 테스트 시 프롬프트로 입력) */
     function getKey(){ return localStorage.getItem('OPENAI_API_KEY') || OPENAI_FALLBACK_KEY || window.OPENAI_API_KEY || '' }
     function setKey(k){ if(k) localStorage.setItem('OPENAI_API_KEY',k) }
     async function ensureKey(){ let k=getKey(); if(!k){ const inKey=prompt('OpenAI API Key를 입력하세요 (로컬에 1회 저장됨):'); if(!inKey) throw new Error('API Key 필요'); setKey(inKey.trim()); k=getKey() } return k }
@@ -547,12 +446,11 @@
             const res=await fetch(base,{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+getKey()},body:JSON.stringify({model:'gpt-4o-mini',messages:[{role:'system',content:'You are a helpful assistant that writes concise Korean adoption blurbs.'},{role:'user',content:prompt}],temperature:0.8})});
             if(!res.ok) throw new Error(await res.text());
             const data=await res.json(); const text=data.choices?.[0]?.message?.content?.trim()||''; memoEl.value=text; showToast('AI 글쓰기가 적용되었습니다.');
-        }catch(err){ alert('AI 글쓰기 실패: '+(err.message||err)) }
-        finally{ aiBtn.disabled=false; aiBtn.textContent='AI 글쓰기' }
+        }catch(err){ alert('AI 글쓰기 실패: '+(err.message||err)) } finally{ aiBtn.disabled=false; aiBtn.textContent='AI 글쓰기' }
     }
     aiBtn?.addEventListener('click',aiWrite);
 
-    /* AI 추천 */
+    /* AI 추천(하이브리드) */
     function readFilters(){
         const v = id => (document.getElementById(id)?.value || '').trim();
         return { activity: v('f_activity'), allergy: v('f_allergy'), size: v('f_size'), gender: v('f_gender'), temper: v('f_temper'), beginner: v('f_beginner') };
@@ -632,7 +530,7 @@ ${JSON.stringify(candidates,null,2)}
     }
     recBtn.addEventListener('click',aiRecommend);
 
-    /* Kakao 지도 렌더 (autoload=false) */
+    /* Kakao 지도 렌더 (autoload=false + 공식 로더) */
     function renderKakaoMapByAddress(addr){
         const mapEl = document.getElementById('dMap');
         const msgEl = document.getElementById('dMapMsg');
@@ -648,7 +546,7 @@ ${JSON.stringify(candidates,null,2)}
                     const coords = new kakao.maps.LatLng(result[0].y, result[0].x);
                     map.setCenter(coords);
                     new kakao.maps.Marker({ map, position: coords });
-                    map.relayout();
+                    map.relayout(); // 모달 표시 후 레이아웃 보정
                 }else{
                     msgEl.textContent = '지오코딩 실패(주소를 확인해주세요).';
                 }
@@ -662,12 +560,13 @@ ${JSON.stringify(candidates,null,2)}
         $("#actNew").addEventListener("click",()=>openDialog());
         $("#actWait").addEventListener("click",()=>{ statusSel.value="입양대기"; renderList() });
         $("#actList").addEventListener("click",()=>{ statusSel.value=""; qEl.value=""; renderList() });
-        qEl.addEventListener("input",renderList);
-        statusSel.addEventListener("change",renderList);
-        sortSel.addEventListener("change",renderList);
+        qEl.addEventListener("input",renderList); statusSel.addEventListener("change",renderList); sortSel.addEventListener("change",renderList);
         dlg.addEventListener('close',()=>form.reset());
         await renderList(); await loadCharts(); startAutoRefresh();
     });
 </script>
 </body>
 </html>
+
+
+
