@@ -1,14 +1,9 @@
 package org.likelion.hsu.db_major.Service;
 
 import lombok.RequiredArgsConstructor;
-import org.likelion.hsu.db_major.Dto.DogRequestDto;
-import org.likelion.hsu.db_major.Dto.DogResponseDto;
-import org.likelion.hsu.db_major.Entity.Dog;
-import org.likelion.hsu.db_major.Entity.DogDetail;
-import org.likelion.hsu.db_major.Entity.DogImage;
-import org.likelion.hsu.db_major.Repository.DogDetailRepository;
-import org.likelion.hsu.db_major.Repository.DogImageRepository;
-import org.likelion.hsu.db_major.Repository.DogRepository;
+import org.likelion.hsu.db_major.Dto.*;
+import org.likelion.hsu.db_major.Entity.*;
+import org.likelion.hsu.db_major.Repository.*;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -29,7 +24,6 @@ public class DogService {
 
     @Value("${file.upload-dir}")
     private String uploadDir;
-
 
     // ✅ 등록 (여러 장 이미지 업로드)
     public DogResponseDto createDog(DogRequestDto dto, List<MultipartFile> images) throws IOException {
@@ -85,18 +79,15 @@ public class DogService {
         return getDogById(dogId);
     }
 
-
-    // ✅ 전체 조회
+    // ✅ 전체 조회 (검색 + 정렬 + 필터)
     public List<DogResponseDto> getAllDogs(String search, String status, String sort) {
         return dogRepository.findAllWithConditions(search, status, sort).stream()
                 .map(d -> getDogById(d.getDogId()))
                 .collect(Collectors.toList());
     }
 
-
     // ✅ 상세 조회
     public DogResponseDto getDogById(Long id) {
-
         Dog dog = dogRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("해당 유기견 정보를 찾을 수 없습니다."));
 
@@ -117,36 +108,32 @@ public class DogService {
                 .build();
     }
 
-
     // ✅ 수정 (여러 장 이미지 업로드)
     public DogResponseDto updateDog(Long id, DogRequestDto dto, List<MultipartFile> images) throws IOException {
 
         Dog existingDog = dogRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("해당 유기견 정보를 찾을 수 없습니다."));
 
-        // 대표 이미지 교체
+        // 기존 이미지 전체 삭제
+        dogImageRepository.deleteByDogId(id);
+
+        // 대표 이미지명 기본값 = 기존 대표 이미지 (새 이미지 없을 때 대비)
+        String mainImageName = existingDog.getImageName();
+
+        // 대표 이미지 교체 + 새 이미지 전체 저장
         if (images != null && !images.isEmpty()) {
 
-            MultipartFile first = images.get(0);
+            for (int i = 0; i < images.size(); i++) {
 
-            if (!first.isEmpty()) {
-                String newMain = saveImage(first);
-                existingDog.setImageName(newMain);
-
-                // 대표 이미지도 dog_image 테이블에 추가
-                DogImage mainImageRecord = DogImage.builder()
-                        .fileName(newMain)
-                        .filePath(uploadDir + "/" + newMain)
-                        .uploadDate(LocalDateTime.now())
-                        .build();
-
-                dogImageRepository.save(mainImageRecord, id);
-            }
-
-            // 추가 이미지들 저장
-            for (MultipartFile file : images) {
+                MultipartFile file = images.get(i);
                 if (file.isEmpty()) continue;
+
                 String fileName = saveImage(file);
+
+                // 첫 번째 이미지를 대표 이미지로 설정
+                if (i == 0) {
+                    mainImageName = fileName;
+                }
 
                 DogImage img = DogImage.builder()
                         .fileName(fileName)
@@ -164,6 +151,7 @@ public class DogService {
         existingDog.setAge(dto.getAge());
         existingDog.setStatus(dto.getStatus());
         existingDog.setGender(dto.getGender());
+        existingDog.setImageName(mainImageName);
 
         dogRepository.update(id, existingDog);
 
@@ -178,14 +166,12 @@ public class DogService {
         return getDogById(id);
     }
 
-
     // ✅ 삭제
     public void deleteDog(Long id) {
         dogImageRepository.deleteByDogId(id);
         dogDetailRepository.deleteByDogId(id);
         dogRepository.delete(id);
     }
-
 
     // ✅ 이미지 저장 (재사용)
     private String saveImage(MultipartFile file) throws IOException {
@@ -205,8 +191,7 @@ public class DogService {
         return uniqueName;
     }
 
-
-    // ✅ 통계
+    // ✅ 통계 (대시보드용)
     public Map<String, Object> getStatistics() {
         Map<String, Object> stats = new HashMap<>();
         stats.put("statusStats", dogRepository.getStatusStats());
