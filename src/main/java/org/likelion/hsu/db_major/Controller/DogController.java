@@ -21,22 +21,26 @@ public class DogController {
     private final DogService dogService;
     private final ObjectMapper objectMapper = new ObjectMapper();
 
+
     /**
-     * ✅ 등록 (JSON + 이미지 업로드)
-     * - Postman에서 form-data로 "dog" JSON과 "image" 파일을 함께 전송
+     * ✅ 등록 (JSON + 다중 이미지 업로드)
+     * - Postman: form-data
+     *   dog -> JSON 문자열
+     *   images -> File (여러 장 가능)
      */
     @PostMapping(consumes = { MediaType.MULTIPART_FORM_DATA_VALUE })
-    public DogResponseDto createDog(@RequestPart("dog") String dogJson,
-                                    @RequestPart(value = "image", required = false) MultipartFile imageFile)
-            throws IOException {
+    public DogResponseDto createDog(
+            @RequestPart("dog") String dogJson,
+            @RequestPart(value = "images", required = false) List<MultipartFile> images
+    ) throws IOException {
 
         DogRequestDto dto = objectMapper.readValue(dogJson, DogRequestDto.class);
-        return dogService.createDog(dto, imageFile);
+        return dogService.createDog(dto, images);
     }
+
 
     /**
      * ✅ 전체 조회 (검색 + 정렬 + 필터 지원)
-     * - /dogs?search=비숑&status=보호중&sort=age
      */
     @GetMapping
     public List<DogResponseDto> getAllDogs(
@@ -47,6 +51,7 @@ public class DogController {
         return dogService.getAllDogs(search, status, sort);
     }
 
+
     /**
      * ✅ 상세 조회
      */
@@ -55,18 +60,22 @@ public class DogController {
         return dogService.getDogById(id);
     }
 
+
     /**
-     * ✅ 수정
+     * ✅ 수정 (JSON + 다중 이미지 업로드)
+     * - 기존 이미지 삭제 후 새 이미지 저장하는 방식은 Service에서 처리
      */
     @PutMapping(value = "/{id}", consumes = { MediaType.MULTIPART_FORM_DATA_VALUE })
-    public DogResponseDto updateDog(@PathVariable Long id,
-                                    @RequestPart("dog") String dogJson,
-                                    @RequestPart(value = "image", required = false) MultipartFile imageFile)
-            throws IOException {
+    public DogResponseDto updateDog(
+            @PathVariable Long id,
+            @RequestPart("dog") String dogJson,
+            @RequestPart(value = "images", required = false) List<MultipartFile> images
+    ) throws IOException {
 
         DogRequestDto dto = objectMapper.readValue(dogJson, DogRequestDto.class);
-        return dogService.updateDog(id, dto, imageFile);
+        return dogService.updateDog(id, dto, images);
     }
+
 
     /**
      * ✅ 삭제
@@ -76,14 +85,9 @@ public class DogController {
         dogService.deleteDog(id);
     }
 
+
     /**
-     * ✅ 통계 대시보드 API
-     * - 상태별 / 품종별 유기견 현황 통계 제공
-     * - 예시 응답:
-     *   {
-     *     "statusStats": [ {"status":"보호중","count":12}, {"status":"입양대기","count":7}, {"status":"입양완료","count":5} ],
-     *     "breedStats": [ {"breed":"푸들","count":8}, {"breed":"말티즈","count":6}, {"breed":"믹스","count":7} ]
-     *   }
+     * ✅ 통계 데이터
      */
     @GetMapping("/statistics")
     public Map<String, Object> getStatistics() {
