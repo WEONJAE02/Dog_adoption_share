@@ -106,17 +106,16 @@
         }
     </style>
 
-    <!-- Chart.js (한 번만) -->
+    <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1"></script>
 
-    <!-- Kakao Maps SDK: 반드시 본인 JavaScript 키로 교체 (REST 키 아님) -->
-    <!-- 사이트 도메인에 http://localhost:63342, http://localhost, http://127.0.0.1 등록 필요 -->
-    <script src="https://dapi.kakao.com/v2/maps/sdk.js?appkey=키값&autoload=false&libraries=services"></script>
+    <!-- Kakao Maps SDK (키/방식 그대로 유지) -->
+    <script src="https://dapi.kakao.com/v2/maps/sdk.js?appkey=&autoload=false&libraries=services"></script>
 </head>
 
 <body>
 <div class="container">
-    <!-- HERO -->
+    <!-- HERO ... (생략: 그대로) -->
     <section class="hero">
         <div>
             <h1 class="title">PET ROOM<br><span style="color:var(--brand)">Finding a family</span> that suits me</h1>
@@ -134,7 +133,7 @@
         <img alt="pet" src="https://images.unsplash.com/photo-1543466835-00a7907e9de1?q=80&w=1200&auto=format&fit=crop" style="width:100%; border-radius:20px; border:1px solid var(--line)">
     </section>
 
-    <!-- TOOLBAR -->
+    <!-- TOOLBAR ... (그대로) -->
     <div class="toolbar">
         <div class="tool-input" style="flex:2"><input id="q" placeholder="이름/품종/장소 검색"/></div>
         <select id="status" class="tool-sel">
@@ -146,13 +145,12 @@
         <button id="btnNew" class="tool-btn primary">등록</button>
     </div>
 
-    <!-- DASHBOARD -->
+    <!-- 대시보드/추천/리스트 ... (그대로) -->
     <section class="charts">
         <div class="panel"><h5>【 상태별 유기견 현황 】</h5><canvas id="statusChart" height="150"></canvas></div>
         <div class="panel"><h5>【 품종별 유기견 현황 】</h5><canvas id="breedChart" height="150"></canvas></div>
     </section>
 
-    <!-- AI 추천 패널 -->
     <section class="rec-panel">
         <div class="rec-head">
             <button id="recBtn" class="rec-btn">AI 추천 (3~5마리)</button>
@@ -162,43 +160,28 @@
             <summary>세부 조건(선택)</summary>
             <div class="rec-grid">
                 <label>활동량
-                    <select id="f_activity">
-                        <option value="">선택 안함</option><option>낮음</option><option>보통</option><option>높음</option>
-                    </select>
+                    <select id="f_activity"><option value="">선택 안함</option><option>낮음</option><option>보통</option><option>높음</option></select>
                 </label>
                 <label>털 알러지 민감
-                    <select id="f_allergy">
-                        <option value="">선택 안함</option><option>민감</option><option>보통</option><option>해당없음</option>
-                    </select>
+                    <select id="f_allergy"><option value="">선택 안함</option><option>민감</option><option>보통</option><option>해당없음</option></select>
                 </label>
                 <label>선호 크기
-                    <select id="f_size">
-                        <option value="">선택 안함</option><option>소형</option><option>중형</option><option>대형</option>
-                    </select>
+                    <select id="f_size"><option value="">선택 안함</option><option>소형</option><option>중형</option><option>대형</option></select>
                 </label>
                 <label>성별 선호
-                    <select id="f_gender">
-                        <option value="">선택 안함</option><option>수컷</option><option>암컷</option>
-                    </select>
+                    <select id="f_gender"><option value="">선택 안함</option><option>수컷</option><option>암컷</option></select>
                 </label>
                 <label>성격 선호
-                    <select id="f_temper">
-                        <option value="">선택 안함</option><option>차분함</option><option>활발함</option><option>사교적</option><option>독립적</option>
-                    </select>
+                    <select id="f_temper"><option value="">선택 안함</option><option>차분함</option><option>활발함</option><option>사교적</option><option>독립적</option></select>
                 </label>
                 <label>초보견주 적합
-                    <select id="f_beginner">
-                        <option value="">선택 안함</option><option>원함</option><option>상관없음</option>
-                    </select>
+                    <select id="f_beginner"><option value="">선택 안함</option><option>원함</option><option>상관없음</option></select>
                 </label>
             </div>
         </details>
     </section>
 
-    <!-- 추천 결과 -->
     <ul id="recList"></ul>
-
-    <!-- 일반 리스트 -->
     <ul id="list" class="grid"></ul>
 </div>
 
@@ -225,8 +208,12 @@
                     <span class="ai-hint">키워드만 써두고 누르면 4–5줄 홍보문으로 바꿔줍니다.</span>
                 </div>
             </label>
-            <label style="grid-column:1 / span 2">대표 이미지 (1장)
-                <input id="photoFile" type="file" accept="image/*"/>
+
+            <!-- ✅ 변경: 여러 장 업로드 + 미리보기 -->
+            <label style="grid-column:1 / span 2">사진 (최대 5장)
+                <input id="photoFiles" type="file" accept="image/*" multiple />
+                <small id="selHint" style="color:#9aa3b2;margin-top:6px">선택: 0장</small>
+                <div id="selPreview" class="thumbs"></div>
             </label>
         </div>
         <footer>
@@ -236,7 +223,7 @@
     </form>
 </dialog>
 
-<!-- 상세 모달 -->
+<!-- 상세 모달 (그대로) -->
 <dialog id="detailDialog" class="detail">
     <header>상세 보기</header>
     <div class="d-wrap">
@@ -254,8 +241,6 @@
             <div class="row"><div class="k">상태</div><div id="dStatus" class="v"></div></div>
             <div class="row"><div class="k">등록일</div><div id="dReg" class="v"></div></div>
             <div class="row" style="align-items:flex-start"><div class="k">특징</div><div id="dMemo" class="v memo"></div></div>
-
-            <!-- 지도 -->
             <div class="row" style="align-items:flex-start">
                 <div class="k">지도</div>
                 <div class="v" style="flex:1">
@@ -263,7 +248,6 @@
                     <div id="dMapMsg" style="margin-top:6px;color:#9aa3b2;font-size:12px"></div>
                 </div>
             </div>
-
             <div class="thumbs" id="dThumbs"></div>
         </div>
     </div>
@@ -275,7 +259,6 @@
     </footer>
 </dialog>
 
-<!-- 템플릿 -->
 <template id="itemTmpl">
     <li class="card">
         <img class="thumb" alt="사진"/>
@@ -299,13 +282,14 @@
     const DOGS = API_BASE + '/dogs';
     const UPLOAD_URL = API_BASE + '/uploads/';
 
-    /* OpenAI 키는 하드코딩 금지! (빈 값 유지) */
+    /* OpenAI 키 보관 방식 유지 */
     const OPENAI_FALLBACK_KEY = '';
 
     /* 엘리먼트 */
     const $ = s => document.querySelector(s);
     const listEl=$("#list"), qEl=$("#q"), statusSel=$("#status"), sortSel=$("#sort");
-    const dlg=$("#petDialog"), form=$("#petForm"), fileEl=$("#photoFile"),
+    const dlg=$("#petDialog"), form=$("#petForm"),
+        filesEl=$("#photoFiles"), selPrev=$("#selPreview"), selHint=$("#selHint"),
         btnSave=$("#btnSave"), btnCancel=$("#btnCancel"),
         aiBtn=$("#aiBtn"), memoEl=$("#memo");
     const dDlg=$("#detailDialog"), dMain=$("#dMain"), dThumbs=$("#dThumbs");
@@ -337,16 +321,31 @@
         return ct.includes('application/json')? res.json() : res.text();
     }
 
+    /* ✅ 변경: 파일 배열을 받도록 수정, 'images'로 여러 번 append (+호환을 위해 첫 장은 'image'도 같이) */
     const Dogs = {
         list:(s,st,so)=>req(`${DOGS}?search=${encodeURIComponent(s||'')}&status=${encodeURIComponent(st||'')}&sort=${encodeURIComponent(so||'latest')}`),
         get:(id)=>req(`${DOGS}/${id}`),
         stats:()=>req(`${DOGS}/statistics`),
-        create:(payload,file)=>{ const fd=new FormData(); fd.append('dog',JSON.stringify(payload)); if(file) fd.append('image',file); return req(DOGS,{method:'POST',body:fd}) },
-        update:(id,payload,file)=>{ const fd=new FormData(); fd.append('dog',JSON.stringify(payload)); if(file) fd.append('image',file); return req(`${DOGS}/${id}`,{method:'PUT',body:fd}) },
+        create:(payload,files=[])=>{
+            const fd=new FormData();
+            fd.append('dog',JSON.stringify(payload));
+            const arr=Array.isArray(files)?files:[];
+            arr.slice(0,5).forEach(f=>fd.append('images',f));
+            if(arr[0]) fd.append('image',arr[0]); // 백엔드 레거시 호환
+            return req(DOGS,{method:'POST',body:fd});
+        },
+        update:(id,payload,files=[])=>{
+            const fd=new FormData();
+            fd.append('dog',JSON.stringify(payload));
+            const arr=Array.isArray(files)?files:[];
+            arr.slice(0,5).forEach(f=>fd.append('images',f));
+            if(arr[0]) fd.append('image',arr[0]); // 백엔드 레거시 호환
+            return req(`${DOGS}/${id}`,{method:'PUT',body:fd});
+        },
         remove:(id)=>req(`${DOGS}/${id}`,{method:'DELETE'})
     };
 
-    /* 리스트 렌더 */
+    /* 목록 렌더 */
     async function renderList(){
         const rows = await Dogs.list(qEl.value, statusSel.value, sortSel.value);
         listEl.innerHTML='';
@@ -377,10 +376,7 @@
         $("#dName").textContent=p.name||'-'; $("#dBreed").textContent=p.breed||'-'; $("#dGender").textContent=p.gender||'-';
         $("#dFound").textContent=p.foundPlace||'-'; $("#dAge").textContent=Number.isFinite(p.age)?`${p.age}살`:'-';
         $("#dStatus").textContent=p.status||'-'; $("#dReg").textContent=fmtDate(p.regDate); $("#dMemo").textContent=p.memo||'';
-
-        // 1) 모달 먼저 표시
         dDlg.showModal();
-        // 2) 모달이 화면에 그려진 뒤 지도 렌더
         setTimeout(()=>renderKakaoMapByAddress(p.foundPlace||''),0);
     }
     $("#dPrev").addEventListener("click",()=>setMain(gi-1));
@@ -389,13 +385,27 @@
     $("#dEdit").addEventListener("click",async()=>{ if(!detailTargetId) return; const dto=await Dogs.get(detailTargetId); dDlg.close(); openDialog(dto) });
     $("#dDel").addEventListener("click",async()=>{ if(!detailTargetId) return; if(confirm("정말 삭제할까요?")){ await Dogs.remove(detailTargetId); dDlg.close(); await renderList(); await loadCharts(); window.scrollTo(0,0); showToast('삭제되었습니다.') } });
 
+    /* ✅ 선택 미리보기 */
+    function renderSelectedPreview(){
+        const files=[...filesEl.files].slice(0,5);
+        selHint.textContent=`선택: ${files.length}장`;
+        selPrev.innerHTML='';
+        files.forEach(f=>{
+            const url=URL.createObjectURL(f);
+            const im=new Image(); im.src=url; im.alt='선택 이미지'; im.style.width='100%'; im.style.height='70px'; im.style.objectFit='cover';
+            selPrev.appendChild(im);
+        });
+    }
+    filesEl.addEventListener('change',renderSelectedPreview);
+
     /* 등록/수정 */
     function openDialog(p){
         form.reset();
         $("#dlgTitle").textContent=p? "반려동물 수정":"반려동물 등록";
         $("#petId").value=getId(p)??''; $("#name").value=p?.name??''; $("#breed").value=p?.breed??'';
         $("#gender").value=p?.gender??''; $("#found").value=p?.foundPlace??''; $("#age").value=Number.isFinite(p?.age)?p.age:'';
-        $("#statusIn").value=p?.status||'보호중'; $("#memo").value=p?.memo??''; fileEl.value='';
+        $("#statusIn").value=p?.status||'보호중'; $("#memo").value=p?.memo??'';
+        filesEl.value=''; selPrev.innerHTML=''; selHint.textContent='선택: 0장';
         dlg.showModal();
     }
     btnCancel.addEventListener('click',()=>dlg.close());
@@ -405,10 +415,13 @@
         const id=$("#petId").value;
         const payload={ name:$("#name").value.trim(), breed:$("#breed").value.trim(), gender:$("#gender").value, foundPlace:$("#found").value.trim(), age:$("#age").value?Number($("#age").value):0, status:$("#statusIn").value, memo:$("#memo").value.trim() };
         if(!payload.name){ showToast('이름은 필수입니다.'); return }
-        const file=fileEl.files?.[0]; btnSave.disabled=true;
+        const files=[...filesEl.files].slice(0,5);
+        btnSave.disabled=true;
         try{
-            if(id) await Dogs.update(id,payload,file); else await Dogs.create(payload,file);
-            dlg.close(); await new Promise(r=>setTimeout(r,30)); await renderList(); await loadCharts(); window.scrollTo(0,0); showToast('저장되었습니다.');
+            if(id) await Dogs.update(id,payload,files);
+            else   await Dogs.create(payload,files);
+            dlg.close(); await new Promise(r=>setTimeout(r,30));
+            await renderList(); await loadCharts(); window.scrollTo(0,0); showToast('저장되었습니다.');
         }catch(err){ alert('저장 중 오류: '+(err.message||err)) } finally{ btnSave.disabled=false }
     });
 
@@ -421,12 +434,11 @@
     async function loadCharts(){ const s=await Dogs.stats(); const order=['보호중','입양대기','입양완료']; const mapS=new Map((s.statusStats||[]).map(x=>[x.status,x.count])); makeStatusBar(order,order.map(k=>Number(mapS.get(k)||0))); const bL=(s.breedStats||[]).map(x=>x.breed); const bV=(s.breedStats||[]).map(x=>Number(x.count||0)); makeBreedPie(bL,bV) }
     function startAutoRefresh(){ clearInterval(chartTimer); chartTimer=setInterval(loadCharts,5000) }
 
-    /* OpenAI 키 헬퍼 (로컬 테스트 시 프롬프트로 입력) */
+    /* OpenAI 키 입력/프롬프트 로직은 그대로 */
     function getKey(){ return localStorage.getItem('OPENAI_API_KEY') || OPENAI_FALLBACK_KEY || window.OPENAI_API_KEY || '' }
     function setKey(k){ if(k) localStorage.setItem('OPENAI_API_KEY',k) }
     async function ensureKey(){ let k=getKey(); if(!k){ const inKey=prompt('OpenAI API Key를 입력하세요 (로컬에 1회 저장됨):'); if(!inKey) throw new Error('API Key 필요'); setKey(inKey.trim()); k=getKey() } return k }
 
-    /* AI 글쓰기 */
     async function aiWrite(){
         try{ await ensureKey() }catch{ return }
         const base='https://api.openai.com/v1/chat/completions';
@@ -450,31 +462,11 @@
     }
     aiBtn?.addEventListener('click',aiWrite);
 
-    /* AI 추천(하이브리드) */
-    function readFilters(){
-        const v = id => (document.getElementById(id)?.value || '').trim();
-        return { activity: v('f_activity'), allergy: v('f_allergy'), size: v('f_size'), gender: v('f_gender'), temper: v('f_temper'), beginner: v('f_beginner') };
-    }
+    /* AI 추천 (그대로) */
+    function readFilters(){ const v = id => (document.getElementById(id)?.value || '').trim(); return { activity: v('f_activity'), allergy: v('f_allergy'), size: v('f_size'), gender: v('f_gender'), temper: v('f_temper'), beginner: v('f_beginner') }; }
     function compactDogs(rows){ return rows.map(r=>({ id:getId(r), name:r.name||'', breed:r.breed||'', gender:r.gender||'', age:Number.isFinite(r.age)?r.age:null, memo:(r.memo||'').slice(0,300), foundPlace:r.foundPlace, imageUrl:r.imageUrl, imageNames:r.imageNames })) }
-    function parseJsonLoose(text){
-        if(!text) return null;
-        const stripped = text.replace(/^```json\s*/i,'').replace(/^```\s*/i,'').replace(/```$/,'').trim();
-        try { return JSON.parse(stripped); } catch {}
-        const m = stripped.match(/\{[\s\S]*\}|\[[\s\S]*\]/);
-        if(m){ try{ return JSON.parse(m[0]); }catch{} }
-        return null;
-    }
-    function recCard(dog,reason){
-        const li=document.createElement('li'); li.className='card';
-        const img=document.createElement('img'); const src=firstImageUrl(dog)||'https://placehold.co/600x400?text=No+Image';
-        img.className='thumb'; img.src=src.includes('placehold')?src:`${src}?v=${Date.now()}`; img.alt=dog.name||'사진'; img.addEventListener('click',()=>openDetail(getId(dog)));
-        const meta=document.createElement('div'); meta.className='meta';
-        const h=document.createElement('h3'); h.className='name'; h.textContent=dog.name||'이름없음';
-        const sub=document.createElement('div'); sub.className='sub'; sub.textContent=[dog.breed,dog.foundPlace,Number.isFinite(dog.age)?`${dog.age}살`:null].filter(Boolean).join(' · ');
-        meta.append(h,sub);
-        const reasonDiv=document.createElement('div'); reasonDiv.className='rec-reason'; reasonDiv.textContent=reason||'';
-        li.append(img,meta,reasonDiv); return li;
-    }
+    function parseJsonLoose(text){ if(!text) return null; const stripped = text.replace(/^```json\s*/i,'').replace(/^```\s*/i,'').replace(/```$/,'').trim(); try { return JSON.parse(stripped); } catch {} const m = stripped.match(/\{[\s\S]*\}|\[[\s\S]*\]/); if(m){ try{ return JSON.parse(m[0]); }catch{} } return null; }
+    function recCard(dog,reason){ const li=document.createElement('li'); li.className='card'; const img=document.createElement('img'); const src=firstImageUrl(dog)||'https://placehold.co/600x400?text=No+Image'; img.className='thumb'; img.src=src.includes('placehold')?src:`${src}?v=${Date.now()}`; img.alt=dog.name||'사진'; img.addEventListener('click',()=>openDetail(getId(dog))); const meta=document.createElement('div'); meta.className='meta'; const h=document.createElement('h3'); h.className='name'; h.textContent=dog.name||'이름없음'; const sub=document.createElement('div'); sub.className='sub'; sub.textContent=[dog.breed,dog.foundPlace,Number.isFinite(dog.age)?`${dog.age}살`:null].filter(Boolean).join(' · '); meta.append(h,sub); const reasonDiv=document.createElement('div'); reasonDiv.className='rec-reason'; reasonDiv.textContent=reason||''; li.append(img,meta,reasonDiv); return li; }
     async function aiRecommend(){
         try{ await ensureKey() }catch{ return }
         recBtn.disabled=true; recBtn.textContent='추천 중…';
@@ -485,58 +477,33 @@
             if(!pool.length){ showToast('추천할 데이터가 없습니다.'); return }
             const filters=readFilters();
             const candidates=compactDogs(pool).slice(0,50);
-
             const system=`You are a helpful assistant that recommends adoptable dogs for Korean users.
 Return STRICT JSON only in the following schema:
 {"recommendations":[{"id":<number>,"score":<0..100>,"title":"<short one-line>","reason":"<2~3 sentences in Korean>"}]}
 Rules: pick 3~5 items; id must be from provided candidates; reason must be kind and specific; no extra prose.`;
-
             const user=`User preference (optional):
 ${JSON.stringify(filters,null,2)}
 
 Candidates:
 ${JSON.stringify(candidates,null,2)}
 `;
-
-            const res=await fetch('https://api.openai.com/v1/chat/completions',{
-                method:'POST',
-                headers:{'Content-Type':'application/json','Authorization':'Bearer '+getKey()},
-                body:JSON.stringify({
-                    model:'gpt-4o-mini',
-                    messages:[{role:'system',content:system},{role:'user',content:user}],
-                    temperature:0.4,
-                    response_format:{ type:'json_object' }
-                })
-            });
+            const res=await fetch('https://api.openai.com/v1/chat/completions',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+getKey()},body:JSON.stringify({model:'gpt-4o-mini',messages:[{role:'system',content:system},{role:'user',content:user}],temperature:0.4,response_format:{ type:'json_object' }})});
             if(!res.ok) throw new Error(await res.text());
-            const data=await res.json();
-            const raw = data.choices?.[0]?.message?.content || '';
-            const json = parseJsonLoose(raw);
-            if(!json?.recommendations?.length) throw new Error('JSON 파싱 실패: '+raw);
-
+            const data=await res.json(); const raw = data.choices?.[0]?.message?.content || ''; const json = parseJsonLoose(raw); if(!json?.recommendations?.length) throw new Error('JSON 파싱 실패: '+raw);
             const map=new Map(pool.map(p=>[getId(p),p]));
             recList.innerHTML='';
-            json.recommendations.slice(0,5).forEach(rec=>{
-                const dog=map.get(rec.id);
-                if(dog) recList.appendChild(recCard(dog,`(${rec.score??'—'}점) ${rec.title||''}\n${rec.reason||''}`))
-            });
-            showToast('AI 추천을 업데이트했습니다.');
-            recList.scrollIntoView({behavior:'smooth',block:'start'});
-        }catch(err){
-            alert('AI 추천 실패: '+(err.message||err));
-        }finally{
-            recBtn.disabled=false; recBtn.textContent='AI 추천 (3~5마리)';
-        }
+            json.recommendations.slice(0,5).forEach(rec=>{ const dog=map.get(rec.id); if(dog) recList.appendChild(recCard(dog,`(${rec.score??'—'}점) ${rec.title||''}\n${rec.reason||''}`)) });
+            showToast('AI 추천을 업데이트했습니다.'); recList.scrollIntoView({behavior:'smooth',block:'start'});
+        }catch(err){ alert('AI 추천 실패: '+(err.message||err)) }finally{ recBtn.disabled=false; recBtn.textContent='AI 추천 (3~5마리)'; }
     }
     recBtn.addEventListener('click',aiRecommend);
 
-    /* Kakao 지도 렌더 (autoload=false + 공식 로더) */
+    /* Kakao 지도 렌더 (그대로) */
     function renderKakaoMapByAddress(addr){
         const mapEl = document.getElementById('dMap');
         const msgEl = document.getElementById('dMapMsg');
         if(!mapEl || !msgEl) return;
         if(!addr){ mapEl.style.display='none'; msgEl.textContent='주소 정보가 없습니다.'; return; }
-
         kakao.maps.load(() => {
             mapEl.style.display='block'; msgEl.textContent='';
             const map = new kakao.maps.Map(mapEl,{center:new kakao.maps.LatLng(37.5665,126.9780), level:5});
@@ -546,7 +513,7 @@ ${JSON.stringify(candidates,null,2)}
                     const coords = new kakao.maps.LatLng(result[0].y, result[0].x);
                     map.setCenter(coords);
                     new kakao.maps.Marker({ map, position: coords });
-                    map.relayout(); // 모달 표시 후 레이아웃 보정
+                    map.relayout();
                 }else{
                     msgEl.textContent = '지오코딩 실패(주소를 확인해주세요).';
                 }
@@ -567,6 +534,3 @@ ${JSON.stringify(candidates,null,2)}
 </script>
 </body>
 </html>
-
-
-

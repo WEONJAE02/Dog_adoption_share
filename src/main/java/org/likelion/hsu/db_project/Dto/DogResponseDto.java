@@ -15,31 +15,31 @@ import java.util.stream.Collectors;
 @AllArgsConstructor
 @Builder
 public class DogResponseDto {
-    private Long id;
+    private Long dogId;
     private String name;
     private String breed;
+    private String gender;
     private String foundPlace;
-    private Integer age;
+    private int age;
     private String status;
     private String memo;
-    private String imageUrl;
+    private List<String> imageNames;
     private LocalDateTime regDate;
-    private LocalDateTime updatedAt;
-    private String gender;
 
-    public static DogResponseDto from(Dog d){
+    public static DogResponseDto from(Dog dog) {
         return DogResponseDto.builder()
-                .id(d.getId())
-                .name(d.getName())
-                .breed(d.getBreed())
-                .foundPlace(d.getFoundPlace())
-                .age(d.getAge())
-                .status(d.getStatus())
-                .memo(d.getMemo())
-                .imageUrl(d.getImageUrl())
-                .regDate(d.getRegDate())
-                .updatedAt(d.getUpdatedAt())
-                .gender(d.getGender())
+                .dogId(dog.getDogId())
+                .name(dog.getName())
+                .breed(dog.getBreed())
+                .foundPlace(dog.getDogDetail() != null ? dog.getDogDetail().getFoundPlace() : null)
+                .age(dog.getAge())
+                .status(dog.getStatus())
+                .memo(dog.getDogDetail() != null ? dog.getDogDetail().getMemo() : null)
+                .gender(dog.getGender())
+                .imageNames(dog.getImages() != null
+                        ? dog.getImages().stream().map(DogImage::getFileName).collect(Collectors.toList())
+                        : null)
+                .regDate(dog.getRegDate())
                 .build();
     }
 }

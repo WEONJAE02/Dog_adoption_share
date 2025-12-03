@@ -1,6 +1,6 @@
 package org.likelion.hsu.db_project.Repository;
-
 import lombok.RequiredArgsConstructor;
+
 import org.likelion.hsu.db_project.Entity.DogImage;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
