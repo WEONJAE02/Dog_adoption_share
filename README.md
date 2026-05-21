@@ -1,178 +1,170 @@
-PET ROOM - 유기견 입양 정보 공유 서비스
+# PET ROOM
 
-유기견 정보를 등록하고 관리할 수 있는 입양 정보 공유 서비스입니다.
-Spring Boot 기반 REST API와 MySQL을 사용하여 유기견 기본 정보, 상세 정보, 이미지 데이터를 관리하고, 검색·필터링·정렬·통계 기능을 제공합니다.
+유기견 입양 정보를 등록하고, 조회하며, 사용자 조건에 맞는 반려견을 추천받을 수 있는 유기견 입양 정보 공유 서비스입니다.
 
-⸻
+단순히 유기견 목록을 보여주는 것을 넘어, 검색·필터링·정렬, 상세 이미지 갤러리, 통계 대시보드, AI 기반 입양 홍보 문구 생성 및 추천 기능을 통해 사용자가 더 쉽게 입양 정보를 탐색할 수 있도록 구현했습니다.
 
-프로젝트 소개
+---
 
-유기견 입양 정보를 체계적으로 관리하고, 사용자가 원하는 조건으로 유기견 정보를 빠르게 조회할 수 있도록 구현한 서비스입니다.
+## 프로젝트 개요
 
-단순 CRUD 기능을 넘어 유기견 기본 정보, 상세 정보, 이미지 정보를 분리하여 관리하고, 다중 이미지 업로드와 통계 조회 기능까지 포함했습니다.
+- 프로젝트명: PET ROOM
+- 주제: 유기견 입양 정보 공유 서비스
+- 목적: 유기견 정보를 체계적으로 관리하고, 사용자가 원하는 조건에 맞는 반려견을 쉽게 찾을 수 있도록 지원
+- 담당 역할: Frontend
+- 개발 형태: Spring Boot 기반 백엔드와 HTML/CSS/JavaScript 기반 프론트엔드 연동
 
-⸻
+---
 
-주요 기능
+## 주요 기능
 
-* 유기견 정보 등록, 조회, 수정, 삭제
-* 다중 이미지 업로드 및 대표 이미지 처리
-* 이름, 품종, 구조 장소 기반 검색
-* 입양 상태별 필터링
-* 최신순, 이름순, 나이순 정렬
-* 입양 상태별/품종별 통계 조회
-* OpenAI API 기반 소개 문구 생성 데모
+### 유기견 목록 조회
 
-⸻
+- 등록된 유기견 정보를 카드 형태로 표시
+- 대표 이미지, 이름, 품종, 구조 장소, 나이, 입양 상태 확인 가능
+- 이미지가 없는 경우 기본 이미지 처리
 
-기술 스택
+### 검색, 필터링, 정렬
 
-Backend
+- 이름, 품종, 구조 장소 기반 검색
+- 보호중, 입양대기, 입양완료 상태별 필터링
+- 최신순, 이름순, 나이순 정렬 기능 제공
 
-* Java 17
-* Spring Boot 3.5.6
-* Spring Web
-* Spring JDBC / JdbcTemplate
-* MySQL
-* Lombok
-* Gradle
+### 유기견 상세 조회
 
-Frontend
+- 카드 클릭 시 상세 모달 표시
+- 유기견 기본 정보, 구조 장소, 메모 확인 가능
+- 다중 이미지 갤러리 및 썸네일 미리보기 구현
+- 이전/다음 버튼을 통한 이미지 전환 기능 구현
 
-* HTML
-* CSS
-* JavaScript
-* Chart.js
-* Kakao Map SDK
-* OpenAI API
+### 유기견 등록 및 수정
 
-⸻
+- 모달 기반 등록/수정 UI 구현
+- 이름, 품종, 나이, 성별, 상태, 구조 장소, 메모 입력 가능
+- 여러 장의 이미지 선택 및 미리보기 기능 제공
+- FormData를 활용하여 JSON 데이터와 이미지 파일을 함께 전송
 
-담당 역할
+### 유기견 삭제
 
-* Spring Boot 기반 REST API 구현
-* MySQL 테이블 설계
-* JdbcTemplate 기반 Repository 구현
-* 유기견 CRUD 기능 구현
-* MultipartFile 기반 다중 이미지 업로드 구현
-* 유기견 기본 정보, 상세 정보, 이미지 정보 분리 저장 구조 설계
-* 검색, 필터링, 정렬 기능 구현
-* 입양 상태별/품종별 통계 API 구현
-* 프론트엔드 화면과 백엔드 API 연동
-* GitHub 공개를 위한 환경변수 및 민감정보 관리 정리
+- 삭제 전 확인창을 통해 실수 방지
+- 삭제 후 목록과 통계 데이터를 즉시 갱신
 
-⸻
+### 통계 대시보드
 
-주요 구현 내용
+- Chart.js를 활용하여 유기견 데이터를 시각화
+- 상태별 유기견 현황 막대 그래프 구현
+- 품종별 유기견 현황 원형 그래프 구현
+- 일정 주기로 통계 데이터 자동 갱신
 
-1. 유기견 CRUD API
+### AI 입양 홍보 문구 생성
 
-유기견 정보를 등록, 조회, 수정, 삭제할 수 있는 REST API를 구현했습니다.
+- OpenAI API를 활용하여 유기견 정보 기반 소개 문구 생성
+- 이름, 품종, 나이, 성별, 구조 장소 등의 정보를 바탕으로 자연스러운 입양 홍보 문구 작성
+- 사용자가 직접 입력한 API Key를 localStorage에 저장하여 데모 형태로 사용
 
-등록 및 수정 시 유기견 기본 정보뿐만 아니라 구조 장소, 메모, 이미지 정보를 함께 처리할 수 있도록 구성했습니다.
+### AI 유기견 추천
 
-2. 다중 이미지 업로드
+- 사용자의 선택 조건을 기반으로 입양대기 상태의 유기견 추천
+- 활동량, 알레르기, 선호 크기, 성별, 성격, 초보 보호자 여부 등의 조건 반영
+- 추천 결과를 카드 형태로 표시하고, 추천 이유를 함께 제공
 
-MultipartFile을 사용하여 여러 장의 이미지를 업로드할 수 있도록 구현했습니다.
+### 카카오 지도 연동
 
-* UUID 기반 파일명 생성
-* 첫 번째 이미지를 대표 이미지로 설정
-* 이미지 메타데이터 DB 저장
-* 서버 업로드 디렉터리에 실제 파일 저장
+- 구조 장소 주소를 기반으로 Kakao Map 표시
+- 유기견 상세 정보에서 위치 정보를 시각적으로 확인할 수 있도록 구현
 
-3. 데이터 분리 설계
+---
 
-유기견 관련 데이터를 역할에 따라 분리하여 관리했습니다.
+## 기술 스택
 
-dog         : 유기견 기본 정보
-dog_detail  : 구조 장소, 메모 등 상세 정보
-dog_image   : 유기견 이미지 정보
+### Frontend
 
-이를 통해 기본 정보, 상세 정보, 이미지 정보를 독립적으로 관리할 수 있도록 설계했습니다.
+- HTML
+- CSS
+- JavaScript
+- Fetch API
+- FormData
+- Chart.js
+- Kakao Map SDK
+- OpenAI API
 
-4. 검색, 필터링, 정렬
+### Backend
 
-목록 조회 API에서 Query Parameter를 활용하여 다양한 조회 조건을 처리했습니다.
+- Java 17
+- Spring Boot
+- Spring Web
+- Spring JDBC / JdbcTemplate
+- MySQL
+- Gradle
 
-* 검색: 이름, 품종, 구조 장소
-* 필터링: 입양 상태
-* 정렬: 최신순, 이름순, 나이순
+---
 
-5. 통계 조회
+## 담당 역할
 
-입양 상태별, 품종별 유기견 수를 집계하는 통계 API를 구현했습니다.
+이 프로젝트에서 저는 프론트엔드 파트를 담당했습니다.
 
-프론트엔드에서는 해당 데이터를 Chart.js와 연동하여 시각화할 수 있도록 구성했습니다.
+### 화면 UI 구현
 
-⸻
+- PET ROOM 메인 화면 구성
+- 유기견 목록 카드 UI 구현
+- 검색, 필터, 정렬 툴바 구현
+- 등록/수정 모달 UI 구현
+- 상세 조회 모달 및 이미지 갤러리 UI 구현
+- 반응형 레이아웃 적용
 
-API 요약
+### API 연동
 
-기능	Method	URL
-유기견 등록	POST	/dogs
-유기견 목록 조회	GET	/dogs
-유기견 상세 조회	GET	/dogs/{id}
-유기견 수정	PUT	/dogs/{id}
-유기견 삭제	DELETE	/dogs/{id}
-통계 조회	GET	/dogs/statistics
+- `fetch` 기반 REST API 연동
+- 유기견 목록 조회 API 연동
+- 유기견 상세 조회 API 연동
+- 유기견 등록, 수정, 삭제 API 연동
+- 통계 조회 API 연동
+- FormData를 활용한 이미지 업로드 요청 처리
 
-⸻
+### 데이터 시각화
 
-실행 방법
+- Chart.js를 활용한 상태별 유기견 현황 그래프 구현
+- Chart.js를 활용한 품종별 유기견 현황 그래프 구현
+- 데이터 변경 후 차트 자동 갱신 처리
 
-git clone https://github.com/사용자명/레포지토리명.git
-cd 레포지토리명
-./gradlew bootRun
+### 사용자 경험 개선
 
-실행 전 MySQL 데이터베이스 생성과 환경변수 설정이 필요합니다.
+- 이미지 미리보기 기능 구현
+- 상세 이미지 갤러리 및 썸네일 전환 기능 구현
+- 삭제 전 확인 메시지 처리
+- 등록, 수정, 삭제 후 Toast 메시지 출력
+- 검색/필터 변경 시 즉시 목록 갱신
+- 이미지 캐싱 문제를 줄이기 위한 쿼리 파라미터 처리
 
-CREATE DATABASE petdb DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-DB_USERNAME=your_mysql_username
-DB_PASSWORD=your_mysql_password
-FILE_UPLOAD_DIR=./uploads
+### AI 기능 연동
 
-기본 실행 주소:
+- OpenAI API를 활용한 입양 홍보 문구 생성 기능 구현
+- 사용자 조건 기반 AI 추천 기능 구현
+- 추천 결과와 추천 이유를 카드 형태로 표시
+- API Key를 localStorage에 저장하여 데모 환경에서 활용 가능하도록 처리
 
-http://localhost:8081
+---
 
-⸻
+## 주요 구현 내용
 
-환경변수 관리
+### 1. 유기견 목록 카드 UI
 
-본 프로젝트는 DB 계정 정보와 업로드 경로를 코드에 직접 작성하지 않고 환경변수로 관리합니다.
+등록된 유기견 데이터를 API로 받아와 카드 형태로 렌더링했습니다.
 
-spring.datasource.username=${DB_USERNAME}
-spring.datasource.password=${DB_PASSWORD}
-file.upload-dir=${FILE_UPLOAD_DIR:./uploads}
+각 카드에는 대표 이미지, 이름, 품종, 구조 장소, 나이, 입양 상태가 표시되며, 상세 보기와 수정 기능을 바로 사용할 수 있도록 구성했습니다.
 
-⸻
+```javascript
+async function renderList() {
+  const rows = await Dogs.list(qEl.value, statusSel.value, sortSel.value);
+  list.innerHTML = '';
 
-프로젝트를 통해 경험한 점
+  rows.forEach(p => {
+    const n = tpl.content.cloneNode(true);
+    n.querySelector('.name').textContent = p.name || '이름없음';
+    n.querySelector('.sub').textContent = [p.breed, p.foundPlace, p.age ? `${p.age}살` : null]
+      .filter(Boolean)
+      .join(' · ');
 
-* Spring Boot 기반 REST API 설계 및 구현
-* MultipartFile을 활용한 다중 이미지 업로드 처리
-* JdbcTemplate 기반 SQL 작성 및 데이터 접근 계층 구현
-* MySQL 테이블 분리 설계 경험
-* 검색, 필터링, 정렬 조건을 반영한 조회 로직 구현
-* 통계 데이터를 API로 제공하고 프론트엔드에서 활용하는 흐름 경험
-* GitHub 공개를 고려한 민감정보 관리 및 환경변수 설정 경험
-
-⸻
-
-개선 예정
-
-* JPA 기반 리팩터링
-* Swagger/OpenAPI 문서화
-* 공통 예외 처리 및 에러 응답 포맷 통일
-* 파일 확장자, MIME 타입, 파일 크기 검증 강화
-* 이미지 삭제 시 실제 서버 파일도 함께 삭제하도록 개선
-* 테스트 코드 추가
-* AI API Key를 백엔드 환경변수로 관리하는 구조로 개선
-
-⸻
-
-보안 관련 안내
-
-본 프로젝트에는 DB 비밀번호, API Key 등의 민감정보를 직접 포함하지 않습니다.
-
-OpenAI API 연동 기능은 데모 목적의 기능이며, 현재는 사용자가 직접 API Key를 입력하는 방식으로 구성되어 있습니다. 실서비스 환경에서는 백엔드 서버에서 API Key를 환경변수로 관리하는 방식이 적절합니다.
+    list.appendChild(n);
+  });
+}
