@@ -4,8 +4,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.likelion.hsu.db_project.Dto.DogRequestDto;
 import org.likelion.hsu.db_project.Dto.DogResponseDto;
+import org.likelion.hsu.db_project.Security.LoginUser;
 import org.likelion.hsu.db_project.Service.DogService;
 import org.springframework.http.MediaType;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -31,11 +33,12 @@ public class DogController {
     @PostMapping(consumes = { MediaType.MULTIPART_FORM_DATA_VALUE })
     public DogResponseDto createDog(
             @RequestPart("dog") String dogJson,
-            @RequestPart(value = "images", required = false) List<MultipartFile> images
+            @RequestPart(value = "images", required = false) List<MultipartFile> images,
+            @AuthenticationPrincipal LoginUser user
     ) throws IOException {
 
         DogRequestDto dto = objectMapper.readValue(dogJson, DogRequestDto.class);
-        return dogService.createDog(dto, images);
+        return dogService.createDog(dto, images, user.getUserId());
     }
 
 
@@ -64,25 +67,27 @@ public class DogController {
     /**
      * ✅ 수정 (JSON + 다중 이미지 업로드)
      * - 기존 이미지 삭제 후 새 이미지 저장하는 방식은 Service에서 처리
+     * - 작성자 본인만 가능
      */
     @PutMapping(value = "/{id}", consumes = { MediaType.MULTIPART_FORM_DATA_VALUE })
     public DogResponseDto updateDog(
             @PathVariable Long id,
             @RequestPart("dog") String dogJson,
-            @RequestPart(value = "images", required = false) List<MultipartFile> images
+            @RequestPart(value = "images", required = false) List<MultipartFile> images,
+            @AuthenticationPrincipal LoginUser user
     ) throws IOException {
 
         DogRequestDto dto = objectMapper.readValue(dogJson, DogRequestDto.class);
-        return dogService.updateDog(id, dto, images);
+        return dogService.updateDog(id, dto, images, user.getUserId());
     }
 
 
     /**
-     * ✅ 삭제
+     * ✅ 삭제 (작성자 본인만 가능)
      */
     @DeleteMapping("/{id}")
-    public void deleteDog(@PathVariable Long id) {
-        dogService.deleteDog(id);
+    public void deleteDog(@PathVariable Long id, @AuthenticationPrincipal LoginUser user) {
+        dogService.deleteDog(id, user.getUserId());
     }
 
 

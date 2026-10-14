@@ -25,6 +25,7 @@ public class DogResponseDto {
     private String memo;
     private List<String> imageNames;
     private LocalDateTime regDate;
+    private Long userId;
 
     public static DogResponseDto from(Dog dog) {
         return DogResponseDto.builder()
@@ -40,6 +41,7 @@ public class DogResponseDto {
                         ? dog.getImages().stream().map(DogImage::getFileName).collect(Collectors.toList())
                         : null)
                 .regDate(dog.getRegDate())
+                .userId(dog.getUserId())
                 .build();
     }
 }

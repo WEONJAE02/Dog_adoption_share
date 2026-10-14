@@ -32,13 +32,14 @@ public class DogRepository {
                     .regDate(rs.getTimestamp("reg_date") != null
                             ? rs.getTimestamp("reg_date").toLocalDateTime()
                             : null)
+                    .userId(rs.getObject("user_id") != null ? rs.getLong("user_id") : null)
                     .build();
         }
     };
 
     // ✅ 등록
     public int save(Dog dog) {
-        String sql = "INSERT INTO dog (name, breed, age, status, image_name, gender, reg_date) VALUES (?, ?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO dog (name, breed, age, status, image_name, gender, reg_date, user_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
         return jdbcTemplate.update(sql,
                 dog.getName(),
                 dog.getBreed(),
@@ -46,7 +47,8 @@ public class DogRepository {
                 dog.getStatus(),
                 dog.getImageName(),
                 dog.getGender(),
-                dog.getRegDate() != null ? dog.getRegDate() : LocalDateTime.now()
+                dog.getRegDate() != null ? dog.getRegDate() : LocalDateTime.now(),
+                dog.getUserId()
         );
     }
 

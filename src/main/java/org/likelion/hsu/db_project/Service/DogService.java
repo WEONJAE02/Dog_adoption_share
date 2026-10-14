@@ -11,6 +11,7 @@ import org.likelion.hsu.db_project.Repository.DogDetailRepository;
 import org.likelion.hsu.db_project.Repository.DogImageRepository;
 import org.likelion.hsu.db_project.Repository.DogRepository;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -32,7 +33,7 @@ public class DogService {
     private String uploadDir;
 
     // ✅ 등록 (여러 장 이미지 업로드)
-    public DogResponseDto createDog(DogRequestDto dto, List<MultipartFile> images) throws IOException {
+    public DogResponseDto createDog(DogRequestDto dto, List<MultipartFile> images, Long userId) throws IOException {
 
         // 대표 이미지 파일명 (images 중 첫 번째 이미지 사용)
         String mainImageName = null;
@@ -52,6 +53,7 @@ public class DogService {
                 .gender(dto.getGender())
                 .imageName(mainImageName)  // ⭐ 대표 이미지로 설정
                 .regDate(LocalDateTime.now())
+                .userId(userId)  // 작성자
                 .build();
 
         // 1. dog 저장
@@ -111,14 +113,16 @@ public class DogService {
                 .memo(detail != null ? detail.getMemo() : null)
                 .imageNames(images.stream().map(DogImage::getFileName).collect(Collectors.toList()))
                 .regDate(dog.getRegDate())
+                .userId(dog.getUserId())
                 .build();
     }
 
     // ✅ 수정 (여러 장 이미지 업로드)
-    public DogResponseDto updateDog(Long id, DogRequestDto dto, List<MultipartFile> images) throws IOException {
+    public DogResponseDto updateDog(Long id, DogRequestDto dto, List<MultipartFile> images, Long userId) throws IOException {
 
         Dog existingDog = dogRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("해당 유기견 정보를 찾을 수 없습니다."));
+        checkOwner(existingDog, userId);
 
         // 기존 이미지 전체 삭제
         dogImageRepository.deleteByDogId(id);
@@ -173,10 +177,19 @@ public class DogService {
     }
 
     // ✅ 삭제
-    public void deleteDog(Long id) {
+    public void deleteDog(Long id, Long userId) {
+        dogRepository.findById(id).ifPresent(dog -> checkOwner(dog, userId));
+
         dogImageRepository.deleteByDogId(id);
         dogDetailRepository.deleteByDogId(id);
         dogRepository.delete(id);
+    }
+
+    // ✅ 작성자 확인 (작성자가 없는 기존 데이터는 로그인한 누구나 수정/삭제 가능)
+    private void checkOwner(Dog dog, Long userId) {
+        if (dog.getUserId() != null && !dog.getUserId().equals(userId)) {
+            throw new AccessDeniedException("작성자만 수정·삭제할 수 있습니다.");
+        }
     }
 
     // ✅ 이미지 저장 (재사용)

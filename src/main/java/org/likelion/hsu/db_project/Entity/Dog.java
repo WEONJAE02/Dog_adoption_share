@@ -19,6 +19,7 @@ public class Dog {
     private String status;
     private String imageName;
     private LocalDateTime regDate;
+    private Long userId;   // 작성자 (로그인 도입 전 데이터는 null)
 
     // ✅ 연관 데이터 포함 (JPA가 아니므로 단순 참조만 유지)
     private DogDetail dogDetail;

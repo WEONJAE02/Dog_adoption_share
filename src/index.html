@@ -93,6 +93,19 @@
         .thumbs{margin-top:12px; display:grid; grid-template-columns:repeat(auto-fill,minmax(80px,1fr)); gap:8px}
         .thumbs img{width:100%; height:70px; object-fit:cover; border-radius:8px; border:1px solid var(--line); cursor:pointer; background:#0d1320}
 
+        /* 로그인 */
+        .authbar{display:flex; justify-content:flex-end; align-items:center; gap:10px; margin-bottom:14px; min-height:42px}
+        .auth-name{color:var(--muted); font-size:14px}
+        .auth{width:min(400px,96vw)}
+        .auth .body{grid-template-columns:1fr}
+        [hidden]{display:none!important}
+        .auth-err{color:#ff9b9b; font-size:13px; min-height:18px}
+        .social{display:flex; flex-direction:column; gap:8px; padding-top:12px; border-top:1px solid var(--line)}
+        .social-btn{display:flex; align-items:center; justify-content:center; padding:10px 12px; border-radius:10px; font-weight:700; font-size:14px; text-decoration:none; cursor:pointer}
+        .social-btn.kakao{background:#fee500; color:#191919}
+        .social-btn.naver{background:#03c75a; color:#fff}
+        .auth-switch{all:unset; cursor:pointer; color:#cfe1ff; font-size:13px; text-align:center}
+
         .toast{position:fixed; left:50%; transform:translateX(-50%); bottom:26px; background:#10182a; border:1px solid #2a3a56; color:#e6ecff; padding:10px 14px; border-radius:10px; font-size:13px; display:none}
         .toast.show{display:block}
 
@@ -115,6 +128,13 @@
 
 <body>
 <div class="container">
+    <!-- 로그인 상태 -->
+    <div class="authbar">
+        <span id="authName" class="auth-name"></span>
+        <button id="btnLogin" class="tool-btn">로그인</button>
+        <button id="btnLogout" class="tool-btn" hidden>로그아웃</button>
+    </div>
+
     <!-- HERO ... (생략: 그대로) -->
     <section class="hero">
         <div>
@@ -223,6 +243,28 @@
     </form>
 </dialog>
 
+<!-- 로그인/회원가입 모달 -->
+<dialog id="authDialog" class="modal auth">
+    <form id="authForm" method="dialog">
+        <header id="authTitle">로그인</header>
+        <div class="body">
+            <label>이메일<input id="authEmail" type="email" autocomplete="username" required/></label>
+            <label>비밀번호<input id="authPw" type="password" autocomplete="current-password" required/></label>
+            <label id="authNickRow" hidden>닉네임<input id="authNick" maxlength="20"/></label>
+            <div id="authErr" class="auth-err"></div>
+            <button type="button" id="authSwitch" class="auth-switch">계정이 없으신가요? 회원가입</button>
+            <div id="socialBox" class="social">
+                <a id="kakaoLogin" class="social-btn kakao">카카오로 로그인</a>
+                <a id="naverLogin" class="social-btn naver">네이버로 로그인</a>
+            </div>
+        </div>
+        <footer>
+            <button type="button" class="btn" id="authCancel">취소</button>
+            <button id="authSubmit" value="default" class="btn">로그인</button>
+        </footer>
+    </form>
+</dialog>
+
 <!-- 상세 모달 (그대로) -->
 <dialog id="detailDialog" class="detail">
     <header>상세 보기</header>
@@ -281,6 +323,7 @@
     const API_BASE = 'http://localhost:8081';
     const DOGS = API_BASE + '/dogs';
     const UPLOAD_URL = API_BASE + '/uploads/';
+    const AUTH = API_BASE + '/auth';
 
     /* OpenAI 키 보관 방식 유지 */
     const OPENAI_FALLBACK_KEY = '';
@@ -313,9 +356,15 @@
     const firstImageUrl = d => Array.isArray(d?.imageNames)&&d.imageNames[0]? buildUploadUrl(d.imageNames[0]) : (d?.imageUrl?buildUploadUrl(d.imageUrl):'');
     const imageUrls = d => Array.isArray(d?.imageNames)&&d.imageNames.length? d.imageNames.map(buildUploadUrl) : (d?.imageUrl?[buildUploadUrl(d.imageUrl)]:[]);
 
+    /* 세션 쿠키를 함께 보내고, 서버의 {message} 오류를 그대로 보여준다 */
     async function req(url,opt={}) {
-        const res = await fetch(url,opt);
-        if(!res.ok){ const msg = await res.text().catch(()=>res.statusText); throw new Error(msg||('HTTP '+res.status)) }
+        const res = await fetch(url,{credentials:'include',...opt});
+        if(!res.ok){
+            let msg = await res.text().catch(()=>res.statusText);
+            try{ msg = JSON.parse(msg).message || msg }catch{}
+            if(res.status===401 && !url.startsWith(AUTH)){ me=null; renderAuth(); openAuth('login') }
+            throw new Error(msg||('HTTP '+res.status))
+        }
         if(res.status===204) return null;
         const ct = res.headers.get('content-type')||'';
         return ct.includes('application/json')? res.json() : res.text();
@@ -345,6 +394,54 @@
         remove:(id)=>req(`${DOGS}/${id}`,{method:'DELETE'})
     };
 
+    /* 로그인 */
+    const authDlg=$("#authDialog"), authForm=$("#authForm"), authErr=$("#authErr");
+    let me=null, authMode='login';
+    const jsonPost = (url,body)=>req(url,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
+
+    function renderAuth(){
+        $("#authName").textContent = me? `${me.nickname}님` : '';
+        $("#btnLogin").hidden = !!me; $("#btnLogout").hidden = !me;
+    }
+    /* 버튼은 항상 보이고, 서버에 키가 설정되지 않은 제공자는 누르면 안내만 한다 */
+    function setSocial(providers=[]){
+        [['kakao','#kakaoLogin','카카오'],['naver','#naverLogin','네이버']].forEach(([id,sel,label])=>{
+            const a=$(sel), on=providers.includes(id);
+            a.href = on? `${API_BASE}/oauth2/authorization/${id}` : '#';
+            a.onclick = on? null : e=>{ e.preventDefault(); authErr.textContent=`${label} 로그인은 아직 설정되지 않았습니다.` };
+        });
+    }
+    setSocial();
+    function openAuth(mode){
+        authMode=mode; const signup = mode==='signup';
+        $("#authTitle").textContent = signup? '회원가입':'로그인';
+        $("#authSubmit").textContent = signup? '가입하기':'로그인';
+        $("#authSwitch").textContent = signup? '이미 계정이 있으신가요? 로그인':'계정이 없으신가요? 회원가입';
+        $("#authNickRow").hidden = !signup; $("#authNick").required = signup;
+        $("#authPw").minLength = signup? 8 : 0; $("#authPw").autocomplete = signup? 'new-password':'current-password';
+        authErr.textContent='';
+        if(!authDlg.open) authDlg.showModal();
+    }
+    /* 본인 글만 수정·삭제 (작성자 없는 기존 글은 로그인한 누구나) */
+    const canEdit = p => !!me && (p?.userId==null || p.userId===me.userId);
+    function requireLogin(){ if(me) return true; openAuth('login'); authErr.textContent='로그인이 필요합니다.'; return false }
+    async function loadMe(){ const r=await req(`${AUTH}/me`); me=r.authenticated? r.user : null; setSocial(r.socialProviders); renderAuth(); if(me) await renderList() }
+
+    authForm.addEventListener('submit',async e=>{
+        e.preventDefault();
+        const email=$("#authEmail").value.trim(), password=$("#authPw").value;
+        $("#authSubmit").disabled=true; authErr.textContent='';
+        try{
+            if(authMode==='signup') await jsonPost(`${AUTH}/signup`,{email,password,nickname:$("#authNick").value.trim()});
+            me = await jsonPost(`${AUTH}/login`,{email,password});
+            renderAuth(); authDlg.close(); authForm.reset(); showToast(`${me.nickname}님, 환영합니다.`); await renderList();
+        }catch(err){ authErr.textContent = err.message||String(err) } finally{ $("#authSubmit").disabled=false }
+    });
+    $("#authSwitch").addEventListener('click',()=>openAuth(authMode==='login'?'signup':'login'));
+    $("#authCancel").addEventListener('click',()=>authDlg.close());
+    $("#btnLogin").addEventListener('click',()=>openAuth('login'));
+    $("#btnLogout").addEventListener('click',async()=>{ await req(`${AUTH}/logout`,{method:'POST'}); me=null; renderAuth(); showToast('로그아웃되었습니다.'); await renderList() });
+
     /* 목록 렌더 */
     async function renderList(){
         const rows = await Dogs.list(qEl.value, statusSel.value, sortSel.value);
@@ -361,6 +458,7 @@
             n.querySelector('.name').textContent=p.name||'이름없음';
             n.querySelector('.sub').textContent=[p.breed,p.foundPlace,(Number.isFinite(p.age)?`${p.age}살`:null)].filter(Boolean).join(' · ');
             const bd=n.querySelector('.badge'); bd.textContent=p.status||'보호중'; bd.className=badgeClass(p.status||'보호중');
+            n.querySelector('.foot').hidden=!canEdit(p);
             n.querySelector('.edit').addEventListener('click',()=>openDialog(p));
             n.querySelector('.del').addEventListener('click',()=>onDelete(getId(p)));
             listEl.appendChild(n);
@@ -376,6 +474,7 @@
         $("#dName").textContent=p.name||'-'; $("#dBreed").textContent=p.breed||'-'; $("#dGender").textContent=p.gender||'-';
         $("#dFound").textContent=p.foundPlace||'-'; $("#dAge").textContent=Number.isFinite(p.age)?`${p.age}살`:'-';
         $("#dStatus").textContent=p.status||'-'; $("#dReg").textContent=fmtDate(p.regDate); $("#dMemo").textContent=p.memo||'';
+        $("#dEdit").hidden=$("#dDel").hidden=!canEdit(p);
         dDlg.showModal();
         setTimeout(()=>renderKakaoMapByAddress(p.foundPlace||''),0);
     }
@@ -383,7 +482,7 @@
     $("#dNext").addEventListener("click",()=>setMain(gi+1));
     $("#dClose").addEventListener("click",()=>dDlg.close());
     $("#dEdit").addEventListener("click",async()=>{ if(!detailTargetId) return; const dto=await Dogs.get(detailTargetId); dDlg.close(); openDialog(dto) });
-    $("#dDel").addEventListener("click",async()=>{ if(!detailTargetId) return; if(confirm("정말 삭제할까요?")){ await Dogs.remove(detailTargetId); dDlg.close(); await renderList(); await loadCharts(); window.scrollTo(0,0); showToast('삭제되었습니다.') } });
+    $("#dDel").addEventListener("click",async()=>{ if(!detailTargetId) return; if(!requireLogin()) return; if(confirm("정말 삭제할까요?")){ await Dogs.remove(detailTargetId); dDlg.close(); await renderList(); await loadCharts(); window.scrollTo(0,0); showToast('삭제되었습니다.') } });
 
     /* ✅ 선택 미리보기 */
     function renderSelectedPreview(){
@@ -400,6 +499,7 @@
 
     /* 등록/수정 */
     function openDialog(p){
+        if(!requireLogin()) return;
         form.reset();
         $("#dlgTitle").textContent=p? "반려동물 수정":"반려동물 등록";
         $("#petId").value=getId(p)??''; $("#name").value=p?.name??''; $("#breed").value=p?.breed??'';
@@ -425,7 +525,7 @@
         }catch(err){ alert('저장 중 오류: '+(err.message||err)) } finally{ btnSave.disabled=false }
     });
 
-    async function onDelete(id){ if(!confirm("정말 삭제할까요?")) return; await Dogs.remove(id); await renderList(); await loadCharts(); window.scrollTo(0,0); showToast('삭제되었습니다.') }
+    async function onDelete(id){ if(!requireLogin()) return; if(!confirm("정말 삭제할까요?")) return; await Dogs.remove(id); await renderList(); await loadCharts(); window.scrollTo(0,0); showToast('삭제되었습니다.') }
 
     /* 차트 */
     let statusChart,breedChart,chartTimer=null;
@@ -529,6 +629,8 @@ ${JSON.stringify(candidates,null,2)}
         $("#actList").addEventListener("click",()=>{ statusSel.value=""; qEl.value=""; renderList() });
         qEl.addEventListener("input",renderList); statusSel.addEventListener("change",renderList); sortSel.addEventListener("change",renderList);
         dlg.addEventListener('close',()=>form.reset());
+        if(new URLSearchParams(location.search).has('loginError')){ showToast('소셜 로그인에 실패했습니다.'); history.replaceState(null,'',location.pathname) }
+        loadMe().catch(()=>{});
         await renderList(); await loadCharts(); startAutoRefresh();
     });
 </script>
