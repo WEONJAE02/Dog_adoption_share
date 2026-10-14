@@ -88,6 +88,11 @@ public class InquiryRepository {
                 reply, Timestamp.valueOf(LocalDateTime.now()), id);
     }
 
+    // ✅ 회원 탈퇴 시 주고받은 문의 삭제
+    public void deleteByUserId(Long userId) {
+        jdbcTemplate.update("DELETE FROM adoption_inquiry WHERE sender_id = ? OR receiver_id = ?", userId, userId);
+    }
+
     // ✅ 유기견 삭제 시 함께 삭제
     public void deleteByDogId(Long dogId) {
         jdbcTemplate.update("DELETE FROM adoption_inquiry WHERE dog_id = ?", dogId);

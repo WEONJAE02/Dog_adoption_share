@@ -9,6 +9,8 @@ CREATE TABLE IF NOT EXISTS users (
     password    VARCHAR(100),
     nickname    VARCHAR(50)  NOT NULL,
     created_at  DATETIME     NOT NULL,
+    terms_agreed_at DATETIME,
+    deleted_at  DATETIME,
     UNIQUE KEY uk_users_provider (provider, provider_id)
 );
 
@@ -21,7 +23,8 @@ CREATE TABLE IF NOT EXISTS dog (
     image_name VARCHAR(255),
     gender     VARCHAR(20),
     reg_date   DATETIME,
-    user_id    BIGINT
+    user_id    BIGINT,
+    hidden     TINYINT(1) NOT NULL DEFAULT 0
 );
 
 CREATE TABLE IF NOT EXISTS dog_detail (
@@ -49,6 +52,7 @@ CREATE TABLE IF NOT EXISTS board_post (
     title      VARCHAR(100) NOT NULL,
     content    TEXT         NOT NULL,
     view_count INT          NOT NULL DEFAULT 0,
+    hidden     TINYINT(1)   NOT NULL DEFAULT 0,
     created_at DATETIME     NOT NULL,
     updated_at DATETIME,
     FOREIGN KEY (user_id) REFERENCES users (user_id)
@@ -69,6 +73,7 @@ CREATE TABLE IF NOT EXISTS board_comment (
     parent_id  BIGINT,
     content    VARCHAR(500) NOT NULL,
     deleted    TINYINT(1)   NOT NULL DEFAULT 0,
+    hidden     TINYINT(1)   NOT NULL DEFAULT 0,
     created_at DATETIME     NOT NULL,
     FOREIGN KEY (post_id) REFERENCES board_post (post_id),
     FOREIGN KEY (user_id) REFERENCES users (user_id)
@@ -88,4 +93,17 @@ CREATE TABLE IF NOT EXISTS adoption_inquiry (
     FOREIGN KEY (dog_id) REFERENCES dog (dog_id),
     FOREIGN KEY (sender_id) REFERENCES users (user_id),
     FOREIGN KEY (receiver_id) REFERENCES users (user_id)
+);
+
+-- 신고 (대상: dog / post / comment). 같은 사람이 같은 대상을 두 번 신고할 수 없다
+CREATE TABLE IF NOT EXISTS report (
+    report_id   BIGINT AUTO_INCREMENT PRIMARY KEY,
+    target_type VARCHAR(10)  NOT NULL,
+    target_id   BIGINT       NOT NULL,
+    reporter_id BIGINT       NOT NULL,
+    reason      VARCHAR(30)  NOT NULL,
+    detail      VARCHAR(500),
+    created_at  DATETIME     NOT NULL,
+    UNIQUE KEY uk_report_once (target_type, target_id, reporter_id),
+    FOREIGN KEY (reporter_id) REFERENCES users (user_id)
 );

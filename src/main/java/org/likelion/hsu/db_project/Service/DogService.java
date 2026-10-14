@@ -12,6 +12,7 @@ import org.likelion.hsu.db_project.Repository.DogImageRepository;
 import org.likelion.hsu.db_project.Repository.DogRepository;
 import org.likelion.hsu.db_project.Repository.InquiryRepository;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -30,6 +31,7 @@ public class DogService {
     private final DogDetailRepository dogDetailRepository;
     private final DogImageRepository dogImageRepository;
     private final InquiryRepository inquiryRepository;
+    private final ImageStorage imageStorage;
 
     @Value("${file.upload-dir}")
     private String uploadDir;
@@ -90,17 +92,27 @@ public class DogService {
     }
 
     // ✅ 전체 조회 (검색 + 정렬 + 필터)
-    public List<DogResponseDto> getAllDogs(String search, String status, String sort) {
-        return dogRepository.findAllWithConditions(search, status, sort).stream()
-                .map(d -> getDogById(d.getDogId()))
+    public List<DogResponseDto> getAllDogs(String search, String status, String sort, Long viewerId) {
+        return dogRepository.findAllWithConditions(search, status, sort, viewerId).stream()
+                .map(this::toResponse)
                 .collect(Collectors.toList());
     }
 
-    // ✅ 상세 조회
-    public DogResponseDto getDogById(Long id) {
+    // ✅ 상세 조회 (신고로 숨겨진 글은 작성자 본인만)
+    public DogResponseDto getDogById(Long id, Long viewerId) {
         Dog dog = dogRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("해당 유기견 정보를 찾을 수 없습니다."));
+                .filter(d -> !d.isHidden() || (d.getUserId() != null && d.getUserId().equals(viewerId)))
+                .orElseThrow(() -> new BoardException(HttpStatus.NOT_FOUND, "해당 유기견 정보를 찾을 수 없습니다."));
+        return toResponse(dog);
+    }
 
+    private DogResponseDto getDogById(Long id) {
+        return toResponse(dogRepository.findById(id)
+                .orElseThrow(() -> new BoardException(HttpStatus.NOT_FOUND, "해당 유기견 정보를 찾을 수 없습니다.")));
+    }
+
+    private DogResponseDto toResponse(Dog dog) {
+        Long id = dog.getDogId();
         DogDetail detail = dogDetailRepository.findByDogId(id);
         List<DogImage> images = dogImageRepository.findByDogId(id);
 
@@ -116,6 +128,7 @@ public class DogService {
                 .imageNames(images.stream().map(DogImage::getFileName).collect(Collectors.toList()))
                 .regDate(dog.getRegDate())
                 .userId(dog.getUserId())
+                .hidden(dog.isHidden())
                 .build();
     }
 
@@ -182,10 +195,12 @@ public class DogService {
     public void deleteDog(Long id, Long userId) {
         dogRepository.findById(id).ifPresent(dog -> checkOwner(dog, userId));
 
+        List<DogImage> images = dogImageRepository.findByDogId(id);
         inquiryRepository.deleteByDogId(id);
         dogImageRepository.deleteByDogId(id);
         dogDetailRepository.deleteByDogId(id);
         dogRepository.delete(id);
+        images.forEach(image -> imageStorage.delete(image.getFileName()));
     }
 
     // ✅ 작성자 확인 (작성자가 없는 기존 데이터는 로그인한 누구나 수정/삭제 가능)

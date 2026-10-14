@@ -1,7 +1,11 @@
 package org.likelion.hsu.db_project.Service;
 
 import lombok.RequiredArgsConstructor;
+import org.likelion.hsu.db_project.Dto.ConsentRequestDto;
 import org.likelion.hsu.db_project.Dto.SignupRequestDto;
+import org.likelion.hsu.db_project.Repository.DogRepository;
+import org.likelion.hsu.db_project.Repository.InquiryRepository;
+import org.likelion.hsu.db_project.Repository.ReportRepository;
 import org.likelion.hsu.db_project.Entity.User;
 import org.likelion.hsu.db_project.Repository.UserRepository;
 import org.likelion.hsu.db_project.Security.LoginUser;
@@ -11,10 +15,13 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
+import java.util.LinkedHashMap;
 import java.util.Locale;
+import java.util.Map;
 import java.util.regex.Pattern;
 
 @Service
@@ -27,6 +34,10 @@ public class UserService implements UserDetailsService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final DogRepository dogRepository;
+    private final DogService dogService;
+    private final InquiryRepository inquiryRepository;
+    private final ReportRepository reportRepository;
 
     // ✅ 이메일 회원가입
     public void signup(SignupRequestDto dto) {
@@ -41,8 +52,9 @@ public class UserService implements UserDetailsService {
         if (password == null || password.length() < 8 || password.getBytes(StandardCharsets.UTF_8).length > 72) {
             throw new IllegalArgumentException("비밀번호는 8자 이상이어야 합니다.");
         }
-        if (nickname.isEmpty() || nickname.length() > 20) {
-            throw new IllegalArgumentException("닉네임은 1~20자로 입력해주세요.");
+        validateNickname(nickname);
+        if (!dto.allAgreed()) {
+            throw new IllegalArgumentException("필수 항목(만 14세 이상, 이용약관, 개인정보 수집·이용)에 모두 동의해주세요.");
         }
         if (userRepository.findByProviderAndProviderId(LOCAL, email).isPresent()) {
             throw new IllegalStateException("이미 가입된 이메일입니다.");
@@ -55,12 +67,64 @@ public class UserService implements UserDetailsService {
                 .password(passwordEncoder.encode(password))
                 .nickname(nickname)
                 .createdAt(LocalDateTime.now())
+                .termsAgreedAt(LocalDateTime.now())
                 .build();
 
         try {
             userRepository.save(user);
         } catch (DuplicateKeyException e) {
             throw new IllegalStateException("이미 가입된 이메일입니다.");
+        }
+    }
+
+    // ✅ 약관 동의 (소셜 로그인으로 처음 가입한 회원, 동의 기능 도입 전 회원)
+    public void agree(Long userId, ConsentRequestDto dto) {
+        if (!dto.allAgreed()) {
+            throw new IllegalArgumentException("필수 항목(만 14세 이상, 이용약관, 개인정보 수집·이용)에 모두 동의해주세요.");
+        }
+        userRepository.agreeTerms(userId);
+    }
+
+    // ✅ 내 정보 + 활동 수
+    public Map<String, Object> profile(Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalStateException("회원 정보를 찾을 수 없습니다."));
+        Map<String, Object> body = new LinkedHashMap<>();
+        body.put("userId", user.getUserId());
+        body.put("provider", user.getProvider());
+        body.put("email", user.getEmail());
+        body.put("nickname", user.getNickname());
+        body.put("createdAt", user.getCreatedAt());
+        body.put("termsAgreedAt", user.getTermsAgreedAt());
+        body.put("counts", userRepository.countActivities(userId));
+        return body;
+    }
+
+    public void updateNickname(Long userId, String nickname) {
+        String value = nickname != null ? nickname.trim() : "";
+        validateNickname(value);
+        userRepository.updateNickname(userId, value);
+    }
+
+    // ✅ 회원 탈퇴
+    // 등록한 유기견(사진 포함)·주고받은 입양 문의·신고 기록은 삭제하고,
+    // 커뮤니티 글·댓글은 남기되 작성자를 "탈퇴한 회원"으로 바꾼다
+    @Transactional
+    public void withdraw(Long userId) {
+        for (Long dogId : dogRepository.findIdsByUserId(userId)) {
+            dogService.deleteDog(dogId, userId);
+        }
+        inquiryRepository.deleteByUserId(userId);
+        reportRepository.deleteByReporterId(userId);
+        userRepository.anonymize(userId);
+    }
+
+    private void validateNickname(String nickname) {
+        if (nickname.isEmpty() || nickname.length() > 20) {
+            throw new IllegalArgumentException("닉네임은 1~20자로 입력해주세요.");
+        }
+        if ("탈퇴한 회원".equals(nickname)) {
+            throw new IllegalArgumentException("사용할 수 없는 닉네임입니다.");
         }
     }
 

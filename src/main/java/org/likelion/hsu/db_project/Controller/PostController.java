@@ -37,9 +37,10 @@ public class PostController {
             @RequestParam(required = false) String category,
             @RequestParam(required = false) String search,
             @RequestParam(required = false, defaultValue = "1") int page,
-            @RequestParam(required = false, defaultValue = "10") int size
+            @RequestParam(required = false, defaultValue = "10") int size,
+            @AuthenticationPrincipal LoginUser user
     ) {
-        return postService.getPosts(category, search, page, size);
+        return postService.getPosts(category, search, page, size, user != null ? user.getUserId() : null);
     }
 
     /**
@@ -54,8 +55,8 @@ public class PostController {
      * ✅ 상세 조회 (댓글 포함)
      */
     @GetMapping("/{id}")
-    public PostResponseDto getPost(@PathVariable Long id) {
-        return postService.getPost(id);
+    public PostResponseDto getPost(@PathVariable Long id, @AuthenticationPrincipal LoginUser user) {
+        return postService.getPost(id, user != null ? user.getUserId() : null);
     }
 
     /**

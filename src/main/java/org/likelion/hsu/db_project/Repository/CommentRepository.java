@@ -27,6 +27,7 @@ public class CommentRepository {
             .parentId(rs.getObject("parent_id") != null ? rs.getLong("parent_id") : null)
             .content(rs.getString("content"))
             .deleted(rs.getBoolean("deleted"))
+            .hidden(rs.getBoolean("hidden"))
             .createdAt(rs.getTimestamp("created_at") != null
                     ? rs.getTimestamp("created_at").toLocalDateTime()
                     : null)

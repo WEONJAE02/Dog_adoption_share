@@ -33,6 +33,7 @@ public class DogRepository {
                             ? rs.getTimestamp("reg_date").toLocalDateTime()
                             : null)
                     .userId(rs.getObject("user_id") != null ? rs.getLong("user_id") : null)
+                    .hidden(rs.getBoolean("hidden"))
                     .build();
         }
     };
@@ -58,9 +59,11 @@ public class DogRepository {
     }
 
     // ✅ 검색 + 정렬 + 필터
-    public List<Dog> findAllWithConditions(String search, String status, String sort) {
-        StringBuilder sql = new StringBuilder("SELECT * FROM dog WHERE 1=1 ");
+    // 숨겨진 글은 작성자 본인(viewerId)에게만 보인다
+    public List<Dog> findAllWithConditions(String search, String status, String sort, Long viewerId) {
+        StringBuilder sql = new StringBuilder("SELECT * FROM dog WHERE (hidden = 0 OR user_id = ?) ");
         List<Object> params = new ArrayList<>();
+        params.add(viewerId);
 
         // 검색 (이름 / 품종 / 구조장소)
         if (search != null && !search.isEmpty()) {
@@ -85,6 +88,10 @@ public class DogRepository {
         }
 
         return jdbcTemplate.query(sql.toString(), dogRowMapper, params.toArray());
+    }
+
+    public List<Long> findIdsByUserId(Long userId) {
+        return jdbcTemplate.queryForList("SELECT dog_id FROM dog WHERE user_id = ?", Long.class, userId);
     }
 
     // ✅ 상세 조회
@@ -115,13 +122,13 @@ public class DogRepository {
 
     // ✅ 상태별 통계 (대시보드)
     public List<Map<String, Object>> getStatusStats() {
-        String sql = "SELECT status, COUNT(*) AS count FROM dog GROUP BY status";
+        String sql = "SELECT status, COUNT(*) AS count FROM dog WHERE hidden = 0 GROUP BY status";
         return jdbcTemplate.queryForList(sql);
     }
 
     // ✅ 품종별 통계 (대시보드)
     public List<Map<String, Object>> getBreedStats() {
-        String sql = "SELECT breed, COUNT(*) AS count FROM dog GROUP BY breed";
+        String sql = "SELECT breed, COUNT(*) AS count FROM dog WHERE hidden = 0 GROUP BY breed";
         return jdbcTemplate.queryForList(sql);
     }
 

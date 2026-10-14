@@ -40,18 +40,18 @@ public class PostService {
             postRepository.saveImage(postId, imageStorage.store(file));
         }
 
-        return toDetail(findPost(postId));
+        return toDetail(findPost(postId), userId);
     }
 
     // ✅ 목록 (말머리 + 검색 + 페이지)
-    public PostPageDto getPosts(String category, String search, int page, int size) {
+    public PostPageDto getPosts(String category, String search, int page, int size, Long viewerId) {
         int pageSize = Math.min(Math.max(size, 1), MAX_PAGE_SIZE);
         int pageNo = Math.max(page, 1);
         String keyword = search != null ? search.trim() : null;
 
-        long total = postRepository.count(category, keyword);
+        long total = postRepository.count(category, keyword, viewerId);
         List<PostResponseDto> items = postRepository
-                .findPage(category, keyword, pageSize, (pageNo - 1) * pageSize).stream()
+                .findPage(category, keyword, viewerId, pageSize, (pageNo - 1) * pageSize).stream()
                 .map(this::toSummary)
                 .toList();
 
@@ -65,10 +65,10 @@ public class PostService {
     }
 
     // ✅ 상세 조회 (조회수 증가)
-    public PostResponseDto getPost(Long id) {
-        findPost(id);
+    public PostResponseDto getPost(Long id, Long viewerId) {
+        findVisiblePost(id, viewerId);
         postRepository.increaseViewCount(id);
-        return toDetail(findPost(id));
+        return toDetail(findPost(id), viewerId);
     }
 
     // ✅ 수정 (keepImages에 없는 기존 이미지는 삭제, 새 이미지는 추가)
@@ -92,7 +92,7 @@ public class PostService {
             postRepository.saveImage(id, imageStorage.store(file));
         }
 
-        return toDetail(findPost(id));
+        return toDetail(findPost(id), userId);
     }
 
     // ✅ 삭제 (댓글, 이미지 포함)
@@ -111,7 +111,7 @@ public class PostService {
     // ✅ 댓글 / 대댓글 등록
     @Transactional
     public PostResponseDto addComment(Long postId, CommentRequestDto dto, Long userId) {
-        findPost(postId);
+        findVisiblePost(postId, userId);
 
         String content = dto.getContent() != null ? dto.getContent().trim() : "";
         if (content.isEmpty() || content.length() > 500) {
@@ -134,7 +134,7 @@ public class PostService {
                 .content(content)
                 .build());
 
-        return toDetail(findPost(postId));
+        return toDetail(findPost(postId), userId);
     }
 
     // ✅ 댓글 삭제 (답글이 달린 댓글은 "삭제된 댓글"로 남긴다)
@@ -157,7 +157,16 @@ public class PostService {
             }
         }
 
-        return toDetail(findPost(postId));
+        return toDetail(findPost(postId), userId);
+    }
+
+    // 신고로 숨겨진 글은 작성자 본인만 볼 수 있다
+    private Post findVisiblePost(Long id, Long viewerId) {
+        Post post = findPost(id);
+        if (post.isHidden() && !post.getUserId().equals(viewerId)) {
+            throw new BoardException(HttpStatus.NOT_FOUND, "게시글을 찾을 수 없습니다.");
+        }
+        return post;
     }
 
     private Post findPost(Long id) {
@@ -215,27 +224,33 @@ public class PostService {
                 .createdAt(post.getCreatedAt())
                 .updatedAt(post.getUpdatedAt())
                 .thumbnail(post.getThumbnail())
+                .hidden(post.isHidden())
                 .build();
     }
 
-    private PostResponseDto toDetail(Post post) {
+    private PostResponseDto toDetail(Post post, Long viewerId) {
         PostResponseDto dto = toSummary(post);
         dto.setContent(post.getContent());
         dto.setImageNames(postRepository.findImages(post.getPostId()));
-        dto.setComments(toCommentTree(commentRepository.findByPostId(post.getPostId())));
+        dto.setComments(toCommentTree(commentRepository.findByPostId(post.getPostId()), viewerId));
         return dto;
     }
 
     // ✅ 댓글 목록 → 댓글 + 답글 구조
-    private List<CommentResponseDto> toCommentTree(List<Comment> comments) {
+    // 신고로 숨겨진 댓글은 작성자 본인에게만 내용이 보인다
+    private List<CommentResponseDto> toCommentTree(List<Comment> comments, Long viewerId) {
         Map<Long, CommentResponseDto> roots = new LinkedHashMap<>();
         for (Comment comment : comments) {
+            boolean masked = comment.isHidden() && !comment.getUserId().equals(viewerId);
+            String content = comment.isDeleted() ? "삭제된 댓글입니다."
+                    : masked ? "신고로 숨겨진 댓글입니다." : comment.getContent();
             CommentResponseDto dto = CommentResponseDto.builder()
                     .commentId(comment.getCommentId())
                     .userId(comment.isDeleted() ? null : comment.getUserId())
                     .nickname(comment.isDeleted() ? null : comment.getNickname())
-                    .content(comment.isDeleted() ? "삭제된 댓글입니다." : comment.getContent())
+                    .content(content)
                     .deleted(comment.isDeleted())
+                    .hidden(comment.isHidden())
                     .createdAt(comment.getCreatedAt())
                     .build();
 

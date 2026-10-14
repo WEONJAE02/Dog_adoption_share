@@ -17,6 +17,7 @@ public class Post {
     private int viewCount;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
+    private boolean hidden;       // 신고 누적으로 숨김
 
     // 조회 시 함께 가져오는 값 (JPA가 아니므로 단순 필드로 유지)
     private String nickname;

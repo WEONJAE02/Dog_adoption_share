@@ -4,9 +4,12 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.likelion.hsu.db_project.Config.SocialLoginProperties;
+import org.likelion.hsu.db_project.Dto.ConsentRequestDto;
 import org.likelion.hsu.db_project.Dto.LoginRequestDto;
 import org.likelion.hsu.db_project.Dto.SignupRequestDto;
 import org.likelion.hsu.db_project.Dto.UserResponseDto;
+import org.likelion.hsu.db_project.Entity.User;
+import org.likelion.hsu.db_project.Repository.UserRepository;
 import org.likelion.hsu.db_project.Security.LoginUser;
 import org.likelion.hsu.db_project.Service.UserService;
 import org.springframework.http.HttpStatus;
@@ -33,6 +36,7 @@ public class AuthController {
     private final AuthenticationManager authenticationManager;
     private final SecurityContextRepository securityContextRepository;
     private final SocialLoginProperties socialLoginProperties;
+    private final UserRepository userRepository;
 
     /**
      * ✅ 이메일 회원가입
@@ -89,11 +93,35 @@ public class AuthController {
      */
     @GetMapping("/me")
     public Map<String, Object> me(@AuthenticationPrincipal LoginUser user) {
+        // 닉네임 변경, 약관 동의, 탈퇴가 바로 반영되도록 세션이 아닌 DB 값을 돌려준다
+        User current = user != null ? userRepository.findById(user.getUserId()).orElse(null) : null;
         Map<String, Object> body = new HashMap<>();
-        body.put("authenticated", user != null);
-        body.put("user", user != null ? UserResponseDto.from(user) : null);
+        body.put("authenticated", current != null);
+        body.put("user", current != null ? UserResponseDto.builder()
+                .userId(current.getUserId())
+                .provider(current.getProvider())
+                .email(current.getEmail())
+                .nickname(current.getNickname())
+                .build() : null);
+        body.put("termsAgreed", current != null && current.getTermsAgreedAt() != null);
         body.put("socialProviders", socialLoginProperties.enabledProviders());
         return body;
+    }
+
+    /**
+     * ✅ 약관 동의 (소셜 로그인 첫 로그인, 동의 기능 도입 전 회원)
+     */
+    @PostMapping("/agree")
+    public ResponseEntity<Map<String, Object>> agree(@RequestBody ConsentRequestDto dto, @AuthenticationPrincipal LoginUser user) {
+        if (user == null) {
+            return message(HttpStatus.UNAUTHORIZED, "로그인이 필요합니다.");
+        }
+        try {
+            userService.agree(user.getUserId(), dto);
+        } catch (IllegalArgumentException e) {
+            return message(HttpStatus.BAD_REQUEST, e.getMessage());
+        }
+        return message(HttpStatus.OK, "동의가 완료되었습니다.");
     }
 
     private ResponseEntity<Map<String, Object>> message(HttpStatus status, String message) {
