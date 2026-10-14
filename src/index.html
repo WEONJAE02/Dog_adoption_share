@@ -6,47 +6,47 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
 
     <style>
-        :root{ --bg:#0b0c0f; --panel:#151922; --panel-2:#1b2130; --text:#e6e7eb; --muted:#9aa3b2; --brand:#8bc3ff; --chip:#e9eef7; --chip-text:#111; --gap:14px; --radius:18px; --line:#222b3a }
+        :root{ --bg:#ffffff; --panel:#ffffff; --panel-2:#f5f7fa; --soft:#eef1f6; --text:#1c1f26; --muted:#6b7482; --brand:#2b65ff; --gap:14px; --radius:18px; --line:#e5e8ee; --field:#d5dbe5 }
         *{box-sizing:border-box}
         body{margin:0; font-family:system-ui,-apple-system,"Noto Sans KR",sans-serif; background:var(--bg); color:var(--text)}
         a,button,input,select,textarea{font:inherit}
         .container{max-width:1080px; margin:0 auto; padding:24px 20px}
 
-        .hero{display:grid; grid-template-columns:1.2fr .8fr; align-items:center; gap:24px; padding:28px; background:linear-gradient(180deg,#111826 0%,#0f1520 100%); border-radius:24px; border:1px solid var(--line)}
+        .hero{display:grid; grid-template-columns:1.2fr .8fr; align-items:center; gap:24px; padding:28px; background:linear-gradient(180deg,#f6f9fd 0%,#eef3fa 100%); border-radius:24px; border:1px solid var(--line)}
         .title{font-size:44px; line-height:1.15; font-weight:800; letter-spacing:-.02em; margin:0 0 8px}
         .subtitle{display:flex; flex-wrap:wrap; gap:10px; margin:8px 0 0}
-        .pill{padding:8px 12px; border-radius:999px; background:#222a39; color:var(--muted); font-size:13px; border:1px solid #2a3548}
+        .pill{padding:8px 12px; border-radius:999px; background:#fff; color:var(--muted); font-size:13px; border:1px solid var(--line)}
         .actions3{display:flex; gap:14px; margin-top:14px}
-        .action{flex:1; background:var(--panel); border:1px solid var(--line); padding:14px; border-radius:18px; display:flex; align-items:center; justify-content:center; color:#dfe6f4; cursor:pointer}
+        .action{flex:1; background:var(--panel); border:1px solid var(--line); padding:14px; border-radius:18px; display:flex; align-items:center; justify-content:center; color:var(--text); cursor:pointer}
         .action:hover{background:var(--panel-2)}
         .action b{font-size:16px}
 
         .toolbar{display:flex; flex-wrap:wrap; gap:10px; align-items:center; margin:22px 0 6px}
-        .tool-input{flex:1; min-width:200px; display:flex; align-items:center; gap:8px; background:#111725; border:1px solid #223046; color:var(--text); padding:10px 12px; border-radius:12px}
+        .tool-input{flex:1; min-width:200px; display:flex; align-items:center; gap:8px; background:#fff; border:1px solid var(--field); color:var(--text); padding:10px 12px; border-radius:12px}
         .tool-input input{all:unset; flex:1}
-        .tool-sel,.tool-btn{background:#111725; border:1px solid #223046; color:var(--text); padding:10px 12px; border-radius:12px}
-        .tool-btn{background:#223046; cursor:pointer}
-        .tool-btn.primary{background:#2b65ff}
+        .tool-sel,.tool-btn{background:#fff; border:1px solid var(--field); color:var(--text); padding:10px 12px; border-radius:12px}
+        .tool-btn{background:var(--soft); cursor:pointer}
+        .tool-btn.primary{background:#2b65ff; border-color:#2b65ff; color:#fff}
 
         .filters{display:none!important}
 
         .grid{display:grid; gap:var(--gap); grid-template-columns:repeat(auto-fill,minmax(240px,1fr)); margin:16px 0 24px}
-        .card{background:var(--panel); border:1px solid var(--line); border-radius:20px; overflow:hidden; display:flex; flex-direction:column}
-        .thumb{height:170px; width:100%; object-fit:cover; background:#0f1625; cursor:pointer}
+        .card{background:var(--panel); border:1px solid var(--line); border-radius:20px; overflow:hidden; display:flex; flex-direction:column; box-shadow:0 1px 3px rgba(16,24,40,.06)}
+        .thumb{height:170px; width:100%; object-fit:cover; background:var(--soft); cursor:pointer}
         .meta{padding:14px}
         .name{margin:0; font-size:18px; font-weight:700}
         .sub{margin:6px 0 8px; color:var(--muted); font-size:13px}
-        .badge{display:inline-block; padding:4px 9px; border-radius:999px; font-size:12px; border:1px solid #2a3548}
-        .badge.wait{background:#2a3652; color:#cfe1ff}
-        .badge.done{background:#233626; color:#b7f6be}
-        .badge.keep{background:#3a2f2f; color:#ffd2d2}
+        .badge{display:inline-block; padding:4px 9px; border-radius:999px; font-size:12px}
+        .badge.wait{background:#e6efff; color:#1f4fd8}
+        .badge.done{background:#e3f6e6; color:#1c7a33}
+        .badge.keep{background:#fdeaea; color:#b93838}
         .foot{display:flex; justify-content:flex-end; gap:8px; padding:12px 14px; border-top:1px solid var(--line)}
-        .btn{background:#223046; color:#dbe6ff; border:none; border-radius:10px; padding:8px 10px; cursor:pointer}
-        .btn:hover{background:#2a3a56}
+        .btn{background:var(--soft); color:var(--text); border:none; border-radius:10px; padding:8px 10px; cursor:pointer}
+        .btn:hover{background:#e1e6ee}
 
         .charts{display:grid; grid-template-columns:1fr 1fr; gap:14px; margin:16px 0 24px}
         .panel{background:var(--panel); border:1px solid var(--line); border-radius:16px; padding:10px}
-        .panel h5{margin:4px 8px 10px; color:#aab3c3; font-weight:700; font-size:13px}
+        .panel h5{margin:4px 8px 10px; color:var(--muted); font-weight:700; font-size:13px}
         canvas{max-height:200px}
 
         /* 추천 패널 */
@@ -55,43 +55,43 @@
         .rec-btn{background:#2b65ff; border:none; color:#fff; border-radius:10px; padding:10px 12px; cursor:pointer}
         .rec-btn[disabled]{opacity:.6; cursor:not-allowed}
         details.rec-adv{margin-top:10px}
-        details.rec-adv summary{cursor:pointer; color:#cfe1ff}
+        details.rec-adv summary{cursor:pointer; color:#2b65ff}
         .rec-grid{margin-top:10px; display:grid; gap:10px; grid-template-columns:repeat(auto-fit,minmax(160px,1fr))}
-        .rec-grid>label{display:flex; flex-direction:column; gap:6px; background:#0f1420; border:1px solid #223046; border-radius:12px; padding:10px}
-        .rec-note{color:#9aa3b2; font-size:12px}
+        .rec-grid>label{display:flex; flex-direction:column; gap:6px; background:#fff; border:1px solid var(--field); border-radius:12px; padding:10px}
+        .rec-note{color:#6b7482; font-size:12px}
         #recList{display:grid; gap:var(--gap); grid-template-columns:repeat(auto-fill,minmax(240px,1fr)); margin:12px 0 20px}
-        .rec-reason{padding:10px 12px; border-top:1px solid var(--line); color:#aab3c3; font-size:13px; white-space:pre-wrap}
+        .rec-reason{padding:10px 12px; border-top:1px solid var(--line); color:var(--muted); font-size:13px; white-space:pre-wrap}
 
         dialog::backdrop{background:rgba(0,0,0,.4)}
-        dialog{border:none; border-radius:16px; padding:0; overflow:hidden}
+        dialog{border:none; border-radius:16px; padding:0; overflow:hidden; box-shadow:0 20px 60px rgba(16,24,40,.25)}
 
         /* 등록 모달 넓게 */
-        .modal{background:#0f1420; color:#e6ecff; width:min(760px,96vw)}
+        .modal{background:#fff; color:var(--text); width:min(760px,96vw)}
         .modal header{padding:16px 18px; border-bottom:1px solid var(--line); font-weight:800}
         .modal .body{display:grid; grid-template-columns:1fr 1fr; gap:14px 18px; padding:16px 18px}
         .modal label{display:flex; flex-direction:column; gap:6px; font-size:13px}
-        .modal input,.modal textarea,.modal select{background:#0d1320; color:#e6e9f8; border:1px solid #223046; padding:10px 12px; border-radius:10px}
+        .modal input,.modal textarea,.modal select{background:#fff; color:var(--text); border:1px solid var(--field); padding:10px 12px; border-radius:10px}
         .modal footer{display:flex; gap:8px; justify-content:flex-end; padding:12px 18px; border-top:1px solid var(--line)}
 
         .label-memo{grid-column:1 / span 2}
         .ai-row{display:flex; gap:8px; align-items:center; margin-top:6px}
         .ai-btn{background:#2b65ff; border:0; color:#fff; border-radius:10px; padding:8px 10px; cursor:pointer}
         .ai-btn[disabled]{opacity:.6; cursor:not-allowed}
-        .ai-hint{font-size:12px; color:#9aa3b2}
+        .ai-hint{font-size:12px; color:#6b7482}
 
-        .detail{background:#0f1420; color:#e6ecff; width:min(980px,96vw)}
+        .detail{background:#fff; color:var(--text); width:min(980px,96vw)}
         .detail header{padding:16px 18px; border-bottom:1px solid var(--line); font-weight:800}
         .detail footer{display:flex; gap:8px; justify-content:flex-end; padding:12px 18px; border-top:1px solid var(--line)}
         .d-wrap{display:grid; grid-template-columns:1.3fr 1fr; gap:18px; padding:18px}
-        .viewer{position:relative; border:1px solid var(--line); border-radius:12px; overflow:hidden; background:#0d1320}
+        .viewer{position:relative; border:1px solid var(--line); border-radius:12px; overflow:hidden; background:#fff}
         .viewer img{width:100%; height:360px; object-fit:cover; display:block}
         .nav-btn{position:absolute; top:50%; transform:translateY(-50%); background:rgba(0,0,0,.45); border:1px solid #3a4760; color:#fff; padding:8px 10px; border-radius:10px; cursor:pointer}
         .nav-prev{left:10px}.nav-next{right:10px}
         .info .row{display:flex; gap:8px; align-items:center; margin:6px 0}
-        .info .k{color:#9aa3b2; font-size:13px; width:86px}
+        .info .k{color:#6b7482; font-size:13px; width:86px}
         .memo{white-space:pre-wrap}
         .thumbs{margin-top:12px; display:grid; grid-template-columns:repeat(auto-fill,minmax(80px,1fr)); gap:8px}
-        .thumbs img{width:100%; height:70px; object-fit:cover; border-radius:8px; border:1px solid var(--line); cursor:pointer; background:#0d1320}
+        .thumbs img{width:100%; height:70px; object-fit:cover; border-radius:8px; border:1px solid var(--line); cursor:pointer; background:#fff}
 
         /* 로그인 */
         .authbar{display:flex; justify-content:flex-end; align-items:center; gap:10px; margin-bottom:14px; min-height:42px}
@@ -99,17 +99,41 @@
         .auth{width:min(400px,96vw)}
         .auth .body{grid-template-columns:1fr}
         [hidden]{display:none!important}
-        .auth-err{color:#ff9b9b; font-size:13px; min-height:18px}
+        .auth-err{color:#d93025; font-size:13px; min-height:18px}
         .social{display:flex; flex-direction:column; gap:8px; padding-top:12px; border-top:1px solid var(--line)}
         .social-btn{display:flex; align-items:center; justify-content:center; padding:10px 12px; border-radius:10px; font-weight:700; font-size:14px; text-decoration:none; cursor:pointer}
         .social-btn.kakao{background:#fee500; color:#191919}
         .social-btn.naver{background:#03c75a; color:#fff}
-        .auth-switch{all:unset; cursor:pointer; color:#cfe1ff; font-size:13px; text-align:center}
+        .auth-switch{all:unset; cursor:pointer; color:#2b65ff; font-size:13px; text-align:center}
+
+        /* 전국 보호소 유기견 (공공데이터) */
+        .seg-row{display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:12px; margin:32px 0 16px}
+        .seg{display:inline-flex; background:var(--soft); border-radius:999px; padding:4px}
+        .seg-btn{all:unset; cursor:pointer; padding:10px 20px; border-radius:999px; font-weight:700; font-size:15px; color:var(--muted)}
+        .seg-btn.on{background:#fff; color:var(--text); box-shadow:0 1px 4px rgba(16,24,40,.14)}
+        .regions{display:flex; gap:18px; overflow-x:auto; padding:4px 2px 14px; scrollbar-width:thin}
+        .region{all:unset; cursor:pointer; display:flex; flex-direction:column; align-items:center; gap:8px; flex:none; font-size:14px; color:var(--text)}
+        .region .dot{width:64px; height:64px; border-radius:50%; border:1px solid var(--line); display:flex; align-items:center; justify-content:center; font-weight:800; font-size:15px; color:var(--muted); background:var(--panel-2)}
+        .region.on{color:#f08a24; font-weight:700}
+        .region.on .dot{border:3px solid #f08a24; color:#f08a24; background:#fff7ee}
+        .sh-grid{display:grid; gap:22px 18px; grid-template-columns:repeat(4,1fr); margin:10px 0 8px}
+        .sh-card{cursor:pointer; min-width:0}
+        .sh-card img{width:100%; aspect-ratio:1; object-fit:cover; border-radius:14px; background:var(--soft); display:block}
+        .sh-card .t{margin:10px 0 2px; font-weight:700; font-size:15px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
+        .sh-card .s{color:var(--muted); font-size:13px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
+        .stats{display:flex; flex-wrap:wrap; align-items:center; gap:12px 24px; background:#fff; border-radius:18px; box-shadow:0 6px 28px rgba(16,24,40,.12); padding:18px 26px; margin:22px 0 8px}
+        .stats .ttl{font-weight:700; flex-basis:100%}
+        .stats .item{flex:1; text-align:center; font-size:20px; font-weight:700; min-width:140px}
+        .stats .n-green{color:#2e9e57} .stats .n-blue{color:#3566e8} .stats .n-red{color:#e8704a}
+        .stats .note{flex-basis:100%; color:var(--muted); font-size:12px; text-align:right}
+        .src-note{color:var(--muted); font-size:12px; margin:6px 0 0}
+        .sd-info .row{align-items:flex-start}
+        .sd-info .k{flex:none}
 
         /* 탭 */
         .tabs{display:flex; gap:6px; margin-right:auto}
         .tab{background:none; border:1px solid transparent; color:var(--muted); padding:8px 14px; border-radius:999px; cursor:pointer; font-weight:700}
-        .tab.on{background:#222a39; border-color:#2a3548; color:var(--text)}
+        .tab.on{background:var(--soft); border-color:#dfe4ec; color:var(--text)}
 
         /* 커뮤니티 게시판 */
         .posts{list-style:none; margin:16px 0; padding:0; display:flex; flex-direction:column; gap:10px}
@@ -129,24 +153,24 @@
         .pv-body{padding:18px; max-height:68vh; overflow:auto}
         .pv-content{white-space:pre-wrap; line-height:1.6; margin:14px 0; overflow-wrap:anywhere}
         .pv-images{display:grid; grid-template-columns:repeat(auto-fill,minmax(180px,1fr)); gap:10px}
-        .pv-images img{width:100%; height:180px; object-fit:cover; border-radius:10px; border:1px solid var(--line); cursor:pointer; background:#0d1320}
+        .pv-images img{width:100%; height:180px; object-fit:cover; border-radius:10px; border:1px solid var(--line); cursor:pointer; background:#fff}
         .pv-body h4{margin:22px 0 4px; padding-top:16px; border-top:1px solid var(--line)}
         .comments,.replies{list-style:none; margin:0; padding:0}
         .comment{padding:10px 0; border-bottom:1px solid var(--line)}
-        .replies .comment{margin:8px 0 0 22px; padding:0 0 0 12px; border-left:2px solid #2a3548; border-bottom:none}
+        .replies .comment{margin:8px 0 0 22px; padding:0 0 0 12px; border-left:2px solid #dfe4ec; border-bottom:none}
         .c-head{display:flex; gap:10px; align-items:center; font-size:13px}
         .c-date{color:var(--muted); font-size:12px}
-        .c-act{all:unset; cursor:pointer; color:#cfe1ff; font-size:12px}
+        .c-act{all:unset; cursor:pointer; color:#2b65ff; font-size:12px}
         .c-body{margin-top:4px; white-space:pre-wrap; overflow-wrap:anywhere; font-size:14px}
         .comment.gone>.c-body{color:var(--muted)}
         .c-form{display:flex; gap:8px; margin-top:10px}
-        .c-form textarea{flex:1; background:#0d1320; color:#e6e9f8; border:1px solid #223046; padding:10px 12px; border-radius:10px; resize:vertical}
+        .c-form textarea{flex:1; background:#fff; color:var(--text); border:1px solid var(--field); padding:10px 12px; border-radius:10px; resize:vertical}
         .field{display:flex; flex-direction:column; gap:6px; font-size:13px; grid-column:1 / span 2}
         .keep-thumb{position:relative; cursor:pointer}
         .keep-thumb.off img{opacity:.25}
-        .keep-thumb.off::after{content:'삭제'; position:absolute; inset:0; display:flex; align-items:center; justify-content:center; font-size:12px; color:#ff9b9b}
+        .keep-thumb.off::after{content:'삭제'; position:absolute; inset:0; display:flex; align-items:center; justify-content:center; font-size:12px; color:#d93025}
 
-        .toast{position:fixed; left:50%; transform:translateX(-50%); bottom:26px; background:#10182a; border:1px solid #2a3a56; color:#e6ecff; padding:10px 14px; border-radius:10px; font-size:13px; display:none}
+        .toast{position:fixed; left:50%; transform:translateX(-50%); bottom:26px; background:#1f2430; color:#fff; padding:10px 14px; border-radius:10px; font-size:13px; display:none}
         .toast.show{display:block}
 
         @media (max-width:900px){
@@ -156,6 +180,7 @@
             .viewer img{height:300px}
             .modal .body{grid-template-columns:1fr}
             .label-memo,.field{grid-column:1}
+            .sh-grid{grid-template-columns:repeat(2,1fr)}
         }
     </style>
 
@@ -198,6 +223,35 @@
         <img alt="pet" src="https://images.unsplash.com/photo-1543466835-00a7907e9de1?q=80&w=1200&auto=format&fit=crop" style="width:100%; border-radius:20px; border:1px solid var(--line)">
     </section>
 
+    <!-- 보기 선택: 전국 보호소(공공데이터) / 회원 등록 -->
+    <div class="seg-row">
+        <div class="seg">
+            <button class="seg-btn on" data-sec="shelter">전국 보호소 유기견</button>
+            <button class="seg-btn" data-sec="member">회원이 등록한 유기견</button>
+        </div>
+        <select id="shState" class="tool-sel">
+            <option value="protect">보호중</option><option value="notice">공고중</option><option value="">전체</option>
+        </select>
+    </div>
+
+    <!-- 전국 보호소 유기견 (공공데이터) -->
+    <section id="shelterSec">
+        <div id="shRegions" class="regions"></div>
+        <div id="shGrid" class="sh-grid"></div>
+        <div id="shMsg" class="post-empty" hidden></div>
+        <div class="pager"><button id="shMore" class="tool-btn" hidden>더보기</button></div>
+        <div id="shStats" class="stats" hidden>
+            <div class="ttl" id="shStatsTitle"></div>
+            <div class="item">구조 <span class="n-green" id="shRescued"></span> 마리</div>
+            <div class="item">입양률 <span class="n-blue" id="shAdopt"></span> %</div>
+            <div class="item">안락사율 <span class="n-red" id="shEuth"></span> %</div>
+            <div class="note" id="shStatsNote"></div>
+        </div>
+        <p class="src-note">자료: 농림축산식품부 국가동물보호정보시스템 (공공데이터포털)</p>
+    </section>
+
+    <!-- 회원이 등록한 유기견 -->
+    <div id="memberSec" hidden>
     <!-- TOOLBAR ... (그대로) -->
     <div class="toolbar">
         <div class="tool-input" style="flex:2"><input id="q" placeholder="이름/품종/장소 검색"/></div>
@@ -249,6 +303,7 @@
     <ul id="recList"></ul>
     <ul id="list" class="grid"></ul>
     </div>
+    </div>
 
     <!-- 커뮤니티 게시판 -->
     <div id="viewBoard" hidden>
@@ -294,7 +349,7 @@
             <!-- ✅ 변경: 여러 장 업로드 + 미리보기 -->
             <label style="grid-column:1 / span 2">사진 (최대 5장)
                 <input id="photoFiles" type="file" accept="image/*" multiple />
-                <small id="selHint" style="color:#9aa3b2;margin-top:6px">선택: 0장</small>
+                <small id="selHint" style="color:#6b7482;margin-top:6px">선택: 0장</small>
                 <div id="selPreview" class="thumbs"></div>
             </label>
         </div>
@@ -349,7 +404,7 @@
                 <div class="k">지도</div>
                 <div class="v" style="flex:1">
                     <div id="dMap" style="width:100%;height:220px;border:1px solid var(--line);border-radius:10px"></div>
-                    <div id="dMapMsg" style="margin-top:6px;color:#9aa3b2;font-size:12px"></div>
+                    <div id="dMapMsg" style="margin-top:6px;color:#6b7482;font-size:12px"></div>
                 </div>
             </div>
             <div class="thumbs" id="dThumbs"></div>
@@ -361,6 +416,23 @@
         <button id="dDel" class="btn">삭제</button>
         <button id="dClose" class="btn">닫기</button>
     </footer>
+</dialog>
+
+<!-- 보호소 유기견 상세 (공공데이터) -->
+<dialog id="shelterDialog" class="detail">
+    <header id="sdTitle">보호소 유기견</header>
+    <div class="d-wrap">
+        <div>
+            <div class="viewer">
+                <img id="sdMain" alt="보호소 유기견 사진">
+                <button class="nav-btn nav-prev" id="sdPrev">‹</button>
+                <button class="nav-btn nav-next" id="sdNext">›</button>
+            </div>
+            <div class="thumbs" id="sdThumbs"></div>
+        </div>
+        <div class="info sd-info" id="sdInfo"></div>
+    </div>
+    <footer><button id="sdClose" class="btn">닫기</button></footer>
 </dialog>
 
 <!-- 게시글 상세 + 댓글 -->
@@ -397,7 +469,7 @@
             </label>
             <div class="field">사진 (최대 5장)
                 <input id="pwFiles" type="file" accept="image/png,image/jpeg,image/gif,image/webp" multiple />
-                <small id="pwHint" style="color:#9aa3b2">선택: 0장</small>
+                <small id="pwHint" style="color:#6b7482">선택: 0장</small>
                 <div id="pwKeep" class="thumbs"></div>
                 <div id="pwPreview" class="thumbs"></div>
             </div>
@@ -433,6 +505,7 @@
     const UPLOAD_URL = API_BASE + '/uploads/';
     const AUTH = API_BASE + '/auth';
     const POSTS = API_BASE + '/posts';
+    const SHELTER = API_BASE + '/shelter';
 
     /* OpenAI 키 보관 방식 유지 */
     const OPENAI_FALLBACK_KEY = '';
@@ -730,6 +803,92 @@ ${JSON.stringify(candidates,null,2)}
         });
     }
 
+    /* 전국 보호소 유기견 (공공데이터) */
+    const NO_IMG='https://placehold.co/600x600?text=No+Image';
+    const shGrid=$("#shGrid"), shDlg=$("#shelterDialog"), sdMain=$("#sdMain");
+    let shRegion='', shPage=1, shLoaded=0, shGallery=[], shIdx=0;
+    // "충청북도" → "충북", "서울특별시" → "서울"
+    const shortRegion = n => /^(충청|전라|경상)(북|남)도$/.test(n) ? n[0]+n[2] : n.replace(/(특별자치도|특별자치시|통합특별시|특별시|광역시|도)$/,'');
+
+    function regionNode(code,name){
+        const b=document.createElement('button'); b.type='button'; b.className='region'+(code===shRegion?' on':''); b.dataset.code=code;
+        const dot=document.createElement('span'); dot.className='dot'; dot.textContent=name.slice(0,2);
+        const label=document.createElement('span'); label.textContent=name;
+        b.append(dot,label);
+        b.addEventListener('click',()=>{ shRegion=code; document.querySelectorAll('.region').forEach(r=>r.classList.toggle('on',r.dataset.code===code)); loadShelter(true) });
+        return b;
+    }
+    async function loadShelterRegions(){
+        const box=$("#shRegions"); box.innerHTML=''; box.appendChild(regionNode('','전체'));
+        (await req(`${SHELTER}/regions`)).forEach(r=>box.appendChild(regionNode(r.code,shortRegion(r.name))));
+    }
+    function shelterCard(a){
+        const card=document.createElement('div'); card.className='sh-card';
+        const im=document.createElement('img'); im.loading='lazy'; im.alt=a.kind||'유기견'; im.src=a.images[0]||NO_IMG; im.onerror=()=>{ im.onerror=null; im.src=NO_IMG };
+        const t=document.createElement('div'); t.className='t'; t.textContent=a.kind||'품종 미상';
+        const s1=document.createElement('div'); s1.className='s'; s1.textContent=[a.sex,a.age,a.weight].filter(Boolean).join(' · ');
+        const s2=document.createElement('div'); s2.className='s'; s2.textContent=a.careName||a.orgName||'';
+        card.append(im,t,s1,s2); card.addEventListener('click',()=>openShelter(a));
+        return card;
+    }
+    async function loadShelter(reset){
+        const msg=$("#shMsg"), more=$("#shMore");
+        if(reset){ shPage=1; shLoaded=0; shGrid.innerHTML=''; msg.hidden=false; msg.textContent='불러오는 중…'; more.hidden=true }
+        more.disabled=true;
+        try{
+            const r=await req(`${SHELTER}/animals?region=${shRegion}&state=${$("#shState").value}&page=${shPage}&size=8`);
+            r.items.forEach(a=>shGrid.appendChild(shelterCard(a)));
+            shLoaded+=r.items.length;
+            msg.hidden = shLoaded>0; msg.textContent='조건에 맞는 유기견이 없습니다.';
+            more.hidden = shLoaded>=r.total || !r.items.length;
+        }catch(err){ msg.hidden=false; msg.textContent=err.message||'보호소 정보를 불러오지 못했습니다.'; more.hidden=true }
+        finally{ more.disabled=false }
+    }
+    async function loadShelterStats(){
+        try{
+            const s=await req(`${SHELTER}/stats`);
+            $("#shStatsTitle").textContent=`최근 ${s.days}일 유기견 통계 (${s.from.slice(5).replace('-','.')} ~ ${s.to.slice(5).replace('-','.')})`;
+            $("#shRescued").textContent=s.rescued.toLocaleString('ko-KR');
+            $("#shAdopt").textContent=s.adoptionRate.toFixed(1); $("#shEuth").textContent=s.euthanasiaRate.toFixed(1);
+            $("#shStatsNote").textContent=`입양률·안락사율은 처리가 끝난 ${s.closed.toLocaleString('ko-KR')}마리 기준 · 보호·공고 중 ${s.protecting.toLocaleString('ko-KR')}마리`;
+            $("#shStats").hidden=false;
+        }catch{ $("#shStats").hidden=true }
+    }
+    function setShelterImage(i){ if(!shGallery.length){ sdMain.src=NO_IMG; return } shIdx=(i+shGallery.length)%shGallery.length; sdMain.src=shGallery[shIdx] }
+    function openShelter(a){
+        shGallery=a.images||[]; setShelterImage(0);
+        $("#sdPrev").hidden=$("#sdNext").hidden = shGallery.length<2;
+        const th=$("#sdThumbs"); th.innerHTML='';
+        if(shGallery.length>1) shGallery.forEach((src,i)=>{ const im=new Image(); im.src=src; im.alt='사진 '+(i+1); im.addEventListener('click',()=>setShelterImage(i)); th.appendChild(im) });
+        $("#sdTitle").textContent=`${a.kind||'품종 미상'} · ${a.state||''}`;
+        const info=$("#sdInfo"); info.innerHTML='';
+        [['공고번호',a.noticeNo],['품종',a.kind],['성별',a.sex],['중성화',a.neuter],['나이',a.age],['체중',a.weight],['색상',a.color],['상태',a.state],
+         ['접수일',a.happenDate],['발견 장소',a.happenPlace],['공고 기간',a.noticeStart&&a.noticeEnd?`${a.noticeStart} ~ ${a.noticeEnd}`:null],['특징',a.specialMark],
+         ['보호소',a.careName],['연락처',a.careTel],['보호 장소',a.careAddr],['관할기관',a.orgName]].forEach(([k,v])=>{
+            if(!v) return;
+            const row=document.createElement('div'); row.className='row';
+            const kk=document.createElement('div'); kk.className='k'; kk.textContent=k;
+            const vv=document.createElement('div'); vv.className='v memo';
+            if(k==='연락처'){ const tel=document.createElement('a'); tel.href='tel:'+v.replace(/[^0-9+]/g,''); tel.textContent=v; vv.appendChild(tel) } else vv.textContent=v;
+            row.append(kk,vv); info.appendChild(row);
+        });
+        shDlg.showModal();
+    }
+    $("#sdPrev").addEventListener('click',()=>setShelterImage(shIdx-1));
+    $("#sdNext").addEventListener('click',()=>setShelterImage(shIdx+1));
+    $("#sdClose").addEventListener('click',()=>shDlg.close());
+    $("#shState").addEventListener('change',()=>loadShelter(true));
+    $("#shMore").addEventListener('click',()=>{ shPage++; loadShelter(false) });
+
+    /* 입양 정보: 전국 보호소 / 회원 등록 중 하나만 보여준다 */
+    function showAdoptSec(name){
+        const member = name==='member';
+        $("#shelterSec").hidden=member; $("#memberSec").hidden=!member; $("#shState").hidden=member;
+        document.querySelectorAll('.seg-btn').forEach(b=>b.classList.toggle('on',b.dataset.sec===name));
+        if(member) loadCharts();
+    }
+    document.querySelectorAll('.seg-btn').forEach(b=>b.addEventListener('click',()=>showAdoptSec(b.dataset.sec)));
+
     /* 커뮤니티 게시판 */
     const enc = v => encodeURIComponent(v||'');
     const fmtDateTime = iso => iso? new Date(iso).toLocaleString('ko-KR',{dateStyle:'short',timeStyle:'short'}) : '';
@@ -880,9 +1039,9 @@ ${JSON.stringify(candidates,null,2)}
     /* 초기 구동 */
     document.addEventListener('DOMContentLoaded',async()=>{
         $("#btnNew").addEventListener("click",()=>openDialog());
-        $("#actNew").addEventListener("click",()=>openDialog());
-        $("#actWait").addEventListener("click",()=>{ statusSel.value="입양대기"; renderList() });
-        $("#actList").addEventListener("click",()=>{ statusSel.value=""; qEl.value=""; renderList() });
+        $("#actNew").addEventListener("click",()=>{ showAdoptSec('member'); openDialog() });
+        $("#actWait").addEventListener("click",()=>{ showAdoptSec('member'); statusSel.value="입양대기"; renderList() });
+        $("#actList").addEventListener("click",()=>{ showAdoptSec('member'); statusSel.value=""; qEl.value=""; renderList() });
         qEl.addEventListener("input",renderList); statusSel.addEventListener("change",renderList); sortSel.addEventListener("change",renderList);
         dlg.addEventListener('close',()=>form.reset());
         if(new URLSearchParams(location.search).has('loginError')){ showToast('소셜 로그인에 실패했습니다.'); history.replaceState(null,'',location.pathname) }
@@ -894,6 +1053,7 @@ ${JSON.stringify(candidates,null,2)}
         $("#bPrev").addEventListener('click',()=>{ bPageNo--; renderPosts() }); $("#bNext").addEventListener('click',()=>{ bPageNo++; renderPosts() });
         Posts.categories().then(list=>list.forEach(c=>{ bCat.add(new Option(c,c)); $("#pwCat").add(new Option(c,c)) })).catch(()=>{});
         if(location.hash==='#board') showView('board');
+        loadShelterRegions().catch(()=>{}); loadShelter(true); loadShelterStats();
         await renderList(); await loadCharts(); startAutoRefresh();
     });
 </script>
