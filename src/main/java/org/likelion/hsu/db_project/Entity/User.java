@@ -16,4 +16,6 @@ public class User {
     private String password;      // local만 사용 (BCrypt 해시)
     private String nickname;
     private LocalDateTime createdAt;
+    private LocalDateTime termsAgreedAt;  // 이용약관·개인정보 동의 시각 (없으면 미동의)
+    private LocalDateTime deletedAt;      // 탈퇴 시각
 }

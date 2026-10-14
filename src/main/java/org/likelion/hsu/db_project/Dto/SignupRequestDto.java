@@ -5,7 +5,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class SignupRequestDto {
+public class SignupRequestDto extends ConsentRequestDto {
     private String email;
     private String password;
     private String nickname;

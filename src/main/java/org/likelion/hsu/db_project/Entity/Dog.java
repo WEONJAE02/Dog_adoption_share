@@ -20,6 +20,7 @@ public class Dog {
     private String imageName;
     private LocalDateTime regDate;
     private Long userId;   // 작성자 (로그인 도입 전 데이터는 null)
+    private boolean hidden; // 신고 누적으로 숨김
 
     // ✅ 연관 데이터 포함 (JPA가 아니므로 단순 참조만 유지)
     private DogDetail dogDetail;

@@ -15,6 +15,7 @@ public class Comment {
     private Long parentId;        // 대댓글이면 부모 댓글 ID
     private String content;
     private boolean deleted;
+    private boolean hidden;       // 신고 누적으로 숨김
     private LocalDateTime createdAt;
 
     private String nickname;      // 조회 시 함께 가져오는 값

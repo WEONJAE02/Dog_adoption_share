@@ -51,7 +51,7 @@ public class SecurityConfig {
                 .httpBasic(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
                         // 조회는 누구나, 등록/수정/삭제는 로그인 필요
-                        .requestMatchers(HttpMethod.GET, "/dogs/**", "/posts/**", "/shelter/**", "/uploads/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/dogs/**", "/posts/**", "/shelter/**", "/uploads/**", "/reports/reasons").permitAll()
                         .requestMatchers("/auth/**", "/error").permitAll()
                         .anyRequest().authenticated())
                 // 로그인 페이지로 보내지 않고 401/403 JSON 응답

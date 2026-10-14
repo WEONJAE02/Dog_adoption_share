@@ -20,6 +20,7 @@ public class PostResponseDto {
     private int commentCount;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
+    private boolean hidden;
 
     // 목록용
     private String thumbnail;

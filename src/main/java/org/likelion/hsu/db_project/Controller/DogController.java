@@ -5,8 +5,10 @@ import lombok.RequiredArgsConstructor;
 import org.likelion.hsu.db_project.Dto.DogRequestDto;
 import org.likelion.hsu.db_project.Dto.DogResponseDto;
 import org.likelion.hsu.db_project.Security.LoginUser;
+import org.likelion.hsu.db_project.Service.BoardException;
 import org.likelion.hsu.db_project.Service.DogService;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -49,9 +51,10 @@ public class DogController {
     public List<DogResponseDto> getAllDogs(
             @RequestParam(required = false) String search,
             @RequestParam(required = false) String status,
-            @RequestParam(required = false, defaultValue = "latest") String sort
+            @RequestParam(required = false, defaultValue = "latest") String sort,
+            @AuthenticationPrincipal LoginUser user
     ) {
-        return dogService.getAllDogs(search, status, sort);
+        return dogService.getAllDogs(search, status, sort, user != null ? user.getUserId() : null);
     }
 
 
@@ -59,8 +62,8 @@ public class DogController {
      * ✅ 상세 조회
      */
     @GetMapping("/{id}")
-    public DogResponseDto getDogById(@PathVariable Long id) {
-        return dogService.getDogById(id);
+    public DogResponseDto getDogById(@PathVariable Long id, @AuthenticationPrincipal LoginUser user) {
+        return dogService.getDogById(id, user != null ? user.getUserId() : null);
     }
 
 
@@ -97,5 +100,10 @@ public class DogController {
     @GetMapping("/statistics")
     public Map<String, Object> getStatistics() {
         return dogService.getStatistics();
+    }
+
+    @ExceptionHandler(BoardException.class)
+    public ResponseEntity<Map<String, Object>> handleBoardException(BoardException e) {
+        return ResponseEntity.status(e.getStatus()).body(Map.of("message", e.getMessage()));
     }
 }

@@ -17,6 +17,7 @@ public class CommentResponseDto {
     private String nickname;
     private String content;
     private boolean deleted;
+    private boolean hidden;
     private LocalDateTime createdAt;
 
     @Builder.Default

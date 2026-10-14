@@ -26,6 +26,7 @@ public class DogResponseDto {
     private List<String> imageNames;
     private LocalDateTime regDate;
     private Long userId;
+    private boolean hidden;
 
     public static DogResponseDto from(Dog dog) {
         return DogResponseDto.builder()

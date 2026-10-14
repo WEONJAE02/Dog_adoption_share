@@ -23,7 +23,7 @@ public class PostRepository {
     // 작성자 닉네임, 댓글 수, 대표 이미지를 함께 조회
     private static final String SELECT_POST =
             "SELECT p.*, u.nickname, " +
-            "(SELECT COUNT(*) FROM board_comment c WHERE c.post_id = p.post_id AND c.deleted = 0) AS comment_count, " +
+            "(SELECT COUNT(*) FROM board_comment c WHERE c.post_id = p.post_id AND c.deleted = 0 AND c.hidden = 0) AS comment_count, " +
             "(SELECT i.file_name FROM board_post_image i WHERE i.post_id = p.post_id ORDER BY i.id LIMIT 1) AS thumbnail " +
             "FROM board_post p JOIN users u ON u.user_id = p.user_id ";
 
@@ -41,6 +41,7 @@ public class PostRepository {
             .nickname(rs.getString("nickname"))
             .commentCount(rs.getInt("comment_count"))
             .thumbnail(rs.getString("thumbnail"))
+            .hidden(rs.getBoolean("hidden"))
             .build();
 
     private static LocalDateTime toLocalDateTime(Timestamp ts) {
@@ -72,23 +73,25 @@ public class PostRepository {
     }
 
     // ✅ 목록 (말머리 + 검색 + 페이지)
-    public List<Post> findPage(String category, String search, int limit, int offset) {
+    public List<Post> findPage(String category, String search, Long viewerId, int limit, int offset) {
         List<Object> params = new ArrayList<>();
-        String sql = SELECT_POST + where(category, search, params) + "ORDER BY p.post_id DESC LIMIT ? OFFSET ?";
+        String sql = SELECT_POST + where(category, search, viewerId, params) + "ORDER BY p.post_id DESC LIMIT ? OFFSET ?";
         params.add(limit);
         params.add(offset);
         return jdbcTemplate.query(sql, postRowMapper, params.toArray());
     }
 
-    public long count(String category, String search) {
+    public long count(String category, String search, Long viewerId) {
         List<Object> params = new ArrayList<>();
-        String sql = "SELECT COUNT(*) FROM board_post p " + where(category, search, params);
+        String sql = "SELECT COUNT(*) FROM board_post p " + where(category, search, viewerId, params);
         Long count = jdbcTemplate.queryForObject(sql, Long.class, params.toArray());
         return count != null ? count : 0;
     }
 
-    private String where(String category, String search, List<Object> params) {
-        StringBuilder sql = new StringBuilder("WHERE 1=1 ");
+    // 숨겨진 글은 작성자 본인(viewerId)에게만 보인다
+    private String where(String category, String search, Long viewerId, List<Object> params) {
+        StringBuilder sql = new StringBuilder("WHERE (p.hidden = 0 OR p.user_id = ?) ");
+        params.add(viewerId);
         if (category != null && !category.isEmpty()) {
             sql.append("AND p.category = ? ");
             params.add(category);
