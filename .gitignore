@@ -38,3 +38,6 @@ out/
 
 ### Local secrets ###
 .env.local
+
+### Uploaded images (local) ###
+uploads/

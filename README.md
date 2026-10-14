@@ -2,100 +2,153 @@
 
 유기견 입양 정보를 등록하고, 조회하며, 사용자 조건에 맞는 반려견을 추천받을 수 있는 유기견 입양 정보 공유 서비스입니다.
 
-단순히 유기견 목록을 보여주는 것을 넘어, 검색·필터링·정렬, 상세 이미지 갤러리, 통계 대시보드, AI 기반 입양 홍보 문구 생성 및 추천 기능을 통해 사용자가 더 쉽게 입양 정보를 탐색할 수 있도록 구현했습니다.
-
----
-
-## 프로젝트 개요
-
-- 프로젝트명: PET ROOM
-- 주제: 유기견 입양 정보 공유 서비스
-- 목적: 유기견 정보를 체계적으로 관리하고, 사용자가 원하는 조건에 맞는 반려견을 쉽게 찾을 수 있도록 지원
-- 담당 역할: Frontend
-- 개발 형태: Spring Boot 기반 백엔드와 HTML/CSS/JavaScript 기반 프론트엔드 연동
+회원이 직접 등록한 유기견뿐 아니라 공공데이터(국가동물보호정보시스템)로 전국 보호소의 실제 유기견 정보를 함께 보여주고, 커뮤니티 게시판에서 입양 후기와 정보를 나눌 수 있습니다.
 
 ---
 
 ## 주요 기능
 
-### 유기견 목록 조회
+### 입양 정보
+- **전국 보호소 유기견**: 공공데이터포털 API로 전국 보호소의 유기견을 지역(시도)·상태(보호중/공고중)별로 조회. 사진 카드, 상세 정보(공고번호, 특징, 보호소 연락처), 최근 30일 통계(구조 수, 입양률, 안락사율)
+- **회원이 등록한 유기견**: 등록·수정·삭제(작성자 본인만), 여러 장 사진 업로드, 검색·필터·정렬, 상태별·품종별 통계 차트
+- 두 목록은 상단 선택 버튼으로 하나씩 볼 수 있습니다
 
-- 등록된 유기견 정보를 카드 형태로 표시
-- 대표 이미지, 이름, 품종, 구조 장소, 나이, 입양 상태 확인 가능
-- 이미지가 없는 경우 기본 이미지 처리
+### 로그인
+- 이메일 회원가입 / 로그인 (세션 방식, 비밀번호 BCrypt 저장)
+- 카카오 로그인, 네이버 로그인 (OAuth2)
+- 조회는 누구나, 등록·수정·삭제는 로그인 필요
 
-### 검색, 필터링, 정렬
+### 커뮤니티 게시판
+- 말머리(자유, 정보공유, 입양후기, 질문, 실종·목격), 사진 최대 5장, 검색, 페이지, 조회수
+- 댓글과 대댓글(2단계), 작성자만 수정·삭제
 
-- 이름, 품종, 구조 장소 기반 검색
-- 보호중, 입양대기, 입양완료 상태별 필터링
-- 최신순, 이름순, 나이순 정렬 기능 제공
-
-### 유기견 상세 조회
-
-- 카드 클릭 시 상세 모달 표시
-- 유기견 기본 정보, 구조 장소, 메모 확인 가능
-- 다중 이미지 갤러리 및 썸네일 미리보기 구현
-- 이전/다음 버튼을 통한 이미지 전환 기능 구현
-
-### 유기견 등록 및 수정
-
-- 모달 기반 등록/수정 UI 구현
-- 이름, 품종, 나이, 성별, 상태, 구조 장소, 메모 입력 가능
-- 여러 장의 이미지 선택 및 미리보기 기능 제공
-- FormData를 활용하여 JSON 데이터와 이미지 파일을 함께 전송
-
-### 유기견 삭제
-
-- 삭제 전 확인창을 통해 실수 방지
-- 삭제 후 목록과 통계 데이터를 즉시 갱신
-
-### 통계 대시보드
-
-- Chart.js를 활용하여 유기견 데이터를 시각화
-- 상태별 유기견 현황 막대 그래프 구현
-- 품종별 유기견 현황 원형 그래프 구현
-- 일정 주기로 통계 데이터 자동 갱신
-
-### AI 입양 홍보 문구 생성
-
-- OpenAI API를 활용하여 유기견 정보 기반 소개 문구 생성
-- 이름, 품종, 나이, 성별, 구조 장소 등의 정보를 바탕으로 자연스러운 입양 홍보 문구 작성
-- 사용자가 직접 입력한 API Key를 localStorage에 저장하여 데모 형태로 사용
-
-### AI 유기견 추천
-
-- 사용자의 선택 조건을 기반으로 입양대기 상태의 유기견 추천
-- 활동량, 알레르기, 선호 크기, 성별, 성격, 초보 보호자 여부 등의 조건 반영
-- 추천 결과를 카드 형태로 표시하고, 추천 이유를 함께 제공
-
-### 카카오 지도 연동
-
-- 구조 장소 주소를 기반으로 Kakao Map 표시
-- 유기견 상세 정보에서 위치 정보를 시각적으로 확인할 수 있도록 구현
+### AI 기능 (OpenAI)
+- 유기견 정보 기반 입양 홍보 문구 생성
+- 사용자 조건(활동량, 알레르기, 크기 등) 기반 입양 추천
+- 사용자가 직접 입력한 API Key를 브라우저(localStorage)에 저장해 사용합니다
 
 ---
 
 ## 기술 스택
 
-### Frontend
+| 구분 | 사용 기술 |
+|---|---|
+| Frontend | HTML, CSS, JavaScript (단일 페이지 `src/index.html`), Fetch API, Chart.js, Kakao Map SDK |
+| Backend | Java 17, Spring Boot 3.5, Spring Web, Spring JDBC (JdbcTemplate), Spring Security, OAuth2 Client |
+| Database | MySQL 8 |
+| 외부 API | 카카오/네이버 로그인, 공공데이터포털 구조동물 조회 서비스, OpenAI API |
+| Build | Gradle |
 
-- HTML
-- CSS
-- JavaScript
-- Fetch API
-- FormData
-- Chart.js
-- Kakao Map SDK
-- OpenAI API
+---
 
-### Backend
+## 로컬에서 실행하기
 
-- Java 17
-- Spring Boot
-- Spring Web
-- Spring JDBC / JdbcTemplate
-- MySQL
-- Gradle
+### 1. 준비물
+- **JDK 17** (`build.gradle`이 Java 17 툴체인을 사용합니다. JDK 21만 있으면 빌드가 실패하니 17을 설치하세요)
+- **Docker** (MySQL 실행용)
+- **Python 3** 또는 아무 정적 파일 서버 (프론트 실행용)
+
+### 2. MySQL 실행
+비밀번호는 원하는 값으로 바꾸고, 아래 3번의 `DB_PASSWORD`에 같은 값을 넣으세요.
+
+```bash
+docker run -d --name petroom-mysql \
+  -p 127.0.0.1:3307:3306 \
+  -e MYSQL_ROOT_PASSWORD=원하는비밀번호 \
+  -e MYSQL_DATABASE=petdb \
+  -e TZ=Asia/Seoul \
+  mysql:8.0 --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
+```
+
+테이블은 서버가 처음 뜰 때 `src/main/resources/schema.sql`로 자동 생성됩니다.
+
+### 3. 환경변수 설정
+```bash
+cp .env.example .env.local
+```
+`.env.local`을 열어 값을 채웁니다. 이 파일은 `.gitignore`에 등록돼 있어 커밋되지 않습니다.
+
+| 변수 | 필수 | 설명 |
+|---|---|---|
+| `DB_USERNAME`, `DB_PASSWORD` | 필수 | MySQL 계정 (위 Docker 기준 `root` / 정한 비밀번호) |
+| `KAKAO_CLIENT_ID`, `KAKAO_CLIENT_SECRET` | 선택 | 카카오 REST API 키, 클라이언트 시크릿 |
+| `NAVER_CLIENT_ID`, `NAVER_CLIENT_SECRET` | 선택 | 네이버 애플리케이션 Client ID / Secret |
+| `ANIMAL_API_KEY` | 선택 | 공공데이터포털 "국가동물보호정보시스템 구조동물 조회 서비스" 인증키 (Decoding) |
+| `DB_URL`, `UPLOAD_DIR`, `FRONTEND_URL` | 선택 | 기본값 대신 다른 DB, 업로드 폴더, 프론트 주소를 쓸 때 |
+
+선택 항목을 비워 두면 해당 기능만 꺼집니다. (소셜 로그인 버튼은 안내 문구만, 전국 보호소 영역은 안내 문구만 표시)
+
+### 4. 백엔드 실행 (포트 8081)
+```bash
+set -a && . ./.env.local && set +a
+./gradlew bootRun
+```
+
+### 5. 프론트 실행 (포트 5500)
+다른 터미널에서:
+```bash
+cd src
+python3 -m http.server 5500 --bind 127.0.0.1
+```
+
+### 6. 접속
+http://localhost:5500/index.html
+
+업로드한 사진은 프로젝트의 `uploads/` 폴더에 저장됩니다(커밋되지 않음).
+
+### 소셜 로그인 키를 직접 발급받을 때
+각 개발자 콘솔에 아래 주소를 등록해야 합니다.
+
+| 제공자 | 등록 위치 | 주소 |
+|---|---|---|
+| 카카오 | 앱 설정 > 플랫폼 키 > REST API 키 > 카카오 로그인 리다이렉트 URI | `http://localhost:8081/login/oauth2/code/kakao` |
+| 네이버 | API 설정 > 로그인 오픈 API 서비스 환경 > PC 웹 | 서비스 URL `http://localhost:5500`, Callback URL `http://localhost:8081/login/oauth2/code/naver` |
+
+- 카카오: 카카오 로그인 활성화, 동의항목에서 닉네임 설정, 클라이언트 시크릿 활성화가 필요합니다.
+- 네이버: 검수 전("개발 중")에는 앱 등록자와 멤버관리에 추가한 계정만 로그인할 수 있습니다.
+
+---
+
+## API 요약
+
+| 구분 | 메서드 | 경로 | 로그인 |
+|---|---|---|---|
+| 인증 | POST | `/auth/signup`, `/auth/login`, `/auth/logout` | - |
+| 인증 | GET | `/auth/me` (로그인 상태 + 사용 가능한 소셜 로그인) | - |
+| 소셜 로그인 | GET | `/oauth2/authorization/{kakao\|naver}` | - |
+| 회원 등록 유기견 | GET | `/dogs`, `/dogs/{id}`, `/dogs/statistics` | - |
+| 회원 등록 유기견 | POST / PUT / DELETE | `/dogs`, `/dogs/{id}` (multipart: `dog` JSON + `images`) | 필요 (수정·삭제는 작성자만) |
+| 전국 보호소 유기견 | GET | `/shelter/regions`, `/shelter/animals`, `/shelter/stats` | - |
+| 게시판 | GET | `/posts`, `/posts/categories`, `/posts/{id}` | - |
+| 게시판 | POST / PUT / DELETE | `/posts`, `/posts/{id}` (multipart: `post` JSON + `images`) | 필요 (수정·삭제는 작성자만) |
+| 댓글 | POST / DELETE | `/posts/{id}/comments`, `/posts/{id}/comments/{commentId}` | 필요 |
+
+---
+
+## 프로젝트 구조
+
+```
+src/
+├── index.html                      # 프론트엔드 (단일 페이지)
+└── main/
+    ├── java/org/likelion/hsu/db_project/
+    │   ├── Config/                 # Security, CORS, 소셜 로그인, 정적 파일, DB 마이그레이션
+    │   ├── Controller/             # Auth, Dog, Post(게시판), Shelter(공공데이터)
+    │   ├── Service/                # 비즈니스 로직, 이미지 저장, 공공데이터 연동
+    │   ├── Repository/             # JdbcTemplate 기반 DB 접근
+    │   ├── Entity/  Dto/  Security/
+    └── resources/
+        ├── application.properties
+        └── schema.sql              # 테이블 정의 (기동 시 자동 생성)
+```
+
+---
+
+## 협업 규칙
+
+- `main`은 PR로만 합칩니다(보호 규칙 설정됨). 기능별 브랜치(`feature/...`)를 만들어 PR을 올려 주세요.
+- API 키, 비밀번호는 `.env.local`에만 둡니다. 코드, 이슈, PR, 메신저에 붙여 넣지 마세요.
+- 공공데이터 자료를 화면에 쓸 때는 출처(농림축산식품부 국가동물보호정보시스템)를 표기합니다.
 
 ---
 
@@ -142,4 +195,3 @@
 - 사용자 조건 기반 AI 추천 기능 구현
 - 추천 결과와 추천 이유를 카드 형태로 표시
 - API Key를 localStorage에 저장하여 데모 환경에서 활용 가능하도록 처리
-  
