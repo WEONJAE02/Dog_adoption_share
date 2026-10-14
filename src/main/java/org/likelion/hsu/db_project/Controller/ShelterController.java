@@ -2,6 +2,7 @@ package org.likelion.hsu.db_project.Controller;
 
 import lombok.RequiredArgsConstructor;
 import org.likelion.hsu.db_project.Dto.ShelterPageDto;
+import org.likelion.hsu.db_project.Dto.ShelterStatsDetailDto;
 import org.likelion.hsu.db_project.Dto.ShelterStatsDto;
 import org.likelion.hsu.db_project.Service.ShelterException;
 import org.likelion.hsu.db_project.Service.ShelterService;
@@ -50,6 +51,18 @@ public class ShelterController {
     @GetMapping("/stats")
     public ShelterStatsDto getStats() {
         return shelterService.getStats();
+    }
+
+    /**
+     * ✅ 상세 통계
+     * - days: 7 / 30 / 90, kind: dog / cat / all
+     */
+    @GetMapping("/stats/detail")
+    public ShelterStatsDetailDto getStatsDetail(
+            @RequestParam(required = false, defaultValue = "30") int days,
+            @RequestParam(required = false, defaultValue = "dog") String kind
+    ) {
+        return shelterService.getStatsDetail(days, kind);
     }
 
     @ExceptionHandler(ShelterException.class)
