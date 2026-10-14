@@ -4,9 +4,12 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.likelion.hsu.db_project.Dto.ShelterAnimalDto;
+import org.likelion.hsu.db_project.Dto.ShelterStatsDetailDto;
 import org.likelion.hsu.db_project.Dto.ShelterPageDto;
 import org.likelion.hsu.db_project.Dto.ShelterStatsDto;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.context.event.ApplicationReadyEvent;
+import org.springframework.context.event.EventListener;
 import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
@@ -33,6 +36,9 @@ import java.util.regex.Pattern;
 public class ShelterService {
 
     private static final String DOG = "417000";                 // 축종코드: 개
+    private static final String CAT = "422400";                 // 축종코드: 고양이
+    private static final Set<Integer> DETAIL_DAYS = Set.of(7, 30, 90);
+    private static final int DETAIL_MAX_PAGES = 40;
     private static final int STATS_DAYS = 30;
     private static final int STATS_PAGE_SIZE = 1000;            // API 최대값
     private static final int STATS_MAX_PAGES = 10;
@@ -144,6 +150,60 @@ public class ShelterService {
                     .adoptionRate(percent(adopted, closed))
                     .euthanasiaRate(percent(euthanized, closed))
                     .build();
+        });
+    }
+
+    // ✅ 상세 통계: 기간(7/30/90일) 동안 구조된 동물 전체를 받아 축종별로 한 번에 집계
+    public ShelterStatsDetailDto getStatsDetail(int days, String kind) {
+        int period = DETAIL_DAYS.contains(days) ? days : 30;
+        String kindKey = "cat".equals(kind) || "all".equals(kind) ? kind : "dog";
+        Map<String, ShelterStatsDetailDto> byKind = loadStatsDetail(period);
+        return byKind.get(kindKey);
+    }
+
+    // 첫 요청이 오래 기다리지 않도록 서버가 뜨면 백그라운드에서 7일·30일 통계를 미리 계산한다
+    @EventListener(ApplicationReadyEvent.class)
+    public void warmUpStats() {
+        if (apiKey.isBlank()) return;
+        Thread warmUp = new Thread(() -> {
+            try {
+                loadStatsDetail(7);
+                loadStatsDetail(30);
+            } catch (ShelterException e) {
+                log.warn("[Shelter] 통계 미리 계산 실패");
+            }
+        }, "shelter-stats-warmup");
+        warmUp.setDaemon(true);
+        warmUp.start();
+    }
+
+    private synchronized Map<String, ShelterStatsDetailDto> loadStatsDetail(int days) {
+        return cached("detail|" + days, Duration.ofHours(3), () -> {
+            LocalDate to = LocalDate.now(SEOUL);
+            LocalDate from = to.minusDays(days);
+            ShelterStatsAggregator dog = new ShelterStatsAggregator("dog", from, to);
+            ShelterStatsAggregator cat = new ShelterStatsAggregator("cat", from, to);
+            ShelterStatsAggregator all = new ShelterStatsAggregator("all", from, to);
+
+            for (int page = 1; page <= DETAIL_MAX_PAGES; page++) {
+                Map<String, String> params = new LinkedHashMap<>();
+                params.put("bgnde", from.format(YMD));
+                params.put("endde", to.format(YMD));
+                params.put("pageNo", String.valueOf(page));
+                params.put("numOfRows", String.valueOf(STATS_PAGE_SIZE));
+
+                JsonNode body = call("/abandonmentPublic_v2", params);
+                List<JsonNode> items = items(body);
+                for (JsonNode item : items) {
+                    String upKind = item.path("upKindCd").asText();
+                    all.add(item);
+                    if (DOG.equals(upKind)) dog.add(item);
+                    else if (CAT.equals(upKind)) cat.add(item);
+                }
+                if (items.isEmpty() || (long) page * STATS_PAGE_SIZE >= body.path("totalCount").asLong()) break;
+            }
+
+            return Map.of("dog", dog.build(), "cat", cat.build(), "all", all.build());
         });
     }
 
