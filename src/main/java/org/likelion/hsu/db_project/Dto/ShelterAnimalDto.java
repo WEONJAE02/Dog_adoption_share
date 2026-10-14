@@ -32,4 +32,11 @@ public class ShelterAnimalDto {
     private String careTel;
     private String careAddr;
     private String orgName;        // 관할기관
+
+    // 보호소가 등록한 입양 절차 (대부분 비어 있음)
+    private String adoptionTitle;
+    private String adoptionPeriod;
+    private String adoptionCondition;
+    private String adoptionText;
+    private String adoptionImage;
 }

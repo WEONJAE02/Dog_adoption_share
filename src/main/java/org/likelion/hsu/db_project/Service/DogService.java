@@ -10,6 +10,7 @@ import org.likelion.hsu.db_project.Entity.DogImage;
 import org.likelion.hsu.db_project.Repository.DogDetailRepository;
 import org.likelion.hsu.db_project.Repository.DogImageRepository;
 import org.likelion.hsu.db_project.Repository.DogRepository;
+import org.likelion.hsu.db_project.Repository.InquiryRepository;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
@@ -28,6 +29,7 @@ public class DogService {
     private final DogRepository dogRepository;
     private final DogDetailRepository dogDetailRepository;
     private final DogImageRepository dogImageRepository;
+    private final InquiryRepository inquiryRepository;
 
     @Value("${file.upload-dir}")
     private String uploadDir;
@@ -180,6 +182,7 @@ public class DogService {
     public void deleteDog(Long id, Long userId) {
         dogRepository.findById(id).ifPresent(dog -> checkOwner(dog, userId));
 
+        inquiryRepository.deleteByDogId(id);
         dogImageRepository.deleteByDogId(id);
         dogDetailRepository.deleteByDogId(id);
         dogRepository.delete(id);
