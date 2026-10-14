@@ -40,3 +40,36 @@ CREATE TABLE IF NOT EXISTS dog_image (
     upload_date DATETIME,
     FOREIGN KEY (dog_id) REFERENCES dog (dog_id)
 );
+
+-- 커뮤니티 게시판
+CREATE TABLE IF NOT EXISTS board_post (
+    post_id    BIGINT AUTO_INCREMENT PRIMARY KEY,
+    user_id    BIGINT       NOT NULL,
+    category   VARCHAR(20)  NOT NULL,
+    title      VARCHAR(100) NOT NULL,
+    content    TEXT         NOT NULL,
+    view_count INT          NOT NULL DEFAULT 0,
+    created_at DATETIME     NOT NULL,
+    updated_at DATETIME,
+    FOREIGN KEY (user_id) REFERENCES users (user_id)
+);
+
+CREATE TABLE IF NOT EXISTS board_post_image (
+    id        BIGINT AUTO_INCREMENT PRIMARY KEY,
+    post_id   BIGINT       NOT NULL,
+    file_name VARCHAR(255) NOT NULL,
+    FOREIGN KEY (post_id) REFERENCES board_post (post_id)
+);
+
+-- parent_id 가 있으면 대댓글 (2단계까지만 사용)
+CREATE TABLE IF NOT EXISTS board_comment (
+    comment_id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    post_id    BIGINT       NOT NULL,
+    user_id    BIGINT       NOT NULL,
+    parent_id  BIGINT,
+    content    VARCHAR(500) NOT NULL,
+    deleted    TINYINT(1)   NOT NULL DEFAULT 0,
+    created_at DATETIME     NOT NULL,
+    FOREIGN KEY (post_id) REFERENCES board_post (post_id),
+    FOREIGN KEY (user_id) REFERENCES users (user_id)
+);

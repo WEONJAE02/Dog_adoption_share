@@ -106,6 +106,46 @@
         .social-btn.naver{background:#03c75a; color:#fff}
         .auth-switch{all:unset; cursor:pointer; color:#cfe1ff; font-size:13px; text-align:center}
 
+        /* 탭 */
+        .tabs{display:flex; gap:6px; margin-right:auto}
+        .tab{background:none; border:1px solid transparent; color:var(--muted); padding:8px 14px; border-radius:999px; cursor:pointer; font-weight:700}
+        .tab.on{background:#222a39; border-color:#2a3548; color:var(--text)}
+
+        /* 커뮤니티 게시판 */
+        .posts{list-style:none; margin:16px 0; padding:0; display:flex; flex-direction:column; gap:10px}
+        .post-row{display:flex; gap:14px; align-items:center; background:var(--panel); border:1px solid var(--line); border-radius:16px; padding:14px 16px; cursor:pointer}
+        .post-row:hover{background:var(--panel-2)}
+        .post-main{flex:1; min-width:0}
+        .post-title{display:flex; gap:8px; align-items:center; font-weight:700; font-size:16px}
+        .post-title .t{overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
+        .post-title .badge{flex:none; font-weight:400}
+        .post-title .cc{color:var(--brand); font-size:13px; flex:none}
+        .post-thumb{width:64px; height:64px; object-fit:cover; border-radius:10px; border:1px solid var(--line); flex:none}
+        .post-empty{color:var(--muted); text-align:center; padding:40px 0}
+        .pager{display:flex; justify-content:center; align-items:center; gap:12px; margin:8px 0 24px; color:var(--muted); font-size:14px}
+        .pager button[disabled]{opacity:.4; cursor:not-allowed}
+        .pv-head{display:flex; gap:10px; align-items:center}
+        .pv-head .badge{flex:none; font-weight:400}
+        .pv-body{padding:18px; max-height:68vh; overflow:auto}
+        .pv-content{white-space:pre-wrap; line-height:1.6; margin:14px 0; overflow-wrap:anywhere}
+        .pv-images{display:grid; grid-template-columns:repeat(auto-fill,minmax(180px,1fr)); gap:10px}
+        .pv-images img{width:100%; height:180px; object-fit:cover; border-radius:10px; border:1px solid var(--line); cursor:pointer; background:#0d1320}
+        .pv-body h4{margin:22px 0 4px; padding-top:16px; border-top:1px solid var(--line)}
+        .comments,.replies{list-style:none; margin:0; padding:0}
+        .comment{padding:10px 0; border-bottom:1px solid var(--line)}
+        .replies .comment{margin:8px 0 0 22px; padding:0 0 0 12px; border-left:2px solid #2a3548; border-bottom:none}
+        .c-head{display:flex; gap:10px; align-items:center; font-size:13px}
+        .c-date{color:var(--muted); font-size:12px}
+        .c-act{all:unset; cursor:pointer; color:#cfe1ff; font-size:12px}
+        .c-body{margin-top:4px; white-space:pre-wrap; overflow-wrap:anywhere; font-size:14px}
+        .comment.gone>.c-body{color:var(--muted)}
+        .c-form{display:flex; gap:8px; margin-top:10px}
+        .c-form textarea{flex:1; background:#0d1320; color:#e6e9f8; border:1px solid #223046; padding:10px 12px; border-radius:10px; resize:vertical}
+        .field{display:flex; flex-direction:column; gap:6px; font-size:13px; grid-column:1 / span 2}
+        .keep-thumb{position:relative; cursor:pointer}
+        .keep-thumb.off img{opacity:.25}
+        .keep-thumb.off::after{content:'삭제'; position:absolute; inset:0; display:flex; align-items:center; justify-content:center; font-size:12px; color:#ff9b9b}
+
         .toast{position:fixed; left:50%; transform:translateX(-50%); bottom:26px; background:#10182a; border:1px solid #2a3a56; color:#e6ecff; padding:10px 14px; border-radius:10px; font-size:13px; display:none}
         .toast.show{display:block}
 
@@ -115,7 +155,7 @@
             .d-wrap{grid-template-columns:1fr}
             .viewer img{height:300px}
             .modal .body{grid-template-columns:1fr}
-            .label-memo{grid-column:1}
+            .label-memo,.field{grid-column:1}
         }
     </style>
 
@@ -130,11 +170,16 @@
 <div class="container">
     <!-- 로그인 상태 -->
     <div class="authbar">
+        <nav class="tabs">
+            <button class="tab on" data-view="adopt">입양 정보</button>
+            <button class="tab" data-view="board">커뮤니티</button>
+        </nav>
         <span id="authName" class="auth-name"></span>
         <button id="btnLogin" class="tool-btn">로그인</button>
         <button id="btnLogout" class="tool-btn" hidden>로그아웃</button>
     </div>
 
+    <div id="viewAdopt">
     <!-- HERO ... (생략: 그대로) -->
     <section class="hero">
         <div>
@@ -203,6 +248,23 @@
 
     <ul id="recList"></ul>
     <ul id="list" class="grid"></ul>
+    </div>
+
+    <!-- 커뮤니티 게시판 -->
+    <div id="viewBoard" hidden>
+        <div class="toolbar">
+            <div class="tool-input" style="flex:2"><input id="bq" placeholder="제목/내용 검색"/></div>
+            <select id="bCat" class="tool-sel"><option value="">말머리 전체</option></select>
+            <button id="bNew" class="tool-btn primary">글쓰기</button>
+        </div>
+        <ul id="postList" class="posts"></ul>
+        <div id="postEmpty" class="post-empty" hidden>아직 글이 없습니다. 첫 글을 남겨보세요.</div>
+        <div class="pager">
+            <button id="bPrev" class="tool-btn">이전</button>
+            <span id="bPage"></span>
+            <button id="bNext" class="tool-btn">다음</button>
+        </div>
+    </div>
 </div>
 
 <!-- 등록/수정 모달 -->
@@ -301,6 +363,52 @@
     </footer>
 </dialog>
 
+<!-- 게시글 상세 + 댓글 -->
+<dialog id="postDialog" class="detail">
+    <header class="pv-head"><span id="pvCat" class="badge wait"></span><span id="pvTitle"></span></header>
+    <div class="pv-body">
+        <div id="pvMeta" class="sub"></div>
+        <div id="pvContent" class="pv-content"></div>
+        <div id="pvImages" class="pv-images"></div>
+        <h4>댓글 <span id="pvCount"></span></h4>
+        <ul id="pvComments" class="comments"></ul>
+        <form id="pvForm" class="c-form">
+            <textarea id="pvInput" rows="2" maxlength="500" placeholder="댓글을 입력하세요"></textarea>
+            <button class="btn">등록</button>
+        </form>
+    </div>
+    <footer>
+        <button id="pvEdit" class="btn">수정</button>
+        <button id="pvDel" class="btn">삭제</button>
+        <button id="pvClose" class="btn">닫기</button>
+    </footer>
+</dialog>
+
+<!-- 게시글 작성/수정 -->
+<dialog id="postWriteDialog" class="modal">
+    <form id="pwForm" method="dialog">
+        <header id="pwTitle">글쓰기</header>
+        <div class="body">
+            <input type="hidden" id="pwId"/>
+            <label>말머리<select id="pwCat"></select></label>
+            <label>제목<input id="pwSubject" maxlength="100" required/></label>
+            <label class="label-memo">내용
+                <textarea id="pwContent" rows="10" maxlength="5000" required></textarea>
+            </label>
+            <div class="field">사진 (최대 5장)
+                <input id="pwFiles" type="file" accept="image/png,image/jpeg,image/gif,image/webp" multiple />
+                <small id="pwHint" style="color:#9aa3b2">선택: 0장</small>
+                <div id="pwKeep" class="thumbs"></div>
+                <div id="pwPreview" class="thumbs"></div>
+            </div>
+        </div>
+        <footer>
+            <button type="button" class="btn" id="pwCancel">취소</button>
+            <button id="pwSave" value="default" class="btn">저장</button>
+        </footer>
+    </form>
+</dialog>
+
 <template id="itemTmpl">
     <li class="card">
         <img class="thumb" alt="사진"/>
@@ -324,6 +432,7 @@
     const DOGS = API_BASE + '/dogs';
     const UPLOAD_URL = API_BASE + '/uploads/';
     const AUTH = API_BASE + '/auth';
+    const POSTS = API_BASE + '/posts';
 
     /* OpenAI 키 보관 방식 유지 */
     const OPENAI_FALLBACK_KEY = '';
@@ -425,7 +534,7 @@
     /* 본인 글만 수정·삭제 (작성자 없는 기존 글은 로그인한 누구나) */
     const canEdit = p => !!me && (p?.userId==null || p.userId===me.userId);
     function requireLogin(){ if(me) return true; openAuth('login'); authErr.textContent='로그인이 필요합니다.'; return false }
-    async function loadMe(){ const r=await req(`${AUTH}/me`); me=r.authenticated? r.user : null; setSocial(r.socialProviders); renderAuth(); if(me) await renderList() }
+    async function loadMe(){ const r=await req(`${AUTH}/me`); me=r.authenticated? r.user : null; setSocial(r.socialProviders); renderAuth(); if(me) await refreshViews() }
 
     authForm.addEventListener('submit',async e=>{
         e.preventDefault();
@@ -434,13 +543,13 @@
         try{
             if(authMode==='signup') await jsonPost(`${AUTH}/signup`,{email,password,nickname:$("#authNick").value.trim()});
             me = await jsonPost(`${AUTH}/login`,{email,password});
-            renderAuth(); authDlg.close(); authForm.reset(); showToast(`${me.nickname}님, 환영합니다.`); await renderList();
+            renderAuth(); authDlg.close(); authForm.reset(); showToast(`${me.nickname}님, 환영합니다.`); await refreshViews();
         }catch(err){ authErr.textContent = err.message||String(err) } finally{ $("#authSubmit").disabled=false }
     });
     $("#authSwitch").addEventListener('click',()=>openAuth(authMode==='login'?'signup':'login'));
     $("#authCancel").addEventListener('click',()=>authDlg.close());
     $("#btnLogin").addEventListener('click',()=>openAuth('login'));
-    $("#btnLogout").addEventListener('click',async()=>{ await req(`${AUTH}/logout`,{method:'POST'}); me=null; renderAuth(); showToast('로그아웃되었습니다.'); await renderList() });
+    $("#btnLogout").addEventListener('click',async()=>{ await req(`${AUTH}/logout`,{method:'POST'}); me=null; renderAuth(); showToast('로그아웃되었습니다.'); await refreshViews() });
 
     /* 목록 렌더 */
     async function renderList(){
@@ -621,6 +730,153 @@ ${JSON.stringify(candidates,null,2)}
         });
     }
 
+    /* 커뮤니티 게시판 */
+    const enc = v => encodeURIComponent(v||'');
+    const fmtDateTime = iso => iso? new Date(iso).toLocaleString('ko-KR',{dateStyle:'short',timeStyle:'short'}) : '';
+    const postForm = (payload,files=[])=>{ const fd=new FormData(); fd.append('post',JSON.stringify(payload)); files.forEach(f=>fd.append('images',f)); return fd };
+    const Posts = {
+        categories:()=>req(`${POSTS}/categories`),
+        list:(cat,s,page)=>req(`${POSTS}?category=${enc(cat)}&search=${enc(s)}&page=${page}&size=10`),
+        get:(id)=>req(`${POSTS}/${id}`),
+        create:(payload,files)=>req(POSTS,{method:'POST',body:postForm(payload,files)}),
+        update:(id,payload,files)=>req(`${POSTS}/${id}`,{method:'PUT',body:postForm(payload,files)}),
+        remove:(id)=>req(`${POSTS}/${id}`,{method:'DELETE'}),
+        addComment:(id,body)=>jsonPost(`${POSTS}/${id}/comments`,body),
+        removeComment:(id,cid)=>req(`${POSTS}/${id}/comments/${cid}`,{method:'DELETE'})
+    };
+    const postDlg=$("#postDialog"), pwDlg=$("#postWriteDialog"), pwForm=$("#pwForm"), pwFiles=$("#pwFiles");
+    const bq=$("#bq"), bCat=$("#bCat"), postList=$("#postList");
+    let bPageNo=1, bTotalPages=1, curPost=null, replyTo=null, keepImgs=[];
+    const el = (tag,cls,text)=>{ const n=document.createElement(tag); if(cls) n.className=cls; if(text!=null) n.textContent=text; return n };
+
+    /* 탭 전환 */
+    function showView(name){
+        const board = name==='board';
+        $("#viewAdopt").hidden=board; $("#viewBoard").hidden=!board;
+        document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('on',t.dataset.view===name));
+        history.replaceState(null,'',board?'#board':location.pathname+location.search);
+        if(board) renderPosts();
+    }
+    async function refreshViews(){ await renderList(); if(!$("#viewBoard").hidden) await renderPosts() }
+
+    /* 글 목록 */
+    async function renderPosts(){
+        const r = await Posts.list(bCat.value, bq.value.trim(), bPageNo);
+        bTotalPages=Math.max(r.totalPages,1);
+        if(bPageNo>bTotalPages){ bPageNo=bTotalPages; return renderPosts() }
+        postList.innerHTML='';
+        r.items.forEach(p=>{
+            const li=el('li','post-row'), main=el('div','post-main'), title=el('div','post-title');
+            title.append(el('span','badge wait',p.category), el('span','t',p.title));
+            if(p.commentCount) title.append(el('span','cc',`[${p.commentCount}]`));
+            main.append(title, el('div','sub',`${p.nickname} · ${fmtDateTime(p.createdAt)} · 조회 ${p.viewCount}`));
+            li.append(main);
+            if(p.thumbnail){ const im=el('img','post-thumb'); im.src=buildUploadUrl(p.thumbnail); im.alt=''; li.append(im) }
+            li.addEventListener('click',()=>openPost(p.postId));
+            postList.appendChild(li);
+        });
+        $("#postEmpty").hidden = r.items.length>0;
+        $("#bPage").textContent=`${bPageNo} / ${bTotalPages}`;
+        $("#bPrev").disabled = bPageNo<=1; $("#bNext").disabled = bPageNo>=bTotalPages;
+    }
+
+    /* 글 상세 + 댓글 */
+    function commentNode(c,rootId){
+        const li=el('li','comment'+(c.deleted?' gone':'')), head=el('div','c-head');
+        head.append(el('b',null,c.deleted?'(삭제됨)':c.nickname), el('span','c-date',fmtDateTime(c.createdAt)));
+        if(!c.deleted){
+            const rb=el('button','c-act','답글'); rb.type='button';
+            rb.addEventListener('click',()=>{ if(!requireLogin()) return; replyTo = replyTo===rootId? null : rootId; renderComments() });
+            head.append(rb);
+            if(me && c.userId===me.userId){
+                const db=el('button','c-act','삭제'); db.type='button';
+                db.addEventListener('click',async()=>{ if(!confirm('댓글을 삭제할까요?')) return; try{ curPost=await Posts.removeComment(curPost.postId,c.commentId); renderComments() }catch(err){ alert(err.message||err) } });
+                head.append(db);
+            }
+        }
+        li.append(head, el('div','c-body',c.content));
+        return li;
+    }
+    function renderComments(){
+        const box=$("#pvComments"); box.innerHTML='';
+        $("#pvCount").textContent=curPost.commentCount;
+        curPost.comments.forEach(c=>{
+            const li=commentNode(c,c.commentId), replies=el('ul','replies');
+            c.replies.forEach(r=>replies.appendChild(commentNode(r,c.commentId)));
+            li.append(replies);
+            if(replyTo===c.commentId){
+                const f=el('form','c-form'), ta=el('textarea'), b=el('button','btn','답글 등록');
+                ta.rows=2; ta.maxLength=500; ta.placeholder='답글을 입력하세요';
+                f.append(ta,b); f.addEventListener('submit',e=>{ e.preventDefault(); submitComment(ta,c.commentId) });
+                li.append(f); setTimeout(()=>ta.focus(),0);
+            }
+            box.appendChild(li);
+        });
+    }
+    async function submitComment(input,parentId){
+        if(!requireLogin()) return;
+        const content=input.value.trim(); if(!content) return;
+        try{ curPost=await Posts.addComment(curPost.postId,{content,parentId:parentId??null}); input.value=''; replyTo=null; renderComments() }
+        catch(err){ alert(err.message||err) }
+    }
+    function renderPost(p){
+        curPost=p;
+        $("#pvCat").textContent=p.category; $("#pvTitle").textContent=p.title;
+        $("#pvMeta").textContent=`${p.nickname} · ${fmtDateTime(p.createdAt)}${p.updatedAt?' (수정됨)':''} · 조회 ${p.viewCount}`;
+        $("#pvContent").textContent=p.content;
+        const box=$("#pvImages"); box.innerHTML='';
+        p.imageNames.forEach(name=>{ const im=el('img'); im.src=buildUploadUrl(name); im.alt='첨부 사진'; im.addEventListener('click',()=>window.open(im.src,'_blank','noopener')); box.appendChild(im) });
+        $("#pvEdit").hidden=$("#pvDel").hidden = !(me && p.userId===me.userId);
+        renderComments();
+    }
+    async function openPost(id){ replyTo=null; renderPost(await Posts.get(id)); $("#pvInput").value=''; if(!postDlg.open) postDlg.showModal() }
+    $("#pvForm").addEventListener('submit',e=>{ e.preventDefault(); submitComment($("#pvInput")) });
+    $("#pvClose").addEventListener('click',()=>postDlg.close());
+    postDlg.addEventListener('close',()=>{ if(!$("#viewBoard").hidden) renderPosts() });
+    $("#pvEdit").addEventListener('click',()=>openPostWrite(curPost));
+    $("#pvDel").addEventListener('click',async()=>{
+        if(!confirm('글을 삭제할까요? 댓글도 함께 삭제됩니다.')) return;
+        try{ await Posts.remove(curPost.postId); postDlg.close(); showToast('삭제되었습니다.') }catch(err){ alert(err.message||err) }
+    });
+
+    /* 글쓰기 / 수정 */
+    function renderWriteImages(){
+        const files=[...pwFiles.files];
+        $("#pwHint").textContent=`기존 ${keepImgs.filter(k=>k.keep).length}장 · 새로 선택 ${files.length}장`;
+        const kb=$("#pwKeep"); kb.innerHTML='';
+        keepImgs.forEach(k=>{
+            const w=el('div','keep-thumb'+(k.keep?'':' off')), im=el('img'); im.src=buildUploadUrl(k.name); im.alt='기존 사진'; w.title='눌러서 삭제/유지 전환';
+            w.append(im); w.addEventListener('click',()=>{ k.keep=!k.keep; renderWriteImages() }); kb.appendChild(w);
+        });
+        const pb=$("#pwPreview"); pb.innerHTML='';
+        files.forEach(f=>{ const im=el('img'); im.src=URL.createObjectURL(f); im.alt='선택 이미지'; pb.appendChild(im) });
+    }
+    pwFiles.addEventListener('change',renderWriteImages);
+    function openPostWrite(p){
+        if(!requireLogin()) return;
+        pwForm.reset();
+        $("#pwTitle").textContent = p? '글 수정':'글쓰기';
+        $("#pwId").value=p?.postId??''; $("#pwSubject").value=p?.title??''; $("#pwContent").value=p?.content??'';
+        if(p) $("#pwCat").value=p.category;
+        keepImgs=(p?.imageNames||[]).map(name=>({name,keep:true}));
+        renderWriteImages();
+        pwDlg.showModal();
+    }
+    $("#pwCancel").addEventListener('click',()=>pwDlg.close());
+    pwForm.addEventListener('submit',async e=>{
+        e.preventDefault();
+        const id=$("#pwId").value, files=[...pwFiles.files], keep=keepImgs.filter(k=>k.keep).map(k=>k.name);
+        if(keep.length+files.length>5){ alert('사진은 최대 5장까지 올릴 수 있습니다.'); return }
+        const payload={ title:$("#pwSubject").value.trim(), content:$("#pwContent").value.trim(), category:$("#pwCat").value, keepImages:keep };
+        $("#pwSave").disabled=true;
+        try{
+            const saved = id? await Posts.update(id,payload,files) : await Posts.create(payload,files);
+            pwDlg.close();
+            if(id){ replyTo=null; renderPost(saved) } else { bPageNo=1; bq.value=''; bCat.value='' }
+            await renderPosts();
+        }catch(err){ alert('저장 중 오류: '+(err.message||err)) } finally{ $("#pwSave").disabled=false }
+    });
+
     /* 초기 구동 */
     document.addEventListener('DOMContentLoaded',async()=>{
         $("#btnNew").addEventListener("click",()=>openDialog());
@@ -631,6 +887,13 @@ ${JSON.stringify(candidates,null,2)}
         dlg.addEventListener('close',()=>form.reset());
         if(new URLSearchParams(location.search).has('loginError')){ showToast('소셜 로그인에 실패했습니다.'); history.replaceState(null,'',location.pathname) }
         loadMe().catch(()=>{});
+
+        document.querySelectorAll('.tab').forEach(t=>t.addEventListener('click',()=>showView(t.dataset.view)));
+        $("#bNew").addEventListener('click',()=>openPostWrite());
+        bq.addEventListener('input',()=>{ bPageNo=1; renderPosts() }); bCat.addEventListener('change',()=>{ bPageNo=1; renderPosts() });
+        $("#bPrev").addEventListener('click',()=>{ bPageNo--; renderPosts() }); $("#bNext").addEventListener('click',()=>{ bPageNo++; renderPosts() });
+        Posts.categories().then(list=>list.forEach(c=>{ bCat.add(new Option(c,c)); $("#pwCat").add(new Option(c,c)) })).catch(()=>{});
+        if(location.hash==='#board') showView('board');
         await renderList(); await loadCharts(); startAutoRefresh();
     });
 </script>
