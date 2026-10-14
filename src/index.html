@@ -63,7 +63,12 @@
         .rec-reason{padding:10px 12px; border-top:1px solid var(--line); color:var(--muted); font-size:13px; white-space:pre-wrap}
 
         dialog::backdrop{background:rgba(0,0,0,.4)}
-        dialog{border:none; border-radius:16px; padding:0; overflow:hidden; box-shadow:0 20px 60px rgba(16,24,40,.25)}
+        dialog{border:none; border-radius:16px; padding:0; overflow:hidden; box-shadow:0 20px 60px rgba(16,24,40,.25); max-height:calc(100vh - 32px); max-height:calc(100dvh - 32px)}
+        /* 창이 화면보다 길면 머리글·버튼 줄은 고정하고 가운데 내용만 스크롤 */
+        dialog[open]{display:flex; flex-direction:column}
+        dialog > form{display:flex; flex-direction:column; flex:1 1 auto; min-height:0}
+        dialog header, dialog footer{flex:none}
+        .d-wrap, .modal .body, .pv-body, .sx-body, .ib-body{flex:1 1 auto; min-height:0; overflow:auto}
 
         /* 등록 모달 넓게 */
         .modal{background:#fff; color:var(--text); width:min(760px,96vw)}
@@ -162,6 +167,32 @@
         .sd-info .row{align-items:flex-start}
         .sd-info .k{flex:none}
 
+        /* 입양 문의 / 문의함 */
+        .btn.go{background:#2b65ff; color:#fff}
+        .btn.go:hover{background:#1f55e0}
+        .inbox-btn{position:relative}
+        .inbox-badge{position:absolute; top:-6px; right:-6px; min-width:18px; height:18px; padding:0 5px; border-radius:9px; background:#e34948; color:#fff; font-size:11px; font-weight:700; display:flex; align-items:center; justify-content:center}
+        .iq{width:min(480px,96vw)}
+        .iq .body{grid-template-columns:1fr}
+        .iq-hint{color:var(--muted); font-size:12px}
+        .ib{width:min(720px,96vw)}
+        .ib .tabs{margin:0}
+        .ib-body{padding:14px 18px; max-height:70vh; overflow:auto}
+        .ib-list{list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:12px}
+        .ib-item{border:1px solid var(--line); border-radius:14px; padding:14px; display:grid; grid-template-columns:64px 1fr; gap:12px}
+        .ib-item img{width:64px; height:64px; object-fit:cover; border-radius:10px; background:var(--soft)}
+        .ib-head{display:flex; flex-wrap:wrap; gap:6px 10px; align-items:center; font-size:14px}
+        .ib-msg{margin-top:6px; white-space:pre-wrap; overflow-wrap:anywhere; font-size:14px}
+        .ib-meta{color:var(--muted); font-size:12px; margin-top:4px}
+        .ib-reply{margin-top:10px; padding:10px 12px; background:var(--panel-2); border-radius:10px; white-space:pre-wrap; overflow-wrap:anywhere; font-size:14px}
+        .ib-empty{color:var(--muted); text-align:center; padding:40px 0}
+        .adopt-guide{margin-top:14px; padding:14px 16px; border:1px solid var(--line); border-radius:12px; background:var(--panel-2); font-size:14px}
+        .adopt-guide h5{margin:0 0 8px; font-size:15px}
+        .adopt-guide ol{margin:6px 0 0; padding-left:20px; line-height:1.7}
+        .adopt-guide .txt{white-space:pre-wrap; overflow-wrap:anywhere; line-height:1.6}
+        .adopt-guide img{max-width:100%; border-radius:8px; margin-top:8px}
+        .adopt-guide .note{color:var(--muted); font-size:12px; margin-top:8px}
+
         /* 탭 */
         .tabs{display:flex; gap:6px; margin-right:auto}
         .tab{background:none; border:1px solid transparent; color:var(--muted); padding:8px 14px; border-radius:999px; cursor:pointer; font-weight:700}
@@ -234,6 +265,7 @@
             <button class="tab" data-view="board">커뮤니티</button>
         </nav>
         <span id="authName" class="auth-name"></span>
+        <button id="btnInbox" class="tool-btn inbox-btn" hidden>문의함<span id="inboxBadge" class="inbox-badge" hidden></span></button>
         <button id="btnLogin" class="tool-btn">로그인</button>
         <button id="btnLogout" class="tool-btn" hidden>로그아웃</button>
     </div>
@@ -446,10 +478,44 @@
     </div>
     <footer>
         <span class="right"></span>
+        <button id="dInquiry" class="btn go" hidden>입양 문의하기</button>
         <button id="dEdit" class="btn">수정</button>
         <button id="dDel" class="btn">삭제</button>
         <button id="dClose" class="btn">닫기</button>
     </footer>
+</dialog>
+
+<!-- 입양 문의 보내기 -->
+<dialog id="inquiryDialog" class="modal iq">
+    <form id="iqForm" method="dialog">
+        <header id="iqTitle">입양 문의</header>
+        <div class="body">
+            <label>문의 내용
+                <textarea id="iqMessage" rows="6" maxlength="1000" required placeholder="예: 입양을 고민하고 있어요. 산책 습관과 건강 상태가 궁금합니다."></textarea>
+            </label>
+            <label>연락받을 연락처 (선택)
+                <input id="iqContact" maxlength="100" placeholder="전화번호 또는 이메일"/>
+            </label>
+            <div class="iq-hint">연락처는 이 아이를 등록한 분에게만 보입니다. 답변은 상단의 "문의함"에서 확인할 수 있어요.</div>
+            <div id="iqErr" class="auth-err"></div>
+        </div>
+        <footer>
+            <button type="button" class="btn" id="iqCancel">취소</button>
+            <button id="iqSend" value="default" class="btn go">문의 보내기</button>
+        </footer>
+    </form>
+</dialog>
+
+<!-- 문의함 -->
+<dialog id="inboxDialog" class="modal ib">
+    <header class="pv-head" style="justify-content:space-between">
+        <nav class="tabs">
+            <button class="tab on" data-box="received">받은 문의</button>
+            <button class="tab" data-box="sent">보낸 문의</button>
+        </nav>
+        <button type="button" class="btn" id="ibClose">닫기</button>
+    </header>
+    <div class="ib-body"><ul id="ibList" class="ib-list"></ul><div id="ibEmpty" class="ib-empty" hidden></div></div>
 </dialog>
 
 <!-- 보호소 유기견 상세 (공공데이터) -->
@@ -464,9 +530,12 @@
             </div>
             <div class="thumbs" id="sdThumbs"></div>
         </div>
-        <div class="info sd-info" id="sdInfo"></div>
+        <div>
+            <div class="info sd-info" id="sdInfo"></div>
+            <div class="adopt-guide" id="sdGuide"></div>
+        </div>
     </div>
-    <footer><button id="sdClose" class="btn">닫기</button></footer>
+    <footer><a id="sdCall" class="btn go" style="text-decoration:none">보호소에 전화하기</a><button id="sdClose" class="btn">닫기</button></footer>
 </dialog>
 
 <!-- 전국 유기동물 상세 통계 (공공데이터) -->
@@ -582,6 +651,7 @@
     const AUTH = API_BASE + '/auth';
     const POSTS = API_BASE + '/posts';
     const SHELTER = API_BASE + '/shelter';
+    const INQ = API_BASE + '/inquiries';
 
     /* OpenAI 키 보관 방식 유지 */
     const OPENAI_FALLBACK_KEY = '';
@@ -596,7 +666,7 @@
     const dDlg=$("#detailDialog"), dMain=$("#dMain"), dThumbs=$("#dThumbs");
     const recBtn=$("#recBtn"), recList=$("#recList");
     const toast=$("#toast");
-    let detailTargetId=null, gallery=[], gi=0;
+    let detailTargetId=null, detailDog=null, gallery=[], gi=0;
 
     /* 유틸 */
     const showToast = msg => { toast.textContent = msg; toast.classList.add('show'); setTimeout(()=>toast.classList.remove('show'), 1500); };
@@ -659,7 +729,8 @@
 
     function renderAuth(){
         $("#authName").textContent = me? `${me.nickname}님` : '';
-        $("#btnLogin").hidden = !!me; $("#btnLogout").hidden = !me;
+        $("#btnLogin").hidden = !!me; $("#btnLogout").hidden = !me; $("#btnInbox").hidden = !me;
+        if(me) refreshInboxBadge(); else $("#inboxBadge").hidden=true;
     }
     /* 버튼은 항상 보이고, 서버에 키가 설정되지 않은 제공자는 누르면 안내만 한다 */
     function setSocial(providers=[]){
@@ -733,6 +804,9 @@
         $("#dFound").textContent=p.foundPlace||'-'; $("#dAge").textContent=Number.isFinite(p.age)?`${p.age}살`:'-';
         $("#dStatus").textContent=p.status||'-'; $("#dReg").textContent=fmtDate(p.regDate); $("#dMemo").textContent=p.memo||'';
         $("#dEdit").hidden=$("#dDel").hidden=!canEdit(p);
+        detailDog=p;
+        // 등록자가 있는 글이고 내 글이 아니면 문의 가능
+        $("#dInquiry").hidden = p.userId==null || (!!me && p.userId===me.userId);
         dDlg.showModal();
         setTimeout(()=>renderKakaoMapByAddress(p.foundPlace||''),0);
     }
@@ -948,13 +1022,100 @@ ${JSON.stringify(candidates,null,2)}
             if(k==='연락처'){ const tel=document.createElement('a'); tel.href='tel:'+v.replace(/[^0-9+]/g,''); tel.textContent=v; vv.appendChild(tel) } else vv.textContent=v;
             row.append(kk,vv); info.appendChild(row);
         });
+        renderShelterGuide(a);
         shDlg.showModal();
+    }
+    function renderShelterGuide(a){
+        const g=$("#sdGuide"); g.innerHTML='';
+        const h=document.createElement('h5');
+        const call=$("#sdCall"); call.hidden=!a.careTel; if(a.careTel) call.href='tel:'+a.careTel.replace(/[^0-9+]/g,'');
+        if(a.adoptionText || a.adoptionCondition){
+            // 보호소가 직접 등록한 입양 절차
+            h.textContent=a.adoptionTitle||'보호소 입양 절차'; g.appendChild(h);
+            if(a.adoptionPeriod){ const p=document.createElement('div'); p.className='note'; p.style.marginTop='0'; p.textContent='안내 기간: '+a.adoptionPeriod; g.appendChild(p) }
+            [a.adoptionText,a.adoptionCondition].filter(Boolean).forEach(t=>{ const d=document.createElement('div'); d.className='txt'; d.style.marginTop='8px'; d.textContent=t; g.appendChild(d) });
+            if(a.adoptionImage){ const im=document.createElement('img'); im.src=a.adoptionImage; im.alt='입양 절차 안내 이미지'; im.loading='lazy'; im.onerror=()=>im.remove(); g.appendChild(im) }
+        }else{
+            h.textContent='입양 절차 안내'; g.appendChild(h);
+            const ol=document.createElement('ol');
+            [`공고 기간${a.noticeStart&&a.noticeEnd?` (${a.noticeStart} ~ ${a.noticeEnd})`:''}과 보호소 운영 시간을 확인하세요.`,
+             `보호소${a.careName?`(${a.careName})`:''}에 전화해 입양 가능 여부를 문의하세요.`,
+             '보호소를 방문해 아이를 직접 만나고 상담을 받습니다.',
+             '입양 신청서 작성과 신분증 확인 후 입양합니다.'].forEach(t=>{ const li=document.createElement('li'); li.textContent=t; ol.appendChild(li) });
+            g.appendChild(ol);
+            const n=document.createElement('div'); n.className='note';
+            n.textContent='공고 기간에는 원래 보호자가 찾아갈 수 있어 입양이 공고 기간 이후에 가능한 경우가 많습니다. 보호소마다 절차가 다르니 꼭 전화로 확인하세요.';
+            g.appendChild(n);
+        }
     }
     $("#sdPrev").addEventListener('click',()=>setShelterImage(shIdx-1));
     $("#sdNext").addEventListener('click',()=>setShelterImage(shIdx+1));
     $("#sdClose").addEventListener('click',()=>shDlg.close());
     $("#shState").addEventListener('change',()=>loadShelter(true));
     $("#shMore").addEventListener('click',()=>{ shPage++; loadShelter(false) });
+
+    /* 입양 문의 */
+    const iqDlg=$("#inquiryDialog"), iqForm=$("#iqForm"), ibDlg=$("#inboxDialog");
+    let iqDog=null, ibBox='received';
+    $("#dInquiry").addEventListener('click',()=>{
+        if(!detailDog || !requireLogin()) return;
+        iqDog=detailDog; iqForm.reset(); $("#iqErr").textContent='';
+        $("#iqTitle").textContent=`입양 문의 · ${iqDog.name||''}`;
+        iqDlg.showModal();
+    });
+    $("#iqCancel").addEventListener('click',()=>iqDlg.close());
+    iqForm.addEventListener('submit',async e=>{
+        e.preventDefault();
+        $("#iqSend").disabled=true; $("#iqErr").textContent='';
+        try{
+            await jsonPost(`${DOGS}/${getId(iqDog)}/inquiries`,{ message:$("#iqMessage").value.trim(), contact:$("#iqContact").value.trim() });
+            iqDlg.close(); showToast('문의를 보냈습니다. 답변은 문의함에서 확인하세요.');
+        }catch(err){ $("#iqErr").textContent=err.message||String(err) }
+        finally{ $("#iqSend").disabled=false }
+    });
+
+    /* 문의함 */
+    async function refreshInboxBadge(){
+        try{ const s=await req(`${INQ}/summary`); const b=$("#inboxBadge"); b.hidden=!s.pendingReceived; b.textContent=s.pendingReceived }catch{}
+    }
+    function inboxItem(q){
+        const li=document.createElement('li'); li.className='ib-item';
+        const im=document.createElement('img'); im.alt=q.dogName||''; im.src=q.dogImage? buildUploadUrl(q.dogImage) : NO_IMG; im.onerror=()=>{ im.onerror=null; im.src=NO_IMG };
+        const box=document.createElement('div');
+        const head=document.createElement('div'); head.className='ib-head';
+        const who=document.createElement('b'); who.textContent= ibBox==='received' ? `${q.senderNickname}님의 문의` : `${q.receiverNickname}님에게 보낸 문의`;
+        const dog=document.createElement('span'); dog.textContent=`· ${q.dogName}`;
+        const st=document.createElement('span'); st.className= q.reply? 'badge done':'badge wait'; st.textContent= q.reply? '답변 완료':'답변 대기';
+        head.append(who,dog,st);
+        const msg=document.createElement('div'); msg.className='ib-msg'; msg.textContent=q.message;
+        const meta=document.createElement('div'); meta.className='ib-meta';
+        meta.textContent=[fmtDateTime(q.createdAt), q.contact? `연락처: ${q.contact}` : null].filter(Boolean).join(' · ');
+        box.append(head,msg,meta);
+        if(q.reply){ const r=document.createElement('div'); r.className='ib-reply'; r.textContent=`답변: ${q.reply}`; box.appendChild(r) }
+        if(ibBox==='received'){
+            const f=document.createElement('form'); f.className='c-form';
+            const ta=document.createElement('textarea'); ta.rows=2; ta.maxLength=1000; ta.placeholder= q.reply? '답변 고치기':'답변을 입력하세요'; ta.value=q.reply||'';
+            const b=document.createElement('button'); b.className='btn'; b.textContent= q.reply? '답변 수정':'답변하기';
+            f.append(ta,b);
+            f.addEventListener('submit',async e=>{ e.preventDefault(); const reply=ta.value.trim(); if(!reply) return;
+                b.disabled=true; try{ await jsonPost(`${INQ}/${q.inquiryId}/reply`,{reply}); await loadInbox(); refreshInboxBadge() }catch(err){ alert(err.message||err) } finally{ b.disabled=false } });
+            box.appendChild(f);
+        }
+        li.append(im,box); return li;
+    }
+    async function loadInbox(){
+        const list=$("#ibList"), empty=$("#ibEmpty"); list.innerHTML=''; empty.hidden=false; empty.textContent='불러오는 중…';
+        try{
+            const items=await req(`${INQ}/${ibBox}`);
+            items.forEach(q=>list.appendChild(inboxItem(q)));
+            empty.hidden=items.length>0; empty.textContent= ibBox==='received'? '받은 문의가 없습니다.' : '보낸 문의가 없습니다.';
+        }catch(err){ empty.textContent=err.message||'문의함을 불러오지 못했습니다.' }
+    }
+    document.querySelectorAll('#inboxDialog .tab').forEach(t=>t.addEventListener('click',()=>{
+        ibBox=t.dataset.box; document.querySelectorAll('#inboxDialog .tab').forEach(x=>x.classList.toggle('on',x===t)); loadInbox();
+    }));
+    $("#btnInbox").addEventListener('click',()=>{ if(!requireLogin()) return; ibDlg.showModal(); loadInbox() });
+    $("#ibClose").addEventListener('click',()=>ibDlg.close());
 
     /* 전국 유기동물 상세 통계 */
     const SX = { blue:'#2a78d6', grid:'#e1e0d9', axis:'#c3c2b7', tick:'#6b7482' };

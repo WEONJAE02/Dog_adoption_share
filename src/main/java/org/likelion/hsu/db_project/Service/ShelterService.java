@@ -261,7 +261,7 @@ public class ShelterService {
         List<String> images = new ArrayList<>();
         for (int i = 1; i <= 8; i++) {
             String url = text(item, "popfile" + i);
-            if (url != null) images.add(url.replaceFirst("^http://", "https://"));
+            if (url != null) images.add(https(url));
         }
 
         return ShelterAnimalDto.builder()
@@ -284,12 +284,25 @@ public class ShelterService {
                 .careTel(text(item, "careTel"))
                 .careAddr(text(item, "careAddr"))
                 .orgName(text(item, "orgNm"))
+                .adoptionTitle(text(item, "adptnTitle"))
+                .adoptionPeriod(period(text(item, "adptnSDate"), text(item, "adptnEDate")))
+                .adoptionCondition(text(item, "adptnConditionLimitTxt"))
+                .adoptionText(text(item, "adptnTxt"))
+                .adoptionImage(https(text(item, "adptnImg")))
                 .build();
     }
 
     private String text(JsonNode item, String field) {
         String value = item.path(field).asText("").trim();
         return value.isEmpty() ? null : value;
+    }
+
+    private String period(String start, String end) {
+        return start != null && end != null ? formatDate(start) + " ~ " + formatDate(end) : null;
+    }
+
+    private String https(String url) {
+        return url == null ? null : url.replaceFirst("^http://", "https://");
     }
 
     // "2026(60일미만)(년생)" → "2026년생 (60일미만)"

@@ -73,3 +73,19 @@ CREATE TABLE IF NOT EXISTS board_comment (
     FOREIGN KEY (post_id) REFERENCES board_post (post_id),
     FOREIGN KEY (user_id) REFERENCES users (user_id)
 );
+
+-- 회원 등록 유기견에 대한 입양 문의 (보낸 사람 → 등록자)
+CREATE TABLE IF NOT EXISTS adoption_inquiry (
+    inquiry_id  BIGINT AUTO_INCREMENT PRIMARY KEY,
+    dog_id      BIGINT        NOT NULL,
+    sender_id   BIGINT        NOT NULL,
+    receiver_id BIGINT        NOT NULL,
+    message     VARCHAR(1000) NOT NULL,
+    contact     VARCHAR(100),
+    reply       VARCHAR(1000),
+    created_at  DATETIME      NOT NULL,
+    replied_at  DATETIME,
+    FOREIGN KEY (dog_id) REFERENCES dog (dog_id),
+    FOREIGN KEY (sender_id) REFERENCES users (user_id),
+    FOREIGN KEY (receiver_id) REFERENCES users (user_id)
+);
