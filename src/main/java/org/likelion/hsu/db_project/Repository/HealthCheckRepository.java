@@ -13,6 +13,7 @@ import java.sql.Statement;
 import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -77,13 +78,35 @@ public class HealthCheckRepository {
         return jdbcTemplate.query(SELECT_CHECK + "WHERE h.check_id = ?", checkRowMapper, checkId).stream().findFirst();
     }
 
-    // ✅ 내 체크 기록 (최신순, 반려동물별로 거를 수 있음)
-    public List<HealthCheck> findByUser(Long userId, Long petId, int limit) {
+    // ✅ 내 체크 기록 (최신순, 반려동물·부위로 거를 수 있음)
+    public List<HealthCheck> findByUser(Long userId, Long petId, String bodyPart, int limit) {
+        StringBuilder sql = new StringBuilder(SELECT_CHECK + "WHERE h.user_id = ? ");
+        List<Object> params = new ArrayList<>(List.of(userId));
         if (petId != null) {
-            return jdbcTemplate.query(SELECT_CHECK + "WHERE h.user_id = ? AND h.pet_id = ? ORDER BY h.check_id DESC LIMIT ?",
-                    checkRowMapper, userId, petId, limit);
+            sql.append("AND h.pet_id = ? ");
+            params.add(petId);
         }
-        return jdbcTemplate.query(SELECT_CHECK + "WHERE h.user_id = ? ORDER BY h.check_id DESC LIMIT ?", checkRowMapper, userId, limit);
+        if (bodyPart != null) {
+            sql.append("AND h.body_part = ? ");
+            params.add(bodyPart);
+        }
+        sql.append("ORDER BY h.check_id DESC LIMIT ?");
+        params.add(limit);
+        return jdbcTemplate.query(sql.toString(), checkRowMapper, params.toArray());
+    }
+
+    // ✅ 같은 반려동물·같은 부위의 바로 이전 체크
+    public Optional<HealthCheck> findPrevious(Long petId, String bodyPart, Long beforeCheckId) {
+        return jdbcTemplate.query(SELECT_CHECK + "WHERE h.pet_id = ? AND h.body_part = ? AND h.check_id < ? ORDER BY h.check_id DESC LIMIT 1",
+                checkRowMapper, petId, bodyPart, beforeCheckId).stream().findFirst();
+    }
+
+    // 같은 반려동물·같은 부위에서 몇 번째 체크인지 (이 체크 포함)
+    public int countUpTo(Long petId, String bodyPart, Long checkId) {
+        Integer count = jdbcTemplate.queryForObject(
+                "SELECT COUNT(*) FROM health_check WHERE pet_id = ? AND body_part = ? AND check_id <= ?",
+                Integer.class, petId, bodyPart, checkId);
+        return count != null ? count : 0;
     }
 
     // ✅ 사용 횟수 (하루 제한). 체크 기록과 따로 남겨서, 기록을 지워도 횟수는 줄지 않는다

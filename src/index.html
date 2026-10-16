@@ -443,6 +443,26 @@
         .vet-rank{position:relative}
         .vet-rank::before{content:attr(data-rank); position:absolute; left:-6px; top:-6px; width:20px; height:20px; border-radius:50%; background:var(--text); color:#fff; font-size:11px; font-weight:700; display:flex; align-items:center; justify-content:center}
 
+        /* 지난 체크와 비교 */
+        .cmp-banner{display:flex; gap:12px; align-items:center; padding:12px 14px; border-radius:12px; font-size:14px; line-height:1.5}
+        .cmp-banner .ic{flex:none; width:32px; height:32px; border-radius:50%; display:flex; align-items:center; justify-content:center; color:#fff; font-weight:900}
+        .cmp-banner b{display:block; font-size:15px}
+        .cmp-banner.BETTER{background:#e9f7ef; color:#185c33} .cmp-banner.BETTER .ic{background:#2e9e57}
+        .cmp-banner.SAME{background:#eef1f6; color:#384152} .cmp-banner.SAME .ic{background:#6b7482}
+        .cmp-banner.WORSE{background:#fdeaea; color:#7a1f19} .cmp-banner.WORSE .ic{background:#d93025}
+        .cmp-grid{display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:10px}
+        .cmp-col{border:1px solid var(--line); border-radius:12px; padding:12px; min-width:0}
+        .cmp-col.now{border-color:#9db8ff; background:#f7f9ff}
+        .cmp-col .h{display:flex; gap:6px; align-items:center; flex-wrap:wrap; font-size:13px; font-weight:700}
+        .cmp-col .d{color:var(--muted); font-weight:400}
+        .cmp-col .ph{display:grid; grid-template-columns:repeat(3,1fr); gap:4px; margin:8px 0}
+        .cmp-col .ph img{width:100%; aspect-ratio:1; object-fit:cover; border-radius:6px; background:var(--soft); display:block}
+        .cmp-col p{margin:0; font-size:13px; line-height:1.6}
+        .cmp-note{color:var(--muted); font-size:12px; margin-top:8px}
+        .hc-filter{display:flex; flex-wrap:wrap; gap:8px; margin-top:10px}
+        .hc-filter select{background:#fff; border:1px solid var(--field); padding:7px 10px; border-radius:10px}
+        @media (max-width:600px){ .cmp-grid{grid-template-columns:1fr} }
+
         .toast{position:fixed; left:50%; transform:translateX(-50%); bottom:26px; background:#1f2430; color:#fff; padding:10px 14px; border-radius:10px; font-size:13px; display:none}
         .toast.show{display:block}
 
@@ -644,7 +664,11 @@
         <ul id="petList" class="pet-grid"></ul>
         <section class="hc-sec" id="hcHistory" hidden>
             <h3>최근 체크 기록</h3>
-            <div class="sub" style="margin:0">결과는 참고용이며 진단이 아니에요.</div>
+            <div class="sub" style="margin:0">결과는 참고용이며 진단이 아니에요. 같은 부위를 다시 체크하면 지난 결과와 비교해 보여드려요.</div>
+            <div class="hc-filter">
+                <select id="hcFilterPet" aria-label="반려동물로 보기"><option value="">모든 반려동물</option></select>
+                <select id="hcFilterPart" aria-label="부위로 보기"><option value="">모든 부위</option></select>
+            </div>
             <ul id="hcList" class="hc-list"></ul>
             <div id="hcEmpty" class="post-empty" hidden>아직 체크 기록이 없어요. "건강체크 시작"으로 첫 체크를 해 보세요.</div>
         </section>
@@ -1062,6 +1086,14 @@
         <div class="hr-sample" id="hrSample" hidden>AI 연결 전이라 <b>샘플 결과</b>예요. 사진을 실제로 분석하지 않고 부위별로 정해진 예시를 보여줘요.</div>
         <div class="urg" id="hrUrg"><div class="ic" id="hrUrgIc" aria-hidden="true"></div><div><b id="hrUrgLabel"></b><span id="hrUrgReason"></span></div></div>
         <div class="hr-meta" id="hrMeta"></div>
+        <div class="hr-sec" id="hrCompare" hidden>
+            <div class="cmp-banner" id="cmpBanner"><div class="ic" id="cmpIc" aria-hidden="true"></div><div><b id="cmpTitle"></b><span id="cmpSub"></span></div></div>
+            <div class="cmp-grid">
+                <div class="cmp-col" id="cmpPrev"></div>
+                <div class="cmp-col now" id="cmpNow"></div>
+            </div>
+            <div class="cmp-note">긴급도만으로 비교한 결과예요. 사진도 직접 나란히 비교해 보세요.</div>
+        </div>
         <div class="frames" id="hrFrames"></div>
         <div class="hr-sec"><h4>보이는 것</h4><p id="hrSummary"></p><ul id="hrFindings" style="margin-top:6px"></ul></div>
         <div class="hr-sec"><h4>의심되는 원인</h4><div class="chips" id="hrCauses"></div></div>
@@ -2597,7 +2629,7 @@ ${JSON.stringify(candidates,null,2)}
         fillList($("#hrHome"),res.homeCare); fillList($("#hrQuestions"),res.questionsForVet);
         $("#hrRetakeBox").hidden = res.imageQuality!=='POOR' || !res.retakeTip; $("#hrRetake").textContent=res.retakeTip||'';
         $("#vetEmergency").hidden = r.urgency!=='EMERGENCY';
-        loadVets();
+        loadVets(); loadCompare();
         if(!hrDlg.open) hrDlg.showModal();
         hrDlg.querySelector('.hr-body').scrollTop=0;
     }
@@ -2654,12 +2686,44 @@ ${JSON.stringify(candidates,null,2)}
     $("#vetSido").addEventListener('change',()=>{ fillSigungu(); saveVetRegion({sido:$("#vetSido").value, sigungu:''}); loadVets() });
     $("#vetSigungu").addEventListener('change',()=>{ saveVetRegion({sido:$("#vetSido").value, sigungu:$("#vetSigungu").value}); loadVets() });
 
+    /* 지난 체크와 비교 */
+    const CHANGE = { BETTER:{title:'지난번보다 나아졌어요', ic:'↓'}, SAME:{title:'지난번과 비슷해요', ic:'='}, WORSE:{title:'지난번보다 더 급해졌어요', ic:'↑'} };
+    let cmpSeq=0;
+    function cmpColumn(box,c,label){
+        box.innerHTML='';
+        const h=el('div','h'); h.append(el('span',null,label), el('span','d',fmtDateTime(c.createdAt)), el('span','badge '+c.urgency,(URGENCY[c.urgency]||URGENCY.SOON).short));
+        const ph=el('div','ph'); c.frames.slice(0,3).forEach((f,i)=>{ const im=el('img'); im.src=buildUploadUrl(f); im.alt=`${label} 장면 ${i+1}`; ph.append(im) });
+        box.append(h, ph, el('p',null,c.summary||''));
+        if(label==='지난번'){ const b=el('button','c-act','지난 결과 열기'); b.type='button'; b.style.marginTop='6px'; b.addEventListener('click',()=>showCheckResult(c)); box.append(b) }
+    }
+    async function loadCompare(){
+        const seq=++cmpSeq, box=$("#hrCompare"); box.hidden=true;
+        if(!hcCur) return;
+        try{
+            const r=await req(`${HC}/${hcCur.checkId}/compare`);
+            if(seq!==cmpSeq || !r.previous) return;
+            const c=CHANGE[r.change]||CHANGE.SAME;
+            $("#cmpBanner").className='cmp-banner '+r.change; $("#cmpIc").textContent=c.ic; $("#cmpTitle").textContent=c.title;
+            const days = r.daysBetween===0? '같은 날' : `${r.daysBetween}일 전`;
+            $("#cmpSub").textContent=`${hcCur.bodyPart} ${r.sequence}번째 체크 · 지난 체크는 ${days}`;
+            cmpColumn($("#cmpPrev"),r.previous,'지난번'); cmpColumn($("#cmpNow"),r.current,'이번');
+            box.hidden=false;
+        }catch{}
+    }
+
     /* 최근 기록 */
+    function fillHcFilters(){
+        const ps=$("#hcFilterPet"), cur=ps.value; ps.length=1;
+        pets.forEach(p=>ps.add(new Option(p.name,p.petId))); if([...ps.options].some(o=>o.value===cur)) ps.value=cur;
+        const pt=$("#hcFilterPart");
+        if(pt.length===1) ['눈','피부','귀','치아·입','걸음걸이','기타'].forEach(b=>pt.add(new Option(b,b)));
+    }
     async function renderChecks(){
         if(!me) return;
-        const list=$("#hcList");
+        const list=$("#hcList"); fillHcFilters();
+        const q=new URLSearchParams(); if($("#hcFilterPet").value) q.set('petId',$("#hcFilterPet").value); if($("#hcFilterPart").value) q.set('bodyPart',$("#hcFilterPart").value);
         try{
-            const rows=await req(HC);
+            const rows=await req(`${HC}?${q}`);
             list.innerHTML='';
             rows.forEach(c=>{
                 const li=el('li','hc-row'), im=el('img'); im.alt=''; im.src=c.thumbnail? buildUploadUrl(c.thumbnail) : NO_IMG; im.onerror=()=>{ im.onerror=null; im.src=NO_IMG };
@@ -2673,9 +2737,13 @@ ${JSON.stringify(candidates,null,2)}
                 li.addEventListener('click',open); li.addEventListener('keydown',e=>{ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); open() } });
                 list.append(li);
             });
+            const filtered = $("#hcFilterPet").value || $("#hcFilterPart").value;
             $("#hcEmpty").hidden=rows.length>0;
+            $("#hcEmpty").textContent = filtered? '조건에 맞는 체크 기록이 없어요.' : '아직 체크 기록이 없어요. "건강체크 시작"으로 첫 체크를 해 보세요.';
         }catch{ list.innerHTML='' }
     }
+    $("#hcFilterPet").addEventListener('change',renderChecks);
+    $("#hcFilterPart").addEventListener('change',renderChecks);
     $("#hcStart").addEventListener('click',()=>openHealthCheck());
 
     /* 초기 구동 */
