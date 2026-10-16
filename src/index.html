@@ -234,7 +234,7 @@
         .my-card{border:1px solid var(--line); border-radius:14px; padding:14px 16px}
         .my-head{display:flex; align-items:center; gap:14px}
         .my-ava{width:52px; height:52px; border-radius:50%; background:#e6efff; color:#1f4fd8; display:flex; align-items:center; justify-content:center; font-weight:800; font-size:20px; flex:none}
-        .my-counts{display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:10px}
+        .my-counts{display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:10px}
         .my-counts .v{font-size:22px; font-weight:800; margin-top:2px}
         .my-danger{border:1px solid #f3c6c2; background:#fff7f6; border-radius:14px; padding:14px 16px; display:flex; align-items:center; gap:14px}
         .btn.danger{background:#d93025; color:#fff; font-weight:700}
@@ -289,6 +289,51 @@
         .keep-thumb.off img{opacity:.25}
         .keep-thumb.off::after{content:'삭제'; position:absolute; inset:0; display:flex; align-items:center; justify-content:center; font-size:12px; color:#d93025}
 
+        /* 용품 중고거래 (Shop) */
+        .shop-cats{display:flex; gap:8px; overflow-x:auto; padding:2px 2px 6px; margin-top:18px; scrollbar-width:none}
+        .shop-cats::-webkit-scrollbar{display:none}
+        .chip{all:unset; flex:none; cursor:pointer; padding:8px 14px; border-radius:999px; border:1px solid var(--line); background:#fff; font-size:14px; color:var(--text)}
+        .chip:hover{background:var(--panel-2)}
+        .chip.on{background:var(--text); border-color:var(--text); color:#fff; font-weight:700}
+        .chip:focus-visible{outline:2px solid var(--brand); outline-offset:2px}
+        .shop-search{flex:2}
+        .shop-check{display:flex; align-items:center; gap:6px; font-size:14px; color:var(--muted); cursor:pointer}
+        .shop-check input{width:16px; height:16px; margin:0; accent-color:var(--brand)}
+        .shop-notice{color:var(--muted); font-size:12px; margin:4px 0 0}
+        .shop-grid{display:grid; gap:26px 18px; grid-template-columns:repeat(4,minmax(0,1fr)); margin:18px 0 8px; list-style:none; padding:0}
+        .shop-card{cursor:pointer; min-width:0}
+        .shop-card .ph{position:relative; aspect-ratio:1; border-radius:14px; overflow:hidden; background:var(--soft); border:1px solid var(--line)}
+        .shop-card .ph img{width:100%; height:100%; object-fit:cover; display:block; transition:transform .25s}
+        .shop-card:hover .ph img{transform:scale(1.03)}
+        .shop-card.sold .ph img{filter:grayscale(.6); opacity:.55}
+        .shop-card .st{position:absolute; left:8px; top:8px; padding:4px 8px; border-radius:6px; font-size:12px; font-weight:700; color:#fff; background:#20a35a}
+        .shop-card .st.done{background:#4b5260}
+        .shop-card .t{margin:10px 0 3px; font-size:15px; line-height:1.4; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; overflow-wrap:anywhere}
+        .shop-card .s{color:var(--muted); font-size:13px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
+        .shop-card .pr{font-weight:800; font-size:16px; margin-top:3px}
+        .price-free{color:#f08a24}
+        .shop-card .cnt{color:var(--muted); font-size:12px; margin-top:4px; display:flex; gap:8px}
+        .shop-card .hid{margin-left:6px; font-weight:400}
+        .sp-seller{display:flex; align-items:center; gap:12px; padding-bottom:14px; border-bottom:1px solid var(--line)}
+        .sp-seller .my-ava{width:44px; height:44px; font-size:17px}
+        .sp-title{font-size:22px; font-weight:800; margin:14px 0 4px; overflow-wrap:anywhere}
+        .sp-price{font-size:22px; font-weight:800; margin:8px 0 0}
+        .sp-desc{white-space:pre-wrap; line-height:1.7; margin:16px 0; overflow-wrap:anywhere}
+        .sp-status{display:flex; align-items:center; gap:8px; margin-top:12px; font-size:14px}
+        .sp-status select{background:#fff; border:1px solid var(--field); padding:6px 10px; border-radius:10px}
+        .btn.like{min-width:72px}
+        .btn.like.on{background:#fff0ec; color:#e8504a; font-weight:700}
+        .price-row{display:flex; gap:10px; align-items:center}
+        .price-row input[type=number]{flex:1; min-width:0}
+        .price-row label{flex-direction:row; align-items:center; gap:6px; font-size:14px; flex:none; white-space:nowrap}
+        .price-row input[type=checkbox]{width:16px; height:16px; margin:0; padding:0; accent-color:var(--brand)}
+        @media (max-width:900px){ .shop-grid{grid-template-columns:repeat(2,minmax(0,1fr))} }
+        @media (max-width:600px){
+            #viewShop .toolbar .shop-search{flex:1 1 100%; min-width:0}
+            #viewShop .toolbar .tool-sel{flex:1 1 0; min-width:0}
+            #viewShop .toolbar .tool-btn{margin-left:auto}
+        }
+
         .toast{position:fixed; left:50%; transform:translateX(-50%); bottom:26px; background:#1f2430; color:#fff; padding:10px 14px; border-radius:10px; font-size:13px; display:none}
         .toast.show{display:block}
 
@@ -319,6 +364,7 @@
         <nav class="tabs">
             <button class="tab on" data-view="adopt">입양 정보</button>
             <button class="tab" data-view="board">커뮤니티</button>
+            <button class="tab" data-view="shop">Shop</button>
         </nav>
         <button id="authName" class="auth-name" type="button" hidden title="내 정보"></button>
         <button id="btnInbox" class="tool-btn inbox-btn" hidden>문의함<span id="inboxBadge" class="inbox-badge" hidden></span></button>
@@ -441,6 +487,26 @@
             <span id="bPage"></span>
             <button id="bNext" class="tool-btn">다음</button>
         </div>
+    </div>
+
+    <!-- 용품 중고거래 (Shop) -->
+    <div id="viewShop" hidden>
+        <nav id="shopCats" class="shop-cats" aria-label="카테고리"></nav>
+        <div class="toolbar">
+            <div class="tool-input shop-search"><input id="sq" placeholder="상품명/설명/지역 검색"/></div>
+            <select id="sFilter" class="tool-sel" aria-label="보기">
+                <option value="">전체 상품</option><option value="liked">관심 목록</option><option value="mine">내 판매 상품</option>
+            </select>
+            <select id="sSort" class="tool-sel" aria-label="정렬">
+                <option value="latest">최신순</option><option value="popular">인기순</option><option value="priceAsc">낮은 가격순</option><option value="priceDesc">높은 가격순</option>
+            </select>
+            <label class="shop-check"><input id="sAvail" type="checkbox"/>거래 가능만</label>
+            <button id="sNew" class="tool-btn primary">판매하기</button>
+        </div>
+        <p class="shop-notice">반려견 용품만 사고팔 수 있어요. 동물 분양·판매 글은 운영정책에 따라 삭제됩니다.</p>
+        <ul id="shopGrid" class="shop-grid"></ul>
+        <div id="shopEmpty" class="post-empty" hidden></div>
+        <div class="pager"><button id="shopMore" class="tool-btn" hidden>더보기</button></div>
     </div>
 
     <footer class="site-foot">
@@ -570,7 +636,7 @@
             <label>연락받을 연락처 (선택)
                 <input id="iqContact" maxlength="100" placeholder="전화번호 또는 이메일"/>
             </label>
-            <div class="iq-hint">연락처는 이 아이를 등록한 분에게만 보입니다. 답변은 상단의 "문의함"에서 확인할 수 있어요.</div>
+            <div class="iq-hint" id="iqHint">연락처는 이 아이를 등록한 분에게만 보입니다. 답변은 상단의 "문의함"에서 확인할 수 있어요.</div>
             <div id="iqErr" class="auth-err"></div>
         </div>
         <footer>
@@ -589,6 +655,10 @@
         </nav>
         <button type="button" class="btn" id="ibClose">닫기</button>
     </header>
+    <div class="seg" id="ibKind" style="margin:12px 18px 0; align-self:flex-start; flex:none">
+        <button type="button" class="seg-btn on" data-kind="dog">입양 문의</button>
+        <button type="button" class="seg-btn" data-kind="shop">거래 문의</button>
+    </div>
     <div class="ib-body"><ul id="ibList" class="ib-list"></ul><div id="ibEmpty" class="ib-empty" hidden></div></div>
 </dialog>
 
@@ -702,6 +772,77 @@
     </form>
 </dialog>
 
+<!-- 용품 상세 -->
+<dialog id="shopDialog" class="detail">
+    <header class="pv-head"><span id="spCat" class="badge wait"></span><span>상품 정보</span></header>
+    <div class="d-wrap">
+        <div>
+            <div class="viewer">
+                <img id="spMain" alt="상품 사진">
+                <button class="nav-btn nav-prev" id="spPrev" aria-label="이전 사진">‹</button>
+                <button class="nav-btn nav-next" id="spNext" aria-label="다음 사진">›</button>
+            </div>
+            <div class="thumbs" id="spThumbs"></div>
+        </div>
+        <div>
+            <div class="sp-seller">
+                <div class="my-ava" id="spAva" aria-hidden="true"></div>
+                <div style="min-width:0"><div id="spSeller" style="font-weight:700"></div><div id="spArea" class="sub" style="margin:2px 0 0"></div></div>
+            </div>
+            <p id="spHidden" class="hidden-note" hidden style="margin-top:12px">신고가 누적되어 숨겨진 상품입니다. 다른 사람에게는 보이지 않아요.</p>
+            <div class="sp-title" id="spTitle"></div>
+            <div class="sub" id="spMeta" style="margin:0"></div>
+            <div class="sp-price" id="spPrice"></div>
+            <div class="sp-status" id="spStatusRow" hidden>
+                <label for="spStatus">거래 상태</label><select id="spStatus"></select>
+            </div>
+            <div class="sp-desc" id="spDesc"></div>
+            <div class="sub" id="spCounts"></div>
+        </div>
+    </div>
+    <footer>
+        <button id="spReport" class="btn" hidden>신고</button>
+        <button id="spLike" class="btn like" hidden>♡ 관심</button>
+        <button id="spInquiry" class="btn go" hidden>구매 문의하기</button>
+        <button id="spEdit" class="btn" hidden>수정</button>
+        <button id="spDel" class="btn" hidden>삭제</button>
+        <button id="spClose" class="btn">닫기</button>
+    </footer>
+</dialog>
+
+<!-- 용품 등록/수정 -->
+<dialog id="shopWriteDialog" class="modal">
+    <form id="swForm" method="dialog">
+        <header id="swTitle">판매하기</header>
+        <div class="body">
+            <input type="hidden" id="swId"/>
+            <label>카테고리<select id="swCat" required></select></label>
+            <label>상품명<input id="swSubject" maxlength="50" required placeholder="예: 강아지 하네스 S 사이즈"/></label>
+            <div style="display:flex; flex-direction:column; gap:6px; font-size:13px">가격
+                <div class="price-row">
+                    <input id="swPrice" type="number" min="0" max="10000000" step="100" placeholder="₩ 가격을 입력하세요" aria-label="가격(원)" style="background:#fff; color:var(--text); border:1px solid var(--field); padding:10px 12px; border-radius:10px"/>
+                    <label><input id="swFree" type="checkbox"/>나눔</label>
+                </div>
+            </div>
+            <label>거래 희망 지역 (선택)<input id="swArea" maxlength="50" placeholder="예: 서울 마포구 망원동"/></label>
+            <label class="label-memo">상품 설명
+                <textarea id="swDesc" rows="7" maxlength="3000" required placeholder="사용 기간, 사이즈, 상태, 유통기한(사료·간식) 등을 적어주세요."></textarea>
+            </label>
+            <div class="field">사진 (최대 5장)
+                <input id="swFiles" type="file" accept="image/png,image/jpeg,image/gif,image/webp" multiple />
+                <small id="swHint" style="color:#6b7482">선택: 0장</small>
+                <div id="swKeep" class="thumbs"></div>
+                <div id="swPreview" class="thumbs"></div>
+            </div>
+            <div class="field iq-hint">반려견 용품만 올릴 수 있어요. 동물 분양·판매, 개봉 후 오래된 사료·간식은 올리지 말아 주세요.</div>
+        </div>
+        <footer>
+            <button type="button" class="btn" id="swCancel">취소</button>
+            <button id="swSave" value="default" class="btn go">저장</button>
+        </footer>
+    </form>
+</dialog>
+
 <template id="itemTmpl">
     <li class="card">
         <img class="thumb" alt="사진"/>
@@ -735,7 +876,7 @@
             <h3>제2조 (회원가입과 탈퇴)</h3>
             <p>만 14세 이상이면 이메일 또는 카카오·네이버 계정으로 가입할 수 있습니다. 회원은 언제든 "내 정보"에서 탈퇴할 수 있습니다.</p>
             <h3>제3조 (서비스 내용)</h3>
-            <ul><li>회원이 등록한 유기견 정보와 입양 문의</li><li>공공데이터(국가동물보호정보시스템)로 제공하는 전국 보호소 유기동물 정보와 통계</li><li>커뮤니티 게시판</li></ul>
+            <ul><li>회원이 등록한 유기견 정보와 입양 문의</li><li>공공데이터(국가동물보호정보시스템)로 제공하는 전국 보호소 유기동물 정보와 통계</li><li>커뮤니티 게시판</li><li>회원 간 반려견 용품 중고거래(Shop)</li></ul>
             <p>보호소 정보는 공공데이터를 그대로 보여주며, 정확한 내용은 각 보호소에 확인해야 합니다.</p>
             <h3>제4조 (금지 행위)</h3>
             <ul><li>동물의 유료 분양·판매, 책임비 등 명목의 금전 요구</li><li>허위 정보 등록, 타인 사칭</li><li>욕설·비방, 타인의 개인정보 노출</li><li>광고·스팸, 서비스 운영을 방해하는 행위</li></ul>
@@ -743,17 +884,18 @@
             <p>신고가 누적된 게시물은 운영정책에 따라 숨겨질 수 있고, 금지 행위가 확인되면 삭제되거나 이용이 제한될 수 있습니다.</p>
             <h3>제6조 (책임의 제한)</h3>
             <p>서비스는 입양 정보를 연결할 뿐, 회원 간 또는 회원과 보호소 간 입양 과정에 직접 관여하지 않습니다.</p>
+            <p>Shop의 용품 거래는 판매자와 구매자가 직접 진행하며, 서비스는 결제·배송·품질에 관여하지 않습니다. 동물은 Shop에서 판매할 수 없습니다.</p>
             <h3>제7조 (문의)</h3>
             <p>서비스 관련 문의: [문의 이메일]</p>
         </section>
         <section data-doc="privacy" hidden>
             <div class="meta">시행일 [YYYY-MM-DD] · 운영자 [운영자 이름]</div>
             <h3>1. 수집하는 개인정보</h3>
-            <ul><li>이메일 가입: 이메일, 비밀번호(암호화하여 저장), 닉네임</li><li>카카오 로그인: 회원번호, 닉네임</li><li>네이버 로그인: 회원 식별값, 이름</li><li>입양 문의 시 회원이 직접 입력한 연락처(문의를 받는 등록자에게만 공개)</li></ul>
+            <ul><li>이메일 가입: 이메일, 비밀번호(암호화하여 저장), 닉네임</li><li>카카오 로그인: 회원번호, 닉네임</li><li>네이버 로그인: 회원 식별값, 이름</li><li>입양·거래 문의 시 회원이 직접 입력한 연락처(문의를 받는 등록자·판매자에게만 공개)</li></ul>
             <h3>2. 이용 목적</h3>
             <p>회원 식별과 로그인, 게시물·댓글 작성자 표시, 입양 문의 전달, 신고 처리와 부정 이용 방지</p>
             <h3>3. 보관 기간과 파기</h3>
-            <p>회원 탈퇴 시 계정 정보(이메일, 비밀번호, 닉네임, 소셜 계정 연결), 등록한 유기견 정보와 사진, 주고받은 입양 문의, 신고 기록을 지체 없이 삭제합니다. 커뮤니티 글·댓글은 남기되 작성자를 "탈퇴한 회원"으로 표시합니다. 다른 법령에 보관 의무가 있으면 [기간] 동안 보관한 뒤 파기합니다.</p>
+            <p>회원 탈퇴 시 계정 정보(이메일, 비밀번호, 닉네임, 소셜 계정 연결), 등록한 유기견 정보와 사진, 주고받은 입양 문의, Shop에 올린 상품과 사진·주고받은 거래 문의·관심 목록, 신고 기록을 지체 없이 삭제합니다. 커뮤니티 글·댓글은 남기되 작성자를 "탈퇴한 회원"으로 표시합니다. 다른 법령에 보관 의무가 있으면 [기간] 동안 보관한 뒤 파기합니다.</p>
             <h3>4. 제3자 제공과 처리 위탁</h3>
             <p>개인정보를 제3자에게 제공하지 않습니다. 서버·데이터베이스 운영: [호스팅 업체]</p>
             <h3>5. 이용자의 권리</h3>
@@ -764,7 +906,7 @@
         <section data-doc="policy" hidden>
             <div class="meta">시행일 [YYYY-MM-DD]</div>
             <h3>1. 신고</h3>
-            <p>회원이 등록한 유기견, 커뮤니티 글, 댓글을 신고할 수 있습니다. 같은 대상은 한 번만 신고할 수 있고, 신고한 사람은 작성자에게 공개되지 않습니다.</p>
+            <p>회원이 등록한 유기견, 커뮤니티 글, 댓글, Shop 상품을 신고할 수 있습니다. 같은 대상은 한 번만 신고할 수 있고, 신고한 사람은 작성자에게 공개되지 않습니다.</p>
             <h3>2. 자동 숨김</h3>
             <p>서로 다른 회원 3명 이상이 신고한 대상은 자동으로 숨겨집니다. 숨겨진 글은 작성자 본인에게만 보입니다.</p>
             <h3>3. 금지 콘텐츠</h3>
@@ -815,6 +957,8 @@
             <div class="my-card"><div class="sub" style="margin:0">커뮤니티 글</div><div class="v" id="myPosts">0</div></div>
             <div class="my-card"><div class="sub" style="margin:0">댓글</div><div class="v" id="myComments">0</div></div>
             <div class="my-card"><div class="sub" style="margin:0">입양 문의</div><div class="v" id="myInquiries">0</div></div>
+            <div class="my-card"><div class="sub" style="margin:0">판매 상품</div><div class="v" id="myShopItems">0</div></div>
+            <div class="my-card"><div class="sub" style="margin:0">거래 문의</div><div class="v" id="myShopInquiries">0</div></div>
         </div>
         <div class="my-card" style="font-size:14px">
             <div style="font-weight:700; margin-bottom:8px">약관 및 정책</div>
@@ -841,6 +985,7 @@
             <div>· 계정 정보 (닉네임, 이메일, 소셜 로그인 연결)</div>
             <div id="wdDogs">· 내가 등록한 유기견과 사진</div>
             <div id="wdInquiries">· 주고받은 입양 문의</div>
+            <div id="wdShop">· 내가 올린 판매 상품과 사진, 주고받은 거래 문의, 관심 목록</div>
         </div>
         <div class="my-card" style="font-size:14px; line-height:1.8">
             <div style="font-weight:700; margin-bottom:4px">남는 것</div>
@@ -885,6 +1030,7 @@
     const POSTS = API_BASE + '/posts';
     const SHELTER = API_BASE + '/shelter';
     const INQ = API_BASE + '/inquiries';
+    const SHOP = API_BASE + '/shop';
 
     /* OpenAI 키 보관 방식 유지 */
     const OPENAI_FALLBACK_KEY = '';
@@ -1356,7 +1502,7 @@ ${JSON.stringify(candidates,null,2)}
             $("#myAva").textContent=myProfile.nickname.slice(0,1); $("#myNick").textContent=myProfile.nickname;
             $("#myMeta").textContent=[providerName(myProfile.provider), myProfile.email, `가입일 ${fmtDate(myProfile.createdAt)}`].filter(Boolean).join(' · ');
             $("#myNickInput").value='';
-            const c=myProfile.counts; $("#myDogs").textContent=c.dogs; $("#myPosts").textContent=c.posts; $("#myComments").textContent=c.comments; $("#myInquiries").textContent=c.inquiries;
+            const c=myProfile.counts; $("#myDogs").textContent=c.dogs; $("#myPosts").textContent=c.posts; $("#myComments").textContent=c.comments; $("#myInquiries").textContent=c.inquiries; $("#myShopItems").textContent=c.shopItems??0; $("#myShopInquiries").textContent=c.shopInquiries??0;
             if(!myDlg.open) myDlg.showModal();
         }catch(err){ alert(err.message||err) }
     }
@@ -1373,6 +1519,7 @@ ${JSON.stringify(candidates,null,2)}
     $("#myWithdraw").addEventListener('click',()=>{
         const c=myProfile?.counts||{};
         $("#wdDogs").textContent=`· 내가 등록한 유기견 ${c.dogs??0}건과 사진`; $("#wdInquiries").textContent=`· 주고받은 입양 문의 ${c.inquiries??0}건`;
+        $("#wdShop").textContent=`· 내가 올린 판매 상품 ${c.shopItems??0}건과 사진, 주고받은 거래 문의 ${c.shopInquiries??0}건, 관심 목록`;
         $("#wdConfirm").value=''; $("#wdSubmit").disabled=true; $("#wdErr").textContent='';
         wdDlg.showModal();
     });
@@ -1414,6 +1561,7 @@ ${JSON.stringify(candidates,null,2)}
                 showToast('신고가 누적되어 숨김 처리되었습니다.');
                 if(rpTarget.type==='dog'){ dDlg.close(); await renderList() }
                 else if(rpTarget.type==='post'){ postDlg.close() }
+                else if(rpTarget.type==='item'){ spDlg.close() }
                 else { curPost=await Posts.get(curPost.postId); renderComments() }
             }else showToast('신고가 접수되었습니다.');
         }catch(err){ $("#rpErr").textContent=err.message||String(err) }
@@ -1424,19 +1572,26 @@ ${JSON.stringify(candidates,null,2)}
 
     /* 입양 문의 */
     const iqDlg=$("#inquiryDialog"), iqForm=$("#iqForm"), ibDlg=$("#inboxDialog");
-    let iqDog=null, ibBox='received';
-    $("#dInquiry").addEventListener('click',()=>{
-        if(!detailDog || !requireLogin()) return;
-        iqDog=detailDog; iqForm.reset(); $("#iqErr").textContent='';
-        $("#iqTitle").textContent=`입양 문의 · ${iqDog.name||''}`;
+    // 입양 문의와 용품 구매 문의가 같은 창을 쓴다
+    let iqUrl=null, ibBox='received', ibKind='dog';
+    function openInquiry(url,title,hint,placeholder){
+        if(!requireLogin()) return;
+        iqUrl=url; iqForm.reset(); $("#iqErr").textContent='';
+        $("#iqTitle").textContent=title; $("#iqHint").textContent=hint; $("#iqMessage").placeholder=placeholder;
         iqDlg.showModal();
+    }
+    $("#dInquiry").addEventListener('click',()=>{
+        if(!detailDog) return;
+        openInquiry(`${DOGS}/${getId(detailDog)}/inquiries`, `입양 문의 · ${detailDog.name||''}`,
+            '연락처는 이 아이를 등록한 분에게만 보입니다. 답변은 상단의 "문의함"에서 확인할 수 있어요.',
+            '예: 입양을 고민하고 있어요. 산책 습관과 건강 상태가 궁금합니다.');
     });
     $("#iqCancel").addEventListener('click',()=>iqDlg.close());
     iqForm.addEventListener('submit',async e=>{
         e.preventDefault();
         $("#iqSend").disabled=true; $("#iqErr").textContent='';
         try{
-            await jsonPost(`${DOGS}/${getId(iqDog)}/inquiries`,{ message:$("#iqMessage").value.trim(), contact:$("#iqContact").value.trim() });
+            await jsonPost(iqUrl,{ message:$("#iqMessage").value.trim(), contact:$("#iqContact").value.trim() });
             iqDlg.close(); showToast('문의를 보냈습니다. 답변은 문의함에서 확인하세요.');
         }catch(err){ $("#iqErr").textContent=err.message||String(err) }
         finally{ $("#iqSend").disabled=false }
@@ -1447,12 +1602,13 @@ ${JSON.stringify(candidates,null,2)}
         try{ const s=await req(`${INQ}/summary`); const b=$("#inboxBadge"); b.hidden=!s.pendingReceived; b.textContent=s.pendingReceived }catch{}
     }
     function inboxItem(q){
+        const shop = ibKind==='shop', name = shop? q.itemTitle : q.dogName, image = shop? q.itemImage : q.dogImage;
         const li=document.createElement('li'); li.className='ib-item';
-        const im=document.createElement('img'); im.alt=q.dogName||''; im.src=q.dogImage? buildUploadUrl(q.dogImage) : NO_IMG; im.onerror=()=>{ im.onerror=null; im.src=NO_IMG };
+        const im=document.createElement('img'); im.alt=name||''; im.src=image? buildUploadUrl(image) : NO_IMG; im.onerror=()=>{ im.onerror=null; im.src=NO_IMG };
         const box=document.createElement('div');
         const head=document.createElement('div'); head.className='ib-head';
         const who=document.createElement('b'); who.textContent= ibBox==='received' ? `${q.senderNickname}님의 문의` : `${q.receiverNickname}님에게 보낸 문의`;
-        const dog=document.createElement('span'); dog.textContent=`· ${q.dogName}`;
+        const dog=document.createElement('span'); dog.textContent= shop? `· ${q.itemTitle} (${fmtPrice(q.itemPrice)})` : `· ${q.dogName}`;
         const st=document.createElement('span'); st.className= q.reply? 'badge done':'badge wait'; st.textContent= q.reply? '답변 완료':'답변 대기';
         head.append(who,dog,st);
         const msg=document.createElement('div'); msg.className='ib-msg'; msg.textContent=q.message;
@@ -1466,7 +1622,7 @@ ${JSON.stringify(candidates,null,2)}
             const b=document.createElement('button'); b.className='btn'; b.textContent= q.reply? '답변 수정':'답변하기';
             f.append(ta,b);
             f.addEventListener('submit',async e=>{ e.preventDefault(); const reply=ta.value.trim(); if(!reply) return;
-                b.disabled=true; try{ await jsonPost(`${INQ}/${q.inquiryId}/reply`,{reply}); await loadInbox(); refreshInboxBadge() }catch(err){ alert(err.message||err) } finally{ b.disabled=false } });
+                b.disabled=true; try{ await jsonPost(`${INQ}/${shop?'shop/':''}${q.inquiryId}/reply`,{reply}); await loadInbox(); refreshInboxBadge() }catch(err){ alert(err.message||err) } finally{ b.disabled=false } });
             box.appendChild(f);
         }
         li.append(im,box); return li;
@@ -1474,15 +1630,24 @@ ${JSON.stringify(candidates,null,2)}
     async function loadInbox(){
         const list=$("#ibList"), empty=$("#ibEmpty"); list.innerHTML=''; empty.hidden=false; empty.textContent='불러오는 중…';
         try{
-            const items=await req(`${INQ}/${ibBox}`);
+            const items=await req(`${INQ}/${ibKind==='shop'?'shop/':''}${ibBox}`);
             items.forEach(q=>list.appendChild(inboxItem(q)));
-            empty.hidden=items.length>0; empty.textContent= ibBox==='received'? '받은 문의가 없습니다.' : '보낸 문의가 없습니다.';
+            const kind = ibKind==='shop'? '거래' : '입양';
+            empty.hidden=items.length>0; empty.textContent= ibBox==='received'? `받은 ${kind} 문의가 없습니다.` : `보낸 ${kind} 문의가 없습니다.`;
         }catch(err){ empty.textContent=err.message||'문의함을 불러오지 못했습니다.' }
     }
     document.querySelectorAll('#inboxDialog .tab').forEach(t=>t.addEventListener('click',()=>{
         ibBox=t.dataset.box; document.querySelectorAll('#inboxDialog .tab').forEach(x=>x.classList.toggle('on',x===t)); loadInbox();
     }));
-    $("#btnInbox").addEventListener('click',()=>{ if(!requireLogin()) return; ibDlg.showModal(); loadInbox() });
+    document.querySelectorAll('#ibKind .seg-btn').forEach(b=>b.addEventListener('click',()=>{
+        ibKind=b.dataset.kind; document.querySelectorAll('#ibKind .seg-btn').forEach(x=>x.classList.toggle('on',x===b)); loadInbox();
+    }));
+    // 답변을 기다리는 문의가 있는 쪽을 먼저 연다
+    $("#btnInbox").addEventListener('click',async()=>{
+        if(!requireLogin()) return;
+        try{ const s=await req(`${INQ}/summary`); if(!s.pendingAdoption && s.pendingShop) document.querySelector('#ibKind [data-kind=shop]').click(); }catch{}
+        ibDlg.showModal(); loadInbox();
+    });
     $("#ibClose").addEventListener('click',()=>ibDlg.close());
 
     /* 전국 유기동물 상세 통계 */
@@ -1552,10 +1717,10 @@ ${JSON.stringify(candidates,null,2)}
     function showAdoptSec(name){
         const member = name==='member';
         $("#shelterSec").hidden=member; $("#memberSec").hidden=!member; $("#shState").hidden=member;
-        document.querySelectorAll('.seg-btn').forEach(b=>b.classList.toggle('on',b.dataset.sec===name));
+        document.querySelectorAll('.seg-btn[data-sec]').forEach(b=>b.classList.toggle('on',b.dataset.sec===name));
         if(member) loadCharts();
     }
-    document.querySelectorAll('.seg-btn').forEach(b=>b.addEventListener('click',()=>showAdoptSec(b.dataset.sec)));
+    document.querySelectorAll('.seg-btn[data-sec]').forEach(b=>b.addEventListener('click',()=>showAdoptSec(b.dataset.sec)));
 
     /* 커뮤니티 게시판 */
     const enc = v => encodeURIComponent(v||'');
@@ -1578,13 +1743,17 @@ ${JSON.stringify(candidates,null,2)}
 
     /* 탭 전환 */
     function showView(name){
-        const board = name==='board';
-        $("#viewAdopt").hidden=board; $("#viewBoard").hidden=!board;
-        document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('on',t.dataset.view===name));
-        history.replaceState(null,'',board?'#board':location.pathname+location.search);
-        if(board) renderPosts();
+        $("#viewAdopt").hidden = name!=='adopt'; $("#viewBoard").hidden = name!=='board'; $("#viewShop").hidden = name!=='shop';
+        document.querySelectorAll('.tab[data-view]').forEach(t=>t.classList.toggle('on',t.dataset.view===name));
+        history.replaceState(null,'',name==='adopt'? location.pathname+location.search : '#'+name);
+        if(name==='board') renderPosts();
+        if(name==='shop') renderShop(true);
     }
-    async function refreshViews(){ await renderList(); if(!$("#viewBoard").hidden) await renderPosts() }
+    async function refreshViews(){
+        await renderList();
+        if(!$("#viewBoard").hidden) await renderPosts();
+        if(!$("#viewShop").hidden) await renderShop(true);
+    }
 
     /* 글 목록 */
     async function renderPosts(){
@@ -1711,6 +1880,197 @@ ${JSON.stringify(candidates,null,2)}
         }catch(err){ alert('저장 중 오류: '+(err.message||err)) } finally{ $("#pwSave").disabled=false }
     });
 
+    /* 용품 중고거래 (Shop) */
+    const fmtPrice = p => p===0? '나눔' : `${Number(p||0).toLocaleString('ko-KR')}원`;
+    function timeAgo(iso){
+        if(!iso) return '';
+        const sec=(Date.now()-new Date(iso).getTime())/1000;
+        if(sec<60) return '방금 전';
+        if(sec<3600) return `${Math.floor(sec/60)}분 전`;
+        if(sec<86400) return `${Math.floor(sec/3600)}시간 전`;
+        if(sec<86400*7) return `${Math.floor(sec/86400)}일 전`;
+        return fmtDate(iso);
+    }
+    const shopForm = (payload,files=[])=>{ const fd=new FormData(); fd.append('item',JSON.stringify(payload)); files.forEach(f=>fd.append('images',f)); return fd };
+    const Shop = {
+        meta:()=>req(`${SHOP}/meta`),
+        list:(q)=>req(`${SHOP}/items?category=${enc(q.category)}&search=${enc(q.search)}&available=${q.available}&filter=${enc(q.filter)}&sort=${enc(q.sort)}&page=${q.page}&size=12`),
+        get:(id)=>req(`${SHOP}/items/${id}`),
+        create:(payload,files)=>req(`${SHOP}/items`,{method:'POST',body:shopForm(payload,files)}),
+        update:(id,payload,files)=>req(`${SHOP}/items/${id}`,{method:'PUT',body:shopForm(payload,files)}),
+        status:(id,status)=>req(`${SHOP}/items/${id}/status`,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({status})}),
+        remove:(id)=>req(`${SHOP}/items/${id}`,{method:'DELETE'}),
+        like:(id,on)=>req(`${SHOP}/items/${id}/like`,{method:on?'POST':'DELETE'})
+    };
+    const spDlg=$("#shopDialog"), swDlg=$("#shopWriteDialog"), swForm=$("#swForm"), swFiles=$("#swFiles"), shopGrid=$("#shopGrid");
+    let shopCat='', shopPageNo=1, shopLoaded=0, shopSeq=0, curItem=null, spGallery=[], spIdx=0, swKeepImgs=[];
+
+    /* 목록 */
+    function shopCard(it){
+        const li=el('li','shop-card'+(it.status==='거래완료'?' sold':'')), ph=el('div','ph'), im=el('img');
+        im.loading='lazy'; im.alt=it.title; im.src=it.thumbnail? buildUploadUrl(it.thumbnail) : NO_IMG; im.onerror=()=>{ im.onerror=null; im.src=NO_IMG };
+        ph.append(im);
+        if(it.status!=='판매중') ph.append(el('span','st'+(it.status==='거래완료'?' done':''),it.status));
+        const t=el('div','t',it.title);
+        const sub=el('div','s',[it.tradeArea, timeAgo(it.createdAt)].filter(Boolean).join(' · '));
+        const pr=el('div','pr'+(it.price===0?' price-free':''),fmtPrice(it.price));
+        if(it.hidden) pr.append(el('span','badge keep hid','숨김'));
+        const cnt=el('div','cnt');
+        if(it.likeCount) cnt.append(el('span',null,`♡ ${it.likeCount}`));
+        if(it.viewCount) cnt.append(el('span',null,`조회 ${it.viewCount}`));
+        li.append(ph,t,sub,pr,cnt);
+        li.tabIndex=0; li.setAttribute('role','button');
+        li.addEventListener('click',()=>openItem(it.itemId));
+        li.addEventListener('keydown',e=>{ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); openItem(it.itemId) } });
+        return li;
+    }
+    async function renderShop(reset){
+        const seq = reset? ++shopSeq : shopSeq;
+        const empty=$("#shopEmpty"), more=$("#shopMore");
+        if(reset){ shopPageNo=1; shopLoaded=0 }
+        if(!me) $("#sFilter").value='';   // 관심 목록·내 판매 상품은 로그인한 경우만
+        more.disabled=true;
+        try{
+            const r=await Shop.list({category:shopCat, search:$("#sq").value.trim(), available:$("#sAvail").checked, filter:$("#sFilter").value, sort:$("#sSort").value, page:shopPageNo});
+            if(seq!==shopSeq) return;   // 검색어를 빠르게 바꾸면 늦게 온 응답은 버린다
+            if(reset) shopGrid.innerHTML='';
+            r.items.forEach(it=>shopGrid.appendChild(shopCard(it)));
+            shopLoaded+=r.items.length;
+            const f=$("#sFilter").value;
+            empty.textContent = f==='liked'? '관심 등록한 상품이 없습니다.' : f==='mine'? '아직 올린 상품이 없습니다. "판매하기"로 첫 상품을 올려보세요.' : '조건에 맞는 상품이 없습니다.';
+            empty.hidden = shopLoaded>0;
+            more.hidden = shopLoaded>=r.total || !r.items.length;
+        }catch(err){
+            if(seq!==shopSeq) return;
+            if(reset) shopGrid.innerHTML='';
+            empty.hidden=false; empty.textContent=err.message||'상품을 불러오지 못했습니다.'; more.hidden=true;
+        }finally{ more.disabled=false }
+    }
+    function renderShopCats(categories){
+        const nav=$("#shopCats"); nav.innerHTML='';
+        ['', ...categories].forEach(c=>{
+            const b=el('button','chip'+(c===shopCat?' on':''),c||'전체'); b.type='button';
+            b.setAttribute('aria-pressed', String(c===shopCat));
+            b.addEventListener('click',()=>{ shopCat=c; nav.querySelectorAll('.chip').forEach(x=>{ const on=x===b; x.classList.toggle('on',on); x.setAttribute('aria-pressed',String(on)) }); renderShop(true) });
+            nav.appendChild(b);
+        });
+    }
+
+    /* 상세 */
+    function setItemImage(i){ if(!spGallery.length){ $("#spMain").src=NO_IMG; return } spIdx=(i+spGallery.length)%spGallery.length; $("#spMain").src=spGallery[spIdx] }
+    function renderItem(it){
+        curItem=it;
+        const mine = !!me && it.userId===me.userId;
+        spGallery=(it.imageNames||[]).map(buildUploadUrl); setItemImage(0);
+        $("#spPrev").hidden=$("#spNext").hidden = spGallery.length<2;
+        const th=$("#spThumbs"); th.innerHTML='';
+        if(spGallery.length>1) spGallery.forEach((src,i)=>{ const im=new Image(); im.src=src; im.alt='사진 '+(i+1); im.addEventListener('click',()=>setItemImage(i)); th.appendChild(im) });
+        $("#spCat").textContent=it.category;
+        $("#spAva").textContent=(it.nickname||'?').slice(0,1); $("#spSeller").textContent=it.nickname;
+        $("#spArea").textContent=it.tradeArea||'거래 지역 미정';
+        $("#spTitle").textContent=it.title;
+        $("#spMeta").textContent=`${it.category} · ${timeAgo(it.createdAt)}${it.updatedAt?' (수정됨)':''}`;
+        const pr=$("#spPrice"); pr.textContent=fmtPrice(it.price); pr.classList.toggle('price-free',it.price===0);
+        if(it.status!=='판매중'){ const b=el('span',`badge ${it.status==='거래완료'?'done':'wait'}`,it.status); b.style.cssText='margin-left:10px; vertical-align:middle'; pr.append(b) }
+        $("#spDesc").textContent=it.description;
+        $("#spCounts").textContent=`관심 ${it.likeCount} · 조회 ${it.viewCount}`;
+        $("#spHidden").hidden=!it.hidden;
+        $("#spStatusRow").hidden=!mine; $("#spStatus").value=it.status;
+        $("#spEdit").hidden=$("#spDel").hidden=!mine;
+        $("#spReport").hidden=mine; $("#spLike").hidden=mine;
+        $("#spInquiry").hidden = mine || it.status==='거래완료';
+        const lk=$("#spLike"); lk.classList.toggle('on',it.liked); lk.textContent = it.liked? `♥ ${it.likeCount}` : `♡ ${it.likeCount}`;
+        lk.setAttribute('aria-pressed',String(it.liked)); lk.title = it.liked? '관심 해제' : '관심 등록';
+    }
+    async function openItem(id){
+        try{ renderItem(await Shop.get(id)); if(!spDlg.open) spDlg.showModal() }
+        catch(err){ alert(err.message||err) }
+    }
+    $("#spPrev").addEventListener('click',()=>setItemImage(spIdx-1));
+    $("#spNext").addEventListener('click',()=>setItemImage(spIdx+1));
+    $("#spClose").addEventListener('click',()=>spDlg.close());
+    spDlg.addEventListener('close',()=>{ if(!$("#viewShop").hidden) renderShop(true) });
+    $("#spLike").addEventListener('click',async()=>{
+        if(!curItem || !requireLogin()) return;
+        try{ const r=await Shop.like(curItem.itemId,!curItem.liked); renderItem({...curItem, liked:r.liked, likeCount:r.likeCount}) }
+        catch(err){ alert(err.message||err) }
+    });
+    $("#spStatus").addEventListener('change',async e=>{
+        try{ renderItem(await Shop.status(curItem.itemId,e.target.value)); showToast(`'${e.target.value}'(으)로 바꿨습니다.`) }
+        catch(err){ alert(err.message||err); e.target.value=curItem.status }
+    });
+    $("#spInquiry").addEventListener('click',()=>{
+        if(!curItem) return;
+        openInquiry(`${SHOP}/items/${curItem.itemId}/inquiries`, `구매 문의 · ${curItem.title}`,
+            '연락처는 판매자에게만 보입니다. 답변은 상단의 "문의함 > 거래 문의"에서 확인할 수 있어요.',
+            '예: 아직 구매 가능한가요? 직거래 가능한 시간이 궁금합니다.');
+    });
+    $("#spReport").addEventListener('click',()=>{ if(curItem) openReport('item',curItem.itemId,curItem.title,'Shop 상품 · '+curItem.nickname) });
+    $("#spEdit").addEventListener('click',()=>openShopWrite(curItem));
+    $("#spDel").addEventListener('click',async()=>{
+        if(!confirm('상품을 삭제할까요? 받은 거래 문의도 함께 삭제됩니다.')) return;
+        try{ await Shop.remove(curItem.itemId); spDlg.close(); showToast('삭제되었습니다.') }catch(err){ alert(err.message||err) }
+    });
+
+    /* 등록 / 수정 */
+    function renderShopWriteImages(){
+        const files=[...swFiles.files];
+        $("#swHint").textContent=`기존 ${swKeepImgs.filter(k=>k.keep).length}장 · 새로 선택 ${files.length}장`;
+        const kb=$("#swKeep"); kb.innerHTML='';
+        swKeepImgs.forEach(k=>{
+            const w=el('div','keep-thumb'+(k.keep?'':' off')), im=el('img'); im.src=buildUploadUrl(k.name); im.alt='기존 사진'; w.title='눌러서 삭제/유지 전환';
+            w.append(im); w.addEventListener('click',()=>{ k.keep=!k.keep; renderShopWriteImages() }); kb.appendChild(w);
+        });
+        const pb=$("#swPreview"); pb.innerHTML='';
+        files.forEach(f=>{ const im=el('img'); im.src=URL.createObjectURL(f); im.alt='선택 이미지'; pb.appendChild(im) });
+    }
+    function syncFree(){ const free=$("#swFree").checked; $("#swPrice").disabled=free; if(free) $("#swPrice").value='' }
+    function openShopWrite(it){
+        if(!requireLogin()) return;
+        swForm.reset();
+        $("#swTitle").textContent = it? '상품 수정':'판매하기';
+        $("#swId").value=it?.itemId??''; $("#swSubject").value=it?.title??''; $("#swDesc").value=it?.description??''; $("#swArea").value=it?.tradeArea??'';
+        if(it) $("#swCat").value=it.category; else if(shopCat) $("#swCat").value=shopCat;
+        $("#swFree").checked = it?.price===0; $("#swPrice").value = it && it.price>0 ? it.price : ''; syncFree();
+        swKeepImgs=(it?.imageNames||[]).map(name=>({name,keep:true}));
+        renderShopWriteImages();
+        swDlg.showModal();
+    }
+    swFiles.addEventListener('change',renderShopWriteImages);
+    $("#swFree").addEventListener('change',syncFree);
+    $("#swCancel").addEventListener('click',()=>swDlg.close());
+    swForm.addEventListener('submit',async e=>{
+        e.preventDefault();
+        const id=$("#swId").value, files=[...swFiles.files], keep=swKeepImgs.filter(k=>k.keep).map(k=>k.name);
+        const free=$("#swFree").checked, priceRaw=$("#swPrice").value;
+        if(!free && priceRaw===''){ alert('가격을 입력하거나 "나눔"을 선택해 주세요.'); return }
+        if(keep.length+files.length>5){ alert('사진은 최대 5장까지 올릴 수 있습니다.'); return }
+        const payload={ category:$("#swCat").value, title:$("#swSubject").value.trim(), price: free? 0 : Number(priceRaw),
+                        tradeArea:$("#swArea").value.trim(), description:$("#swDesc").value.trim(), keepImages:keep };
+        $("#swSave").disabled=true;
+        try{
+            const saved = id? await Shop.update(id,payload,files) : await Shop.create(payload,files);
+            swDlg.close();
+            if(spDlg.open) renderItem(saved); else { await renderShop(true); await openItem(saved.itemId) }
+            showToast(id? '수정되었습니다.' : '상품을 올렸습니다.');
+        }catch(err){ alert('저장 중 오류: '+(err.message||err)) } finally{ $("#swSave").disabled=false }
+    });
+
+    function bindShop(){
+        let t=null;
+        $("#sq").addEventListener('input',()=>{ clearTimeout(t); t=setTimeout(()=>renderShop(true),250) });
+        $("#sSort").addEventListener('change',()=>renderShop(true));
+        $("#sAvail").addEventListener('change',()=>renderShop(true));
+        $("#sFilter").addEventListener('change',()=>{ if($("#sFilter").value && !requireLogin()){ $("#sFilter").value=''; return } renderShop(true) });
+        $("#sNew").addEventListener('click',()=>openShopWrite());
+        $("#shopMore").addEventListener('click',()=>{ shopPageNo++; renderShop(false) });
+        Shop.meta().then(m=>{
+            renderShopCats(m.categories);
+            m.categories.forEach(c=>$("#swCat").add(new Option(c,c)));
+            m.statuses.forEach(st=>$("#spStatus").add(new Option(st,st)));
+        }).catch(()=>{});
+    }
+
     /* 초기 구동 */
     document.addEventListener('DOMContentLoaded',async()=>{
         $("#btnNew").addEventListener("click",()=>openDialog());
@@ -1722,12 +2082,14 @@ ${JSON.stringify(candidates,null,2)}
         if(new URLSearchParams(location.search).has('loginError')){ showToast('소셜 로그인에 실패했습니다.'); history.replaceState(null,'',location.pathname) }
         loadMe().catch(()=>{});
 
-        document.querySelectorAll('.tab').forEach(t=>t.addEventListener('click',()=>showView(t.dataset.view)));
+        document.querySelectorAll('.tab[data-view]').forEach(t=>t.addEventListener('click',()=>showView(t.dataset.view)));
         $("#bNew").addEventListener('click',()=>openPostWrite());
         bq.addEventListener('input',()=>{ bPageNo=1; renderPosts() }); bCat.addEventListener('change',()=>{ bPageNo=1; renderPosts() });
         $("#bPrev").addEventListener('click',()=>{ bPageNo--; renderPosts() }); $("#bNext").addEventListener('click',()=>{ bPageNo++; renderPosts() });
         Posts.categories().then(list=>list.forEach(c=>{ bCat.add(new Option(c,c)); $("#pwCat").add(new Option(c,c)) })).catch(()=>{});
+        bindShop();
         if(location.hash==='#board') showView('board');
+        if(location.hash==='#shop') showView('shop');
         if(['#terms','#privacy','#policy'].includes(location.hash)) openTerms(location.hash.slice(1));
         loadShelterRegions().catch(()=>{}); loadShelter(true); loadShelterStats();
         await renderList(); await loadCharts(); startAutoRefresh();

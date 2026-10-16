@@ -13,14 +13,14 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * 신고: 회원 등록 유기견, 게시글, 댓글
+ * 신고: 회원 등록 유기견, 게시글, 댓글, 용품 거래 상품
  * 서로 다른 회원 N명(기본 3명)이 신고하면 자동으로 숨긴다. 숨긴 글은 작성자 본인에게만 보인다.
  */
 @Service
 @RequiredArgsConstructor
 public class ReportService {
 
-    public static final List<String> TARGET_TYPES = List.of("dog", "post", "comment");
+    public static final List<String> TARGET_TYPES = List.of("dog", "post", "comment", "item");
     public static final List<String> REASONS = List.of(
             "유료 분양·판매 의심", "허위 정보", "동물 학대 의심", "욕설·비방·개인정보 노출", "광고·스팸", "기타");
 

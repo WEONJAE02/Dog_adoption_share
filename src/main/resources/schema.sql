@@ -107,3 +107,53 @@ CREATE TABLE IF NOT EXISTS report (
     UNIQUE KEY uk_report_once (target_type, target_id, reporter_id),
     FOREIGN KEY (reporter_id) REFERENCES users (user_id)
 );
+
+-- 용품 중고거래 (Shop). price 0 은 나눔
+CREATE TABLE IF NOT EXISTS shop_item (
+    item_id     BIGINT AUTO_INCREMENT PRIMARY KEY,
+    user_id     BIGINT       NOT NULL,
+    category    VARCHAR(20)  NOT NULL,
+    title       VARCHAR(100) NOT NULL,
+    price       INT          NOT NULL DEFAULT 0,
+    description TEXT         NOT NULL,
+    trade_area  VARCHAR(50),
+    status      VARCHAR(10)  NOT NULL DEFAULT '판매중',
+    view_count  INT          NOT NULL DEFAULT 0,
+    hidden      TINYINT(1)   NOT NULL DEFAULT 0,
+    created_at  DATETIME     NOT NULL,
+    updated_at  DATETIME,
+    FOREIGN KEY (user_id) REFERENCES users (user_id)
+);
+
+CREATE TABLE IF NOT EXISTS shop_item_image (
+    id        BIGINT AUTO_INCREMENT PRIMARY KEY,
+    item_id   BIGINT       NOT NULL,
+    file_name VARCHAR(255) NOT NULL,
+    FOREIGN KEY (item_id) REFERENCES shop_item (item_id)
+);
+
+-- 관심(찜). 한 사람이 한 상품에 한 번
+CREATE TABLE IF NOT EXISTS shop_item_like (
+    item_id    BIGINT   NOT NULL,
+    user_id    BIGINT   NOT NULL,
+    created_at DATETIME NOT NULL,
+    PRIMARY KEY (item_id, user_id),
+    FOREIGN KEY (item_id) REFERENCES shop_item (item_id),
+    FOREIGN KEY (user_id) REFERENCES users (user_id)
+);
+
+-- 구매 문의 (보낸 사람 → 판매자)
+CREATE TABLE IF NOT EXISTS shop_inquiry (
+    inquiry_id  BIGINT AUTO_INCREMENT PRIMARY KEY,
+    item_id     BIGINT        NOT NULL,
+    sender_id   BIGINT        NOT NULL,
+    receiver_id BIGINT        NOT NULL,
+    message     VARCHAR(1000) NOT NULL,
+    contact     VARCHAR(100),
+    reply       VARCHAR(1000),
+    created_at  DATETIME      NOT NULL,
+    replied_at  DATETIME,
+    FOREIGN KEY (item_id) REFERENCES shop_item (item_id),
+    FOREIGN KEY (sender_id) REFERENCES users (user_id),
+    FOREIGN KEY (receiver_id) REFERENCES users (user_id)
+);
