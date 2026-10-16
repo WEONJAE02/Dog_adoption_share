@@ -22,6 +22,12 @@
 - 말머리(자유, 정보공유, 입양후기, 질문, 실종·목격), 사진 최대 5장, 검색, 페이지, 조회수
 - 댓글과 대댓글(2단계), 작성자만 수정·삭제
 
+### Shop (반려견 용품 중고거래)
+- 회원끼리 사료·간식·장난감·의류·식기 등 반려견 용품을 사고팔기 (가격 0원은 "나눔")
+- 카테고리, 검색(상품명·설명·지역), 거래 가능만 보기, 정렬(최신·인기·가격), 관심 목록, 내 판매 상품
+- 거래 상태(판매중 / 예약중 / 거래완료), 관심(찜), 구매 문의 → 판매자가 문의함에서 답변
+- 신고 누적 시 숨김, 회원 탈퇴 시 판매 상품·문의·관심 삭제. 동물 분양·판매는 금지
+
 ### AI 기능 (OpenAI)
 - 유기견 정보 기반 입양 홍보 문구 생성
 - 사용자 조건(활동량, 알레르기, 크기 등) 기반 입양 추천
@@ -122,6 +128,11 @@ http://localhost:5500/index.html
 | 게시판 | GET | `/posts`, `/posts/categories`, `/posts/{id}` | - |
 | 게시판 | POST / PUT / DELETE | `/posts`, `/posts/{id}` (multipart: `post` JSON + `images`) | 필요 (수정·삭제는 작성자만) |
 | 댓글 | POST / DELETE | `/posts/{id}/comments`, `/posts/{id}/comments/{commentId}` | 필요 |
+| Shop | GET | `/shop/meta`, `/shop/items`, `/shop/items/{id}` | - (`filter=liked\|mine`은 필요) |
+| Shop | POST / PUT / DELETE | `/shop/items`, `/shop/items/{id}` (multipart: `item` JSON + `images`) | 필요 (수정·삭제는 판매자만) |
+| Shop | PUT / POST / DELETE | `/shop/items/{id}/status`, `/shop/items/{id}/like` | 필요 |
+| 구매 문의 | POST | `/shop/items/{id}/inquiries` | 필요 |
+| 구매 문의 | GET / POST | `/inquiries/shop/received`, `/inquiries/shop/sent`, `/inquiries/shop/{id}/reply` | 필요 |
 
 ---
 

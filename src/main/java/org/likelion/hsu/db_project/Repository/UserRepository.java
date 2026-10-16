@@ -89,6 +89,8 @@ public class UserRepository {
         counts.put("posts", count("SELECT COUNT(*) FROM board_post WHERE user_id = ?", userId));
         counts.put("comments", count("SELECT COUNT(*) FROM board_comment WHERE user_id = ? AND deleted = 0", userId));
         counts.put("inquiries", count("SELECT COUNT(*) FROM adoption_inquiry WHERE sender_id = ? OR receiver_id = ?", userId, userId));
+        counts.put("shopItems", count("SELECT COUNT(*) FROM shop_item WHERE user_id = ?", userId));
+        counts.put("shopInquiries", count("SELECT COUNT(*) FROM shop_inquiry WHERE sender_id = ? OR receiver_id = ?", userId, userId));
         return counts;
     }
 

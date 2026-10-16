@@ -34,6 +34,7 @@ public class ReportRepository {
             case "dog" -> "SELECT COALESCE(user_id, -1) FROM dog WHERE dog_id = ?";
             case "post" -> "SELECT user_id FROM board_post WHERE post_id = ?";
             case "comment" -> "SELECT user_id FROM board_comment WHERE comment_id = ? AND deleted = 0";
+            case "item" -> "SELECT user_id FROM shop_item WHERE item_id = ?";
             default -> throw new IllegalArgumentException(targetType);
         };
         List<Long> owners = jdbcTemplate.queryForList(sql, Long.class, targetId);
@@ -46,6 +47,7 @@ public class ReportRepository {
             case "dog" -> "UPDATE dog SET hidden = 1 WHERE dog_id = ?";
             case "post" -> "UPDATE board_post SET hidden = 1 WHERE post_id = ?";
             case "comment" -> "UPDATE board_comment SET hidden = 1 WHERE comment_id = ?";
+            case "item" -> "UPDATE shop_item SET hidden = 1 WHERE item_id = ?";
             default -> throw new IllegalArgumentException(targetType);
         };
         jdbcTemplate.update(sql, targetId);

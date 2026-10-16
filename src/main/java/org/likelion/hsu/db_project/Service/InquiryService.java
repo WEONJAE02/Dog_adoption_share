@@ -7,6 +7,7 @@ import org.likelion.hsu.db_project.Entity.Dog;
 import org.likelion.hsu.db_project.Entity.Inquiry;
 import org.likelion.hsu.db_project.Repository.DogRepository;
 import org.likelion.hsu.db_project.Repository.InquiryRepository;
+import org.likelion.hsu.db_project.Repository.ShopInquiryRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
@@ -20,6 +21,7 @@ public class InquiryService {
 
     private final InquiryRepository inquiryRepository;
     private final DogRepository dogRepository;
+    private final ShopInquiryRepository shopInquiryRepository;
 
     // ✅ 입양 문의 보내기 (회원 등록 유기견 → 등록자)
     public void send(Long dogId, InquiryRequestDto dto, Long senderId) {
@@ -63,8 +65,11 @@ public class InquiryService {
         return inquiryRepository.findBySenderId(userId).stream().map(this::toDto).toList();
     }
 
+    // 답변 대기 수 (문의함 배지: 입양 문의 + 용품 구매 문의)
     public Map<String, Integer> summary(Long userId) {
-        return Map.of("pendingReceived", inquiryRepository.countPendingReceived(userId));
+        int adoption = inquiryRepository.countPendingReceived(userId);
+        int shop = shopInquiryRepository.countPendingReceived(userId);
+        return Map.of("pendingReceived", adoption + shop, "pendingAdoption", adoption, "pendingShop", shop);
     }
 
     // ✅ 답변 (받은 사람만, 다시 보내면 답변을 고친다)
