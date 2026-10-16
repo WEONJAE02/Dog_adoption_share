@@ -34,7 +34,7 @@ class ClaudeHealthAnalyzerTest {
     @Test
     void 장면_라벨과_사진을_번갈아_넣고_마지막에_보호자_설명을_붙인다() throws Exception {
         ImageStorage storage = mock(ImageStorage.class);
-        when(storage.read(anyString())).thenReturn(new byte[]{1, 2, 3});
+        when(storage.readPrivate(anyString())).thenReturn(new byte[]{1, 2, 3});
         ClaudeHealthAnalyzer analyzer = new ClaudeHealthAnalyzer(mock(AnthropicClient.class), "claude-opus-5-5", storage);
 
         JsonNode body = json(analyzer.buildParams(input(List.of("절뚝거림"), List.of("a.jpg", "b.png"))).rawParams()._body());
@@ -53,7 +53,7 @@ class ClaudeHealthAnalyzerTest {
     @Test
     void 결과_형식은_구조화_출력_스키마로_강제한다() throws Exception {
         ImageStorage storage = mock(ImageStorage.class);
-        when(storage.read(anyString())).thenReturn(new byte[]{1});
+        when(storage.readPrivate(anyString())).thenReturn(new byte[]{1});
         ClaudeHealthAnalyzer analyzer = new ClaudeHealthAnalyzer(mock(AnthropicClient.class), "claude-opus-5-5", storage);
 
         var params = analyzer.buildParams(input(List.of(), List.of("a.jpg"))).rawParams();

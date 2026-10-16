@@ -87,7 +87,7 @@ public class HealthCheckService {
         List<String> stored = new ArrayList<>();
         try {
             for (MultipartFile file : files) {
-                stored.add(imageStorage.store(file));
+                stored.add(imageStorage.storePrivate(file));
             }
             // 분석은 오래 걸릴 수 있어 DB 트랜잭션 밖에서 한다
             HealthResult result = applySafetyRules(
@@ -116,7 +116,7 @@ public class HealthCheckService {
             });
             return toDetail(checkRepository.findById(checkId).orElseThrow());
         } catch (RuntimeException | IOException e) {
-            stored.forEach(imageStorage::delete);   // 저장에 실패하면 올린 프레임도 지운다
+            stored.forEach(imageStorage::deletePrivate);   // 저장에 실패하면 올린 프레임도 지운다
             throw e;
         }
     }
@@ -188,7 +188,7 @@ public class HealthCheckService {
     private void deleteWithFiles(Long checkId) {
         List<String> frames = checkRepository.findFrames(checkId);
         checkRepository.delete(checkId);
-        frames.forEach(imageStorage::delete);
+        frames.forEach(imageStorage::deletePrivate);
     }
 
     /**
@@ -229,6 +229,17 @@ public class HealthCheckService {
         return petRepository.findById(petId)
                 .filter(pet -> pet.getUserId().equals(userId))
                 .orElseThrow(() -> new BoardException(HttpStatus.NOT_FOUND, "반려동물 정보를 찾을 수 없습니다."));
+    }
+
+    // ✅ 장면 사진 (본인만, seq 는 1부터) — 비공개 폴더의 파일 경로
+    public java.nio.file.Path getFrame(Long checkId, int seq, Long userId) {
+        findMyCheck(checkId, userId);
+        List<String> frames = checkRepository.findFrames(checkId);
+        if (seq < 1 || seq > frames.size()) {
+            throw new BoardException(HttpStatus.NOT_FOUND, "장면을 찾을 수 없습니다.");
+        }
+        return imageStorage.privateFile(frames.get(seq - 1))
+                .orElseThrow(() -> new BoardException(HttpStatus.NOT_FOUND, "장면을 찾을 수 없습니다."));
     }
 
     // 다른 사람의 기록은 있는지조차 알려주지 않는다

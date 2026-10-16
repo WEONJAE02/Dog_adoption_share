@@ -52,7 +52,7 @@ class HealthCheckServiceTest {
 
         when(petRepository.findById(PET_ID)).thenReturn(Optional.of(MyPet.builder().petId(PET_ID).userId(OWNER).name("콩이").species("개").build()));
         when(imageStorage.isImage(any())).thenReturn(true);
-        when(imageStorage.store(any())).thenReturn("f1.jpg", "f2.jpg", "f3.jpg");
+        when(imageStorage.storePrivate(any())).thenReturn("f1.jpg", "f2.jpg", "f3.jpg");
         when(analyzer.name()).thenReturn("test");
         when(analyzer.analyze(any())).thenAnswer(inv -> result(HealthResult.MONITOR, "안과"));
         // 트랜잭션 없이 콜백만 실행
@@ -107,7 +107,7 @@ class HealthCheckServiceTest {
         assertEquals(HttpStatus.TOO_MANY_REQUESTS, e.getStatus());
         verify(analyzer, never()).analyze(any());
         verify(checkRepository, never()).recordUsage(any());
-        verify(imageStorage, never()).store(any());
+        verify(imageStorage, never()).storePrivate(any());
     }
 
     @Test
@@ -130,7 +130,7 @@ class HealthCheckServiceTest {
         service.deleteCheck(5L, OWNER);
 
         verify(checkRepository).delete(5L);
-        verify(imageStorage).delete("f1.jpg");
+        verify(imageStorage).deletePrivate("f1.jpg");
         verify(checkRepository, never()).deleteUsageByUserId(any());
     }
 
@@ -176,8 +176,8 @@ class HealthCheckServiceTest {
 
         assertThrows(IllegalStateException.class, () -> service.create(request("눈", "video", List.of()), frames(2), OWNER));
 
-        verify(imageStorage).delete("f1.jpg");
-        verify(imageStorage).delete("f2.jpg");
+        verify(imageStorage).deletePrivate("f1.jpg");
+        verify(imageStorage).deletePrivate("f2.jpg");
     }
 
     // ---------- 지난 체크와 비교 ----------
@@ -233,6 +233,31 @@ class HealthCheckServiceTest {
         assertThrows(BoardException.class, () -> service.getChecks(OWNER, null, "꼬리"));
         service.getChecks(OWNER, PET_ID, "");
         verify(checkRepository).findByUser(OWNER, PET_ID, null, 50);
+    }
+
+    // ---------- 장면 사진 (비공개) ----------
+
+    @Test
+    void 장면_사진은_본인만_받을_수_있다() {
+        when(checkRepository.findById(5L)).thenReturn(Optional.of(savedCheck(5L, OWNER)));
+        when(checkRepository.findFrames(5L)).thenReturn(List.of("f1.jpg", "f2.jpg"));
+        when(imageStorage.privateFile("f2.jpg")).thenReturn(Optional.of(java.nio.file.Path.of("/private/f2.jpg")));
+
+        assertEquals("f2.jpg", service.getFrame(5L, 2, OWNER).getFileName().toString());
+        assertEquals(HttpStatus.NOT_FOUND, assertThrows(BoardException.class, () -> service.getFrame(5L, 1, OTHER)).getStatus());
+        assertEquals(HttpStatus.NOT_FOUND, assertThrows(BoardException.class, () -> service.getFrame(5L, 3, OWNER)).getStatus());
+        assertEquals(HttpStatus.NOT_FOUND, assertThrows(BoardException.class, () -> service.getFrame(5L, 0, OWNER)).getStatus());
+        verify(imageStorage, never()).privateFile("f1.jpg");
+    }
+
+    @Test
+    void 장면은_비공개_폴더에_저장한다() throws Exception {
+        stubSavedCheck();
+
+        service.create(request("눈", "photo", List.of()), frames(1), OWNER);
+
+        verify(imageStorage).storePrivate(any());
+        verify(imageStorage, never()).store(any());
     }
 
     // ---------- helpers ----------

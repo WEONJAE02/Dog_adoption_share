@@ -10,6 +10,12 @@ import org.likelion.hsu.db_project.Security.LoginUser;
 import org.likelion.hsu.db_project.Service.BoardException;
 import org.likelion.hsu.db_project.Service.HealthAnalyzer;
 import org.likelion.hsu.db_project.Service.HealthCheckService;
+import org.likelion.hsu.db_project.Service.ImageStorage;
+import org.springframework.core.io.FileSystemResource;
+import org.springframework.core.io.Resource;
+import org.springframework.http.CacheControl;
+import java.nio.file.Path;
+import java.time.Duration;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -54,6 +60,18 @@ public class HealthCheckController {
             @AuthenticationPrincipal LoginUser user
     ) {
         return checkService.getChecks(user.getUserId(), petId, bodyPart);
+    }
+
+    /**
+     * ✅ 장면 사진 (본인만, n 은 1부터). 비공개 폴더에 있어 /uploads 로는 열리지 않는다
+     */
+    @GetMapping("/{id}/frames/{seq}")
+    public ResponseEntity<Resource> getFrame(@PathVariable Long id, @PathVariable int seq, @AuthenticationPrincipal LoginUser user) {
+        Path file = checkService.getFrame(id, seq, user.getUserId());
+        return ResponseEntity.ok()
+                .contentType(ImageStorage.mediaType(file.getFileName().toString()))
+                .cacheControl(CacheControl.maxAge(Duration.ofHours(1)).cachePrivate())
+                .body(new FileSystemResource(file));
     }
 
     /**

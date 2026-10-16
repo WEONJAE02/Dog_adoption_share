@@ -8,6 +8,12 @@ import org.likelion.hsu.db_project.Dto.MyPetResponseDto;
 import org.likelion.hsu.db_project.Security.LoginUser;
 import org.likelion.hsu.db_project.Service.BoardException;
 import org.likelion.hsu.db_project.Service.MyPetService;
+import org.likelion.hsu.db_project.Service.ImageStorage;
+import org.springframework.core.io.FileSystemResource;
+import org.springframework.core.io.Resource;
+import org.springframework.http.CacheControl;
+import java.nio.file.Path;
+import java.time.Duration;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -38,6 +44,18 @@ public class MyPetController {
     @GetMapping("/{id}")
     public MyPetResponseDto getPet(@PathVariable Long id, @AuthenticationPrincipal LoginUser user) {
         return petService.getPet(id, user.getUserId());
+    }
+
+    /**
+     * ✅ 사진 (본인만). 비공개 폴더에 있어 /uploads 로는 열리지 않는다
+     */
+    @GetMapping("/{id}/image")
+    public ResponseEntity<Resource> getImage(@PathVariable Long id, @AuthenticationPrincipal LoginUser user) {
+        Path file = petService.getImage(id, user.getUserId());
+        return ResponseEntity.ok()
+                .contentType(ImageStorage.mediaType(file.getFileName().toString()))
+                .cacheControl(CacheControl.maxAge(Duration.ofHours(1)).cachePrivate())
+                .body(new FileSystemResource(file));
     }
 
     /**
