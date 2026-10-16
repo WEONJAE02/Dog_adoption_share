@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.likelion.hsu.db_project.Dto.HealthCheckRequestDto;
 import org.likelion.hsu.db_project.Dto.HealthCheckResponseDto;
+import org.likelion.hsu.db_project.Dto.HealthCompareDto;
 import org.likelion.hsu.db_project.Dto.HealthResult;
 import org.likelion.hsu.db_project.Entity.HealthCheck;
 import org.likelion.hsu.db_project.Entity.MyPet;
@@ -17,6 +18,7 @@ import org.springframework.transaction.support.TransactionTemplate;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedHashSet;
@@ -119,8 +121,40 @@ public class HealthCheckService {
         }
     }
 
-    public List<HealthCheckResponseDto> getChecks(Long userId, Long petId) {
-        return checkRepository.findByUser(userId, petId, LIST_LIMIT).stream().map(this::toSummary).toList();
+    public List<HealthCheckResponseDto> getChecks(Long userId, Long petId, String bodyPart) {
+        if (bodyPart != null && !bodyPart.isBlank() && !BODY_PARTS.contains(bodyPart)) {
+            throw new BoardException(HttpStatus.BAD_REQUEST, "부위가 올바르지 않습니다.");
+        }
+        String part = bodyPart == null || bodyPart.isBlank() ? null : bodyPart;
+        return checkRepository.findByUser(userId, petId, part, LIST_LIMIT).stream().map(this::toSummary).toList();
+    }
+
+    // ✅ 같은 반려동물·같은 부위의 지난 체크와 비교 (긴급도 기준)
+    public HealthCompareDto compare(Long checkId, Long userId) {
+        HealthCheck current = findMyCheck(checkId, userId);
+        HealthCheck previous = checkRepository.findPrevious(current.getPetId(), current.getBodyPart(), current.getCheckId()).orElse(null);
+        return HealthCompareDto.builder()
+                .current(toDetail(current))
+                .previous(previous == null ? null : toDetail(previous))
+                .change(previous == null ? HealthCompareDto.FIRST : change(previous.getUrgency(), current.getUrgency()))
+                .sequence(checkRepository.countUpTo(current.getPetId(), current.getBodyPart(), current.getCheckId()))
+                .daysBetween(previous == null ? 0
+                        : ChronoUnit.DAYS.between(previous.getCreatedAt().toLocalDate(), current.getCreatedAt().toLocalDate()))
+                .build();
+    }
+
+    /** 긴급도가 낮아지면 BETTER, 같으면 SAME, 높아지면 WORSE */
+    static String change(String before, String after) {
+        int diff = urgencyRank(after) - urgencyRank(before);
+        return diff < 0 ? HealthCompareDto.BETTER : diff == 0 ? HealthCompareDto.SAME : HealthCompareDto.WORSE;
+    }
+
+    private static int urgencyRank(String urgency) {
+        return switch (urgency == null ? "" : urgency) {
+            case HealthResult.EMERGENCY -> 3;
+            case HealthResult.MONITOR -> 1;
+            default -> 2;   // SOON, 알 수 없는 값
+        };
     }
 
     public HealthCheckResponseDto getCheck(Long checkId, Long userId) {

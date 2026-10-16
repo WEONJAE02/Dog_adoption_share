@@ -38,7 +38,8 @@
 - **추천 주치의 (샘플 데이터)**: 결과의 진료 분야와 내 지역(시도·시군구), 긴급도로 샘플 수의사 26명 중 상위 3명을 추천하고 이유를 함께 보여줍니다. AI는 진료 분야만 정하고, 순위는 코드의 점수로 정합니다
   - 점수(최대 100): 주 분야 일치 50 / 함께 보는 분야 25, 같은 시도 10 + 같은 시군구 10, 해당 분야 진료 건수 최대 15, 평점 최대 10, 응급일 때 24시간 진료 5
   - 수의사·병원은 모두 가상 데이터("펫룸 ○○")이며 화면에 "샘플"로 표시합니다
-- 다음 단계: 공공데이터 실제 동물병원 위치 → 기록 비교
+- **지난 체크와 비교**: 같은 반려동물·같은 부위의 바로 이전 체크와 나란히 보여주고, 긴급도로 "나아졌어요 / 비슷해요 / 더 급해졌어요"를 표시합니다. 기록 목록은 반려동물·부위로 거를 수 있습니다
+- 다음 단계: 공공데이터 실제 동물병원 위치
 
 ### AI 기능 (OpenAI)
 - 유기견 정보 기반 입양 홍보 문구 생성
@@ -147,7 +148,7 @@ http://localhost:5500/index.html
 | Shop | PUT / POST / DELETE | `/shop/items/{id}/status`, `/shop/items/{id}/like` | 필요 |
 | 구매 문의 | POST | `/shop/items/{id}/inquiries` | 필요 |
 | 내 반려동물 | GET / POST / PUT / DELETE | `/pets`, `/pets/{id}` (multipart: `pet` JSON + `image`) | 필요 (본인만) |
-| 건강체크 | GET | `/health-checks/meta`, `/health-checks?petId=`, `/health-checks/{id}` | 필요 (본인만) |
+| 건강체크 | GET | `/health-checks/meta`, `/health-checks?petId=&bodyPart=`, `/health-checks/{id}`, `/health-checks/{id}/compare` | 필요 (본인만) |
 | 건강체크 | POST / DELETE | `/health-checks` (multipart: `check` JSON + `frames`), `/health-checks/{id}` | 필요 (본인만) |
 | 주치의 추천 | GET | `/vets/recommend?specialty=&sido=&sigungu=&urgency=`, `/vets/regions` | - |
 | 구매 문의 | GET / POST | `/inquiries/shop/received`, `/inquiries/shop/sent`, `/inquiries/shop/{id}/reply` | 필요 |

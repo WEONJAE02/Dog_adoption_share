@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.likelion.hsu.db_project.Dto.HealthCheckRequestDto;
 import org.likelion.hsu.db_project.Dto.HealthCheckResponseDto;
+import org.likelion.hsu.db_project.Dto.HealthCompareDto;
 import org.likelion.hsu.db_project.Security.LoginUser;
 import org.likelion.hsu.db_project.Service.BoardException;
 import org.likelion.hsu.db_project.Service.HealthAnalyzer;
@@ -47,8 +48,20 @@ public class HealthCheckController {
     }
 
     @GetMapping
-    public List<HealthCheckResponseDto> getChecks(@RequestParam(required = false) Long petId, @AuthenticationPrincipal LoginUser user) {
-        return checkService.getChecks(user.getUserId(), petId);
+    public List<HealthCheckResponseDto> getChecks(
+            @RequestParam(required = false) Long petId,
+            @RequestParam(required = false) String bodyPart,
+            @AuthenticationPrincipal LoginUser user
+    ) {
+        return checkService.getChecks(user.getUserId(), petId, bodyPart);
+    }
+
+    /**
+     * ✅ 같은 반려동물·같은 부위의 지난 체크와 비교
+     */
+    @GetMapping("/{id}/compare")
+    public HealthCompareDto compare(@PathVariable Long id, @AuthenticationPrincipal LoginUser user) {
+        return checkService.compare(id, user.getUserId());
     }
 
     @GetMapping("/{id}")
