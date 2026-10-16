@@ -95,7 +95,7 @@ cp .env.example .env.local
 | `ANTHROPIC_API_KEY` | 선택 | 건강체크 AI 분석용 Claude API 키. 비워 두면 샘플 결과만 나옵니다. 사용한 만큼 과금되니 [Anthropic 콘솔](https://console.anthropic.com)에서 월 사용 한도를 걸어 두세요 |
 | `HEALTH_AI_MODEL`, `HEALTH_DAILY_LIMIT` | 선택 | 건강체크 모델(기본 `claude-opus-5-5`), 회원당 하루 횟수(기본 10) |
 | `ANIMAL_API_KEY` | 선택 | 공공데이터포털 "국가동물보호정보시스템 구조동물 조회 서비스" 인증키 (Decoding) |
-| `DB_URL`, `UPLOAD_DIR`, `FRONTEND_URL` | 선택 | 기본값 대신 다른 DB, 업로드 폴더, 프론트 주소를 쓸 때 |
+| `DB_URL`, `UPLOAD_DIR`, `PRIVATE_UPLOAD_DIR`, `FRONTEND_URL` | 선택 | 기본값 대신 다른 DB, 공개·비공개 업로드 폴더, 프론트 주소를 쓸 때 |
 
 선택 항목을 비워 두면 해당 기능만 꺼집니다. (소셜 로그인 버튼은 안내 문구만, 전국 보호소 영역은 안내 문구만 표시)
 
@@ -115,7 +115,9 @@ python3 -m http.server 5500 --bind 127.0.0.1
 ### 6. 접속
 http://localhost:5500/index.html
 
-업로드한 사진은 프로젝트의 `uploads/` 폴더에 저장됩니다(커밋되지 않음).
+업로드한 사진은 두 폴더에 나눠 저장됩니다(둘 다 커밋되지 않음).
+- `uploads/`: 유기견·커뮤니티·Shop 사진. `/uploads/파일명`으로 누구나 볼 수 있습니다
+- `private-uploads/`: 내 반려동물 사진과 건강체크 장면. 공개 주소가 없고, 로그인한 본인만 `/pets/{id}/image`, `/health-checks/{id}/frames/{n}`으로 받을 수 있습니다. 예전에 `uploads/`에 저장된 반려동물·건강체크 사진은 서버를 시작할 때 자동으로 옮겨집니다
 
 ### 소셜 로그인 키를 직접 발급받을 때
 각 개발자 콘솔에 아래 주소를 등록해야 합니다.

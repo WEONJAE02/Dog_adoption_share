@@ -208,7 +208,7 @@ public class ClaudeHealthAnalyzer implements HealthAnalyzer {
     }
 
     private ContentBlockParam image(String fileName) throws IOException {
-        String data = Base64.getEncoder().encodeToString(imageStorage.read(fileName));
+        String data = Base64.getEncoder().encodeToString(imageStorage.readPrivate(fileName));
         return ContentBlockParam.ofImage(ImageBlockParam.builder()
                 .source(Base64ImageSource.builder().data(data).mediaType(mediaType(fileName)).build())
                 .build());

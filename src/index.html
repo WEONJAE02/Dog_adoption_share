@@ -2387,9 +2387,11 @@ ${JSON.stringify(candidates,null,2)}
         const age=new Date().getFullYear()-birthYear;
         return age<=0? `1살 미만 (${birthYear}년생)` : `${age}살 (${birthYear}년생)`;
     }
+    // 반려동물 사진은 비공개라 본인 확인 API로 받는다 (?v= 는 사진이 바뀌면 새로 받기 위한 값)
+    const petImageUrl = p => `${PETS}/${p.petId}/image?v=${encodeURIComponent(p.imageName)}`;
     function petAvatar(box,p){
         box.innerHTML='';
-        if(p?.imageName){ const im=el('img'); im.src=buildUploadUrl(p.imageName); im.alt=''; im.onerror=()=>{ box.innerHTML=''; box.textContent=(p.name||'?').slice(0,1) }; box.append(im) }
+        if(p?.imageName && p.petId){ const im=el('img'); im.src=petImageUrl(p); im.alt=''; im.onerror=()=>{ box.innerHTML=''; box.textContent=(p.name||'?').slice(0,1) }; box.append(im) }
         else box.textContent=(p?.name||'?').slice(0,1);
     }
     function petCard(p){
@@ -2475,6 +2477,8 @@ ${JSON.stringify(candidates,null,2)}
                       MONITOR:{label:'집에서 지켜봐도 괜찮아요', short:'지켜보기', ic:'✓'} };
     const MAX_FRAMES=8, MAX_PHOTOS=5, MAX_VIDEO_SEC=30, FRAME_EDGE=1024;
     const hcDlg=$("#hcDialog"), hcForm=$("#hcForm"), hcFile=$("#hcFile"), hrDlg=$("#hrDialog");
+    // 장면 사진도 비공개라 본인 확인 API로 받는다 (n 은 1부터)
+    const frameUrl = (checkId,n) => `${HC}/${checkId}/frames/${n}`;
     let hcMeta=null, hcFrames=[], hcCur=null, hcLoadSeq=0;
 
     // 이벤트 한 번 기다리기 (영상이 응답하지 않으면 시간 초과)
@@ -2620,8 +2624,8 @@ ${JSON.stringify(candidates,null,2)}
         $("#hrMeta").textContent=[fmtDateTime(r.createdAt), r.source==='video'?'영상':'사진', r.symptoms.length? '증상: '+r.symptoms.join(', ') : null, r.memo,
                                    r.analyzer!=='sample'? `AI 분석 (${r.analyzer})` : null].filter(Boolean).join(' · ');
         const hits=new Set((res.findings||[]).map(f=>f.frame)), fb=$("#hrFrames"); fb.innerHTML='';
-        r.frames.forEach((name,i)=>{ const a=el('a','frame'+(hits.has(i+1)?' hit':'')); a.href=buildUploadUrl(name); a.target='_blank'; a.rel='noopener';
-            const im=el('img'); im.src=buildUploadUrl(name); im.alt=`장면 ${i+1}`; a.append(im, el('span','n',String(i+1))); fb.append(a) });
+        r.frames.forEach((name,i)=>{ const a=el('a','frame'+(hits.has(i+1)?' hit':'')); a.href=frameUrl(r.checkId,i+1); a.target='_blank'; a.rel='noopener';
+            const im=el('img'); im.src=frameUrl(r.checkId,i+1); im.alt=`장면 ${i+1}`; a.append(im, el('span','n',String(i+1))); fb.append(a) });
         $("#hrSummary").textContent=res.summary||'';
         fillList($("#hrFindings"), (res.findings||[]).map(f=>`장면 ${f.frame}: ${f.observation}`));
         const cz=$("#hrCauses"); cz.innerHTML=''; (res.possibleCauses||[]).forEach(c=>cz.append(el('span','pill',c)));
@@ -2692,7 +2696,7 @@ ${JSON.stringify(candidates,null,2)}
     function cmpColumn(box,c,label){
         box.innerHTML='';
         const h=el('div','h'); h.append(el('span',null,label), el('span','d',fmtDateTime(c.createdAt)), el('span','badge '+c.urgency,(URGENCY[c.urgency]||URGENCY.SOON).short));
-        const ph=el('div','ph'); c.frames.slice(0,3).forEach((f,i)=>{ const im=el('img'); im.src=buildUploadUrl(f); im.alt=`${label} 장면 ${i+1}`; ph.append(im) });
+        const ph=el('div','ph'); c.frames.slice(0,3).forEach((f,i)=>{ const im=el('img'); im.src=frameUrl(c.checkId,i+1); im.alt=`${label} 장면 ${i+1}`; ph.append(im) });
         box.append(h, ph, el('p',null,c.summary||''));
         if(label==='지난번'){ const b=el('button','c-act','지난 결과 열기'); b.type='button'; b.style.marginTop='6px'; b.addEventListener('click',()=>showCheckResult(c)); box.append(b) }
     }
@@ -2726,7 +2730,7 @@ ${JSON.stringify(candidates,null,2)}
             const rows=await req(`${HC}?${q}`);
             list.innerHTML='';
             rows.forEach(c=>{
-                const li=el('li','hc-row'), im=el('img'); im.alt=''; im.src=c.thumbnail? buildUploadUrl(c.thumbnail) : NO_IMG; im.onerror=()=>{ im.onerror=null; im.src=NO_IMG };
+                const li=el('li','hc-row'), im=el('img'); im.alt=''; im.src=c.thumbnail? frameUrl(c.checkId,1) : NO_IMG; im.onerror=()=>{ im.onerror=null; im.src=NO_IMG };
                 const m=el('div','m'), t=el('div','t');
                 t.append(el('span',null,`${c.petName} · ${c.bodyPart}`), el('span','badge '+c.urgency,(URGENCY[c.urgency]||URGENCY.SOON).short));
                 if(c.specialty) t.append(el('span','badge wait',c.specialty));

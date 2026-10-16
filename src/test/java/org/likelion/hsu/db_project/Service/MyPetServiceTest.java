@@ -44,7 +44,15 @@ class MyPetServiceTest {
 
         verify(healthCheckService).deleteAllByPet(10L);
         verify(petRepository).delete(10L);
-        verify(imageStorage).delete("old.jpg");
+        verify(imageStorage).deletePrivate("old.jpg");
+    }
+
+    @Test
+    void 반려동물_사진은_본인만_받을_수_있다() {
+        when(imageStorage.privateFile("old.jpg")).thenReturn(java.util.Optional.of(java.nio.file.Path.of("/private/old.jpg")));
+
+        assertEquals("old.jpg", service.getImage(10L, 1L).getFileName().toString());
+        assertEquals(HttpStatus.NOT_FOUND, assertThrows(BoardException.class, () -> service.getImage(10L, 2L)).getStatus());
     }
 
     @Test

@@ -68,7 +68,7 @@ public class MyPetService {
 
         petRepository.update(petId, pet);
         if (oldImage != null && !oldImage.equals(pet.getImageName())) {
-            imageStorage.delete(oldImage);
+            imageStorage.deletePrivate(oldImage);
         }
         return toDto(findMyPet(petId, userId));
     }
@@ -80,7 +80,7 @@ public class MyPetService {
         healthCheckService.deleteAllByPet(petId);
         petRepository.delete(petId);
         if (pet.getImageName() != null) {
-            imageStorage.delete(pet.getImageName());
+            imageStorage.deletePrivate(pet.getImageName());
         }
     }
 
@@ -90,6 +90,13 @@ public class MyPetService {
         for (MyPet pet : petRepository.findByUserId(userId)) {
             deletePet(pet.getPetId(), userId);
         }
+    }
+
+    // ✅ 사진 (본인만) — 비공개 폴더의 파일 경로
+    public java.nio.file.Path getImage(Long petId, Long userId) {
+        MyPet pet = findMyPet(petId, userId);
+        return imageStorage.privateFile(pet.getImageName())
+                .orElseThrow(() -> new BoardException(HttpStatus.NOT_FOUND, "사진이 없습니다."));
     }
 
     // 다른 사람의 반려동물은 있는지조차 알려주지 않는다
@@ -106,7 +113,7 @@ public class MyPetService {
         if (!imageStorage.isImage(image)) {
             throw new BoardException(HttpStatus.BAD_REQUEST, "이미지 파일(jpg, png, gif, webp)만 올릴 수 있습니다.");
         }
-        return imageStorage.store(image);
+        return imageStorage.storePrivate(image);
     }
 
     // ✅ 입력값 검증 (선택 항목은 비워 두면 null)
