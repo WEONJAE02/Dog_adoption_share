@@ -1112,6 +1112,7 @@
             <p>회원 탈퇴 시 계정 정보(이메일, 비밀번호, 닉네임, 소셜 계정 연결), 등록한 유기견 정보와 사진, 주고받은 입양 문의, Shop에 올린 상품과 사진·주고받은 거래 문의·관심 목록, 등록한 반려동물 정보와 사진, 신고 기록을 지체 없이 삭제합니다. 커뮤니티 글·댓글은 남기되 작성자를 "탈퇴한 회원"으로 표시합니다. 다른 법령에 보관 의무가 있으면 [기간] 동안 보관한 뒤 파기합니다.</p>
             <h3>4. 제3자 제공과 처리 위탁</h3>
             <p>개인정보를 제3자에게 제공하지 않습니다. 서버·데이터베이스 운영: [호스팅 업체]</p>
+            <p>건강체크 AI 분석: 회원이 올린 반려동물 사진과 입력한 반려동물 정보·증상·메모를 분석을 위해 Anthropic(Claude API)에 보냅니다. 회원의 이름·이메일 등 계정 정보는 보내지 않습니다. (AI 분석을 켠 경우에만)</p>
             <h3>5. 이용자의 권리</h3>
             <p>"내 정보"에서 언제든 정보를 확인·수정하고 탈퇴할 수 있습니다. 카카오·네이버 로그인 연결은 각 서비스에서도 해제할 수 있습니다.</p>
             <h3>6. 개인정보 보호책임자</h3>
@@ -2556,7 +2557,8 @@ ${JSON.stringify(candidates,null,2)}
         $("#hrTitle").textContent=`${r.petName} · ${r.bodyPart} 체크 결과`;
         $("#hrSample").hidden = r.analyzer!=='sample';
         $("#hrUrg").className='urg '+r.urgency; $("#hrUrgIc").textContent=u.ic; $("#hrUrgLabel").textContent=u.label; $("#hrUrgReason").textContent=res.urgencyReason||'';
-        $("#hrMeta").textContent=[fmtDateTime(r.createdAt), r.source==='video'?'영상':'사진', r.symptoms.length? '증상: '+r.symptoms.join(', ') : null, r.memo].filter(Boolean).join(' · ');
+        $("#hrMeta").textContent=[fmtDateTime(r.createdAt), r.source==='video'?'영상':'사진', r.symptoms.length? '증상: '+r.symptoms.join(', ') : null, r.memo,
+                                   r.analyzer!=='sample'? `AI 분석 (${r.analyzer})` : null].filter(Boolean).join(' · ');
         const hits=new Set((res.findings||[]).map(f=>f.frame)), fb=$("#hrFrames"); fb.innerHTML='';
         r.frames.forEach((name,i)=>{ const a=el('a','frame'+(hits.has(i+1)?' hit':'')); a.href=buildUploadUrl(name); a.target='_blank'; a.rel='noopener';
             const im=el('img'); im.src=buildUploadUrl(name); im.alt=`장면 ${i+1}`; a.append(im, el('span','n',String(i+1))); fb.append(a) });
