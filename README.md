@@ -28,6 +28,10 @@
 - 거래 상태(판매중 / 예약중 / 거래완료), 관심(찜), 구매 문의 → 판매자가 문의함에서 답변
 - 신고 누적 시 숨김, 회원 탈퇴 시 판매 상품·문의·관심 삭제. 동물 분양·판매는 금지
 
+### 건강체크 (개발 중)
+- **내 반려동물**: 이름·종류(개/고양이)·품종·성별·중성화·태어난 해·몸무게·특이사항(지병, 알러지 등)·사진 1장 등록. 1인 최대 10마리, 본인만 조회·수정
+- 다음 단계: 사진·영상으로 부위별 체크 → AI 긴급도·소견·진료 분야 → 분야별 주치의 추천 → 기록 비교
+
 ### AI 기능 (OpenAI)
 - 유기견 정보 기반 입양 홍보 문구 생성
 - 사용자 조건(활동량, 알레르기, 크기 등) 기반 입양 추천
@@ -132,6 +136,7 @@ http://localhost:5500/index.html
 | Shop | POST / PUT / DELETE | `/shop/items`, `/shop/items/{id}` (multipart: `item` JSON + `images`) | 필요 (수정·삭제는 판매자만) |
 | Shop | PUT / POST / DELETE | `/shop/items/{id}/status`, `/shop/items/{id}/like` | 필요 |
 | 구매 문의 | POST | `/shop/items/{id}/inquiries` | 필요 |
+| 내 반려동물 | GET / POST / PUT / DELETE | `/pets`, `/pets/{id}` (multipart: `pet` JSON + `image`) | 필요 (본인만) |
 | 구매 문의 | GET / POST | `/inquiries/shop/received`, `/inquiries/shop/sent`, `/inquiries/shop/{id}/reply` | 필요 |
 
 ---

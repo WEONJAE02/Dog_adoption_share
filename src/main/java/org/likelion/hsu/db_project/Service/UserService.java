@@ -43,6 +43,7 @@ public class UserService implements UserDetailsService {
     private final ShopItemRepository shopItemRepository;
     private final ShopInquiryRepository shopInquiryRepository;
     private final ShopService shopService;
+    private final MyPetService myPetService;
 
     // ✅ 이메일 회원가입
     public void signup(SignupRequestDto dto) {
@@ -112,7 +113,7 @@ public class UserService implements UserDetailsService {
     }
 
     // ✅ 회원 탈퇴
-    // 등록한 유기견(사진 포함)·주고받은 입양 문의·판매 상품(사진 포함)·주고받은 구매 문의·관심·신고 기록은 삭제하고,
+    // 등록한 유기견(사진 포함)·주고받은 입양 문의·판매 상품(사진 포함)·주고받은 구매 문의·관심·내 반려동물(사진 포함)·신고 기록은 삭제하고,
     // 커뮤니티 글·댓글은 남기되 작성자를 "탈퇴한 회원"으로 바꾼다
     @Transactional
     public void withdraw(Long userId) {
@@ -125,6 +126,7 @@ public class UserService implements UserDetailsService {
             shopService.deleteItem(itemId, userId);
         }
         shopItemRepository.deleteLikesByUserId(userId);
+        myPetService.deleteAllByUser(userId);
         reportRepository.deleteByReporterId(userId);
         userRepository.anonymize(userId);
     }

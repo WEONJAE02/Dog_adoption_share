@@ -157,3 +157,21 @@ CREATE TABLE IF NOT EXISTS shop_inquiry (
     FOREIGN KEY (sender_id) REFERENCES users (user_id),
     FOREIGN KEY (receiver_id) REFERENCES users (user_id)
 );
+
+-- 내 반려동물 (건강체크 대상). 입양 대상 유기견(dog)과는 별개
+CREATE TABLE IF NOT EXISTS my_pet (
+    pet_id     BIGINT AUTO_INCREMENT PRIMARY KEY,
+    user_id    BIGINT       NOT NULL,
+    name       VARCHAR(20)  NOT NULL,
+    species    VARCHAR(10)  NOT NULL,
+    breed      VARCHAR(30),
+    gender     VARCHAR(10),
+    neutered   TINYINT(1),
+    birth_year INT,
+    weight_kg  DECIMAL(5,2),
+    notes      VARCHAR(500),
+    image_name VARCHAR(255),
+    created_at DATETIME     NOT NULL,
+    updated_at DATETIME,
+    FOREIGN KEY (user_id) REFERENCES users (user_id)
+);

@@ -260,6 +260,13 @@
         .tabs{display:flex; gap:6px; margin-right:auto}
         .tab{background:none; border:1px solid transparent; color:var(--muted); padding:8px 14px; border-radius:999px; cursor:pointer; font-weight:700}
         .tab.on{background:var(--soft); border-color:#dfe4ec; color:var(--text)}
+        .tab, .authbar > button{white-space:nowrap; flex:none}
+        /* 좁은 화면: 로그인 버튼 줄 아래로 탭을 내리고, 탭이 넘치면 옆으로 스크롤 */
+        @media (max-width:600px){
+            .authbar{flex-wrap:wrap; row-gap:8px}
+            .authbar .tabs{order:2; flex-basis:100%; margin-right:0; overflow-x:auto; scrollbar-width:none}
+            .authbar .tabs::-webkit-scrollbar{display:none}
+        }
 
         /* 커뮤니티 게시판 */
         .posts{list-style:none; margin:16px 0; padding:0; display:flex; flex-direction:column; gap:10px}
@@ -341,6 +348,34 @@
             #viewShop .toolbar .tool-btn{margin-left:auto}
         }
 
+        /* 건강체크 · 내 반려동물 */
+        .hc-head{display:flex; flex-wrap:wrap; align-items:flex-end; justify-content:space-between; gap:12px; margin:22px 0 4px}
+        .hc-head h2{margin:0; font-size:24px; letter-spacing:-.01em}
+        .hc-head p{margin:6px 0 0; color:var(--muted); font-size:14px}
+        .pet-grid{list-style:none; margin:18px 0 8px; padding:0; display:grid; gap:14px; grid-template-columns:repeat(auto-fill,minmax(300px,1fr))}
+        .pet-card{background:var(--panel); border:1px solid var(--line); border-radius:18px; padding:16px; display:grid; grid-template-columns:72px 1fr; gap:14px; align-items:start; box-shadow:0 1px 3px rgba(16,24,40,.06)}
+        .pet-ava{width:72px; height:72px; border-radius:50%; object-fit:cover; background:#e6efff; color:#1f4fd8; display:flex; align-items:center; justify-content:center; font-weight:800; font-size:26px; overflow:hidden}
+        .pet-ava img{width:100%; height:100%; object-fit:cover; display:block}
+        .pet-name{display:flex; align-items:center; gap:8px; font-weight:800; font-size:18px; min-width:0}
+        .pet-name span:first-child{overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
+        .pet-name .badge{flex:none; font-weight:600}
+        .badge.cat{background:#fdf0e3; color:#b25b12}
+        .pet-facts{margin:6px 0 0; color:var(--muted); font-size:13px; line-height:1.6}
+        .pet-facts span{white-space:nowrap}
+        .pet-notes{margin:8px 0 0; padding:8px 10px; border-radius:10px; background:var(--panel-2); font-size:13px; line-height:1.5; white-space:pre-wrap; overflow-wrap:anywhere}
+        .pet-actions{grid-column:1 / -1; display:flex; justify-content:flex-end; gap:8px; border-top:1px solid var(--line); padding-top:12px; margin-top:2px}
+        .pet-empty{border:1px dashed var(--field); border-radius:18px; padding:36px 20px; text-align:center; color:var(--muted); margin:18px 0}
+        .pet-empty b{display:block; color:var(--text); font-size:16px; margin-bottom:6px}
+        .pet-empty .tool-btn{margin-top:14px}
+        .pp-photo{display:flex; flex-direction:row; align-items:center; gap:14px}
+        .pp-photo .pet-ava{flex:none}
+        .pp-photo .opts{display:flex; flex-direction:column; gap:6px; min-width:0; flex:1}
+        .pp-photo label.inline{flex-direction:row; align-items:center; gap:6px; font-size:13px}
+        .pp-photo input[type=checkbox]{width:16px; height:16px; margin:0; padding:0}
+        .unit{position:relative; display:block}
+        .unit input{width:100%; padding-right:34px}
+        .unit::after{content:attr(data-unit); position:absolute; right:12px; bottom:11px; color:var(--muted); font-size:13px; pointer-events:none}
+
         .toast{position:fixed; left:50%; transform:translateX(-50%); bottom:26px; background:#1f2430; color:#fff; padding:10px 14px; border-radius:10px; font-size:13px; display:none}
         .toast.show{display:block}
 
@@ -372,6 +407,7 @@
             <button class="tab on" data-view="adopt">입양 정보</button>
             <button class="tab" data-view="board">커뮤니티</button>
             <button class="tab" data-view="shop">Shop</button>
+            <button class="tab" data-view="health">건강체크</button>
         </nav>
         <button id="authName" class="auth-name" type="button" hidden title="내 정보"></button>
         <button id="btnInbox" class="tool-btn inbox-btn" hidden>문의함<span id="inboxBadge" class="inbox-badge" hidden></span></button>
@@ -514,6 +550,28 @@
         <ul id="shopGrid" class="shop-grid"></ul>
         <div id="shopEmpty" class="post-empty" hidden></div>
         <div class="pager"><button id="shopMore" class="tool-btn" hidden>더보기</button></div>
+    </div>
+
+    <!-- 건강체크: 내 반려동물 -->
+    <div id="viewHealth" hidden>
+        <div class="hc-head">
+            <div>
+                <h2>내 반려동물</h2>
+                <p>나이·몸무게·지병 같은 기본 정보를 등록해 두면 건강체크에서 바로 불러와요.</p>
+            </div>
+            <button id="petNew" class="tool-btn primary" hidden>반려동물 등록</button>
+        </div>
+        <div id="petLoggedOut" class="pet-empty" hidden>
+            <b>로그인하고 반려동물을 등록해 보세요</b>
+            등록한 정보는 나만 볼 수 있어요.
+            <div><button type="button" class="tool-btn primary" id="petLogin">로그인</button></div>
+        </div>
+        <div id="petEmpty" class="pet-empty" hidden>
+            <b>아직 등록한 반려동물이 없어요</b>
+            이름과 종류만 있으면 바로 등록할 수 있어요.
+            <div><button type="button" class="tool-btn primary" id="petEmptyNew">첫 반려동물 등록하기</button></div>
+        </div>
+        <ul id="petList" class="pet-grid"></ul>
     </div>
 
     <footer class="site-foot">
@@ -850,6 +908,39 @@
     </form>
 </dialog>
 
+<!-- 내 반려동물 등록/수정 -->
+<dialog id="petProfileDialog" class="modal">
+    <form id="ppForm" method="dialog">
+        <header id="ppTitle">반려동물 등록</header>
+        <div class="body">
+            <input type="hidden" id="ppId"/>
+            <div class="field pp-photo">
+                <div class="pet-ava" id="ppPreview" aria-hidden="true"></div>
+                <div class="opts">
+                    <span>사진 (선택)</span>
+                    <input id="ppFile" type="file" accept="image/png,image/jpeg,image/gif,image/webp"/>
+                    <label class="inline" id="ppRemoveRow" hidden><input id="ppRemove" type="checkbox"/>지금 사진 삭제</label>
+                </div>
+            </div>
+            <label>이름<input id="ppName" maxlength="20" required placeholder="예: 콩이"/></label>
+            <label>종류<select id="ppSpecies" required><option value="개">개</option><option value="고양이">고양이</option></select></label>
+            <label>품종 (선택)<input id="ppBreed" maxlength="30" placeholder="예: 말티즈, 코리안 숏헤어"/></label>
+            <label>성별 (선택)<select id="ppGender"><option value="">모름</option><option value="수컷">수컷</option><option value="암컷">암컷</option></select></label>
+            <label>중성화 (선택)<select id="ppNeutered"><option value="">모름</option><option value="true">했어요</option><option value="false">안 했어요</option></select></label>
+            <label>태어난 해 (선택)<input id="ppBirth" type="number" inputmode="numeric" placeholder="예: 2021"/></label>
+            <label>몸무게 (선택)<span class="unit" data-unit="kg"><input id="ppWeight" type="number" min="0.01" max="150" step="0.01" inputmode="decimal" placeholder="예: 3.2"/></span></label>
+            <label class="label-memo">특이사항 (선택)
+                <textarea id="ppNotes" rows="4" maxlength="500" placeholder="지병, 알러지, 복용 중인 약, 수술 이력 등 — 건강체크 때 참고해요."></textarea>
+            </label>
+            <div id="ppErr" class="auth-err field"></div>
+        </div>
+        <footer>
+            <button type="button" class="btn" id="ppCancel">취소</button>
+            <button id="ppSave" value="default" class="btn go">저장</button>
+        </footer>
+    </form>
+</dialog>
+
 <template id="itemTmpl">
     <li class="card">
         <img class="thumb" alt="사진"/>
@@ -898,11 +989,11 @@
         <section data-doc="privacy" hidden>
             <div class="meta">시행일 [YYYY-MM-DD] · 운영자 [운영자 이름]</div>
             <h3>1. 수집하는 개인정보</h3>
-            <ul><li>이메일 가입: 이메일, 비밀번호(암호화하여 저장), 닉네임</li><li>카카오 로그인: 회원번호, 닉네임</li><li>네이버 로그인: 회원 식별값, 이름</li><li>입양·거래 문의 시 회원이 직접 입력한 연락처(문의를 받는 등록자·판매자에게만 공개)</li></ul>
+            <ul><li>이메일 가입: 이메일, 비밀번호(암호화하여 저장), 닉네임</li><li>카카오 로그인: 회원번호, 닉네임</li><li>네이버 로그인: 회원 식별값, 이름</li><li>입양·거래 문의 시 회원이 직접 입력한 연락처(문의를 받는 등록자·판매자에게만 공개)</li><li>건강체크를 위해 회원이 직접 입력한 반려동물 정보(이름, 종류, 품종, 성별, 중성화 여부, 태어난 해, 몸무게, 특이사항, 사진 — 본인에게만 공개)</li></ul>
             <h3>2. 이용 목적</h3>
             <p>회원 식별과 로그인, 게시물·댓글 작성자 표시, 입양 문의 전달, 신고 처리와 부정 이용 방지</p>
             <h3>3. 보관 기간과 파기</h3>
-            <p>회원 탈퇴 시 계정 정보(이메일, 비밀번호, 닉네임, 소셜 계정 연결), 등록한 유기견 정보와 사진, 주고받은 입양 문의, Shop에 올린 상품과 사진·주고받은 거래 문의·관심 목록, 신고 기록을 지체 없이 삭제합니다. 커뮤니티 글·댓글은 남기되 작성자를 "탈퇴한 회원"으로 표시합니다. 다른 법령에 보관 의무가 있으면 [기간] 동안 보관한 뒤 파기합니다.</p>
+            <p>회원 탈퇴 시 계정 정보(이메일, 비밀번호, 닉네임, 소셜 계정 연결), 등록한 유기견 정보와 사진, 주고받은 입양 문의, Shop에 올린 상품과 사진·주고받은 거래 문의·관심 목록, 등록한 반려동물 정보와 사진, 신고 기록을 지체 없이 삭제합니다. 커뮤니티 글·댓글은 남기되 작성자를 "탈퇴한 회원"으로 표시합니다. 다른 법령에 보관 의무가 있으면 [기간] 동안 보관한 뒤 파기합니다.</p>
             <h3>4. 제3자 제공과 처리 위탁</h3>
             <p>개인정보를 제3자에게 제공하지 않습니다. 서버·데이터베이스 운영: [호스팅 업체]</p>
             <h3>5. 이용자의 권리</h3>
@@ -965,6 +1056,10 @@
             <div class="my-card"><div class="sub" style="margin:0">댓글</div><div class="v" id="myComments">0</div></div>
             <div class="my-card"><div class="sub" style="margin:0">입양 문의</div><div class="v" id="myInquiries">0</div></div>
         </div>
+        <div class="my-sec">건강체크</div>
+        <div class="my-counts shop">
+            <button type="button" class="my-card" id="myGoPets"><div class="sub" style="margin:0">내 반려동물</div><div class="v" id="myPets">0</div><div class="go">관리하기 ›</div></button>
+        </div>
         <div class="my-sec">Shop</div>
         <div class="my-counts shop">
             <button type="button" class="my-card" id="myGoLiked"><div class="sub" style="margin:0">관심 상품</div><div class="v" id="myShopLikes">0</div><div class="go">목록 보기 ›</div></button>
@@ -997,6 +1092,7 @@
             <div id="wdDogs">· 내가 등록한 유기견과 사진</div>
             <div id="wdInquiries">· 주고받은 입양 문의</div>
             <div id="wdShop">· 내가 올린 판매 상품과 사진, 주고받은 거래 문의, 관심 목록</div>
+            <div id="wdPets">· 등록한 내 반려동물 정보와 사진</div>
         </div>
         <div class="my-card" style="font-size:14px; line-height:1.8">
             <div style="font-weight:700; margin-bottom:4px">남는 것</div>
@@ -1513,7 +1609,7 @@ ${JSON.stringify(candidates,null,2)}
             $("#myAva").textContent=myProfile.nickname.slice(0,1); $("#myNick").textContent=myProfile.nickname;
             $("#myMeta").textContent=[providerName(myProfile.provider), myProfile.email, `가입일 ${fmtDate(myProfile.createdAt)}`].filter(Boolean).join(' · ');
             $("#myNickInput").value='';
-            const c=myProfile.counts; $("#myDogs").textContent=c.dogs; $("#myPosts").textContent=c.posts; $("#myComments").textContent=c.comments; $("#myInquiries").textContent=c.inquiries; $("#myShopItems").textContent=c.shopItems??0; $("#myShopLikes").textContent=c.shopLikes??0; $("#myShopInquiries").textContent=c.shopInquiries??0;
+            const c=myProfile.counts; $("#myDogs").textContent=c.dogs; $("#myPosts").textContent=c.posts; $("#myComments").textContent=c.comments; $("#myInquiries").textContent=c.inquiries; $("#myShopItems").textContent=c.shopItems??0; $("#myShopLikes").textContent=c.shopLikes??0; $("#myPets").textContent=c.pets??0; $("#myShopInquiries").textContent=c.shopInquiries??0;
             if(!myDlg.open) myDlg.showModal();
         }catch(err){ alert(err.message||err) }
     }
@@ -1531,6 +1627,7 @@ ${JSON.stringify(candidates,null,2)}
         const c=myProfile?.counts||{};
         $("#wdDogs").textContent=`· 내가 등록한 유기견 ${c.dogs??0}건과 사진`; $("#wdInquiries").textContent=`· 주고받은 입양 문의 ${c.inquiries??0}건`;
         $("#wdShop").textContent=`· 내가 올린 판매 상품 ${c.shopItems??0}건과 사진, 주고받은 거래 문의 ${c.shopInquiries??0}건, 관심 목록`;
+        $("#wdPets").textContent=`· 등록한 내 반려동물 ${c.pets??0}마리의 정보와 사진`;
         $("#wdConfirm").value=''; $("#wdSubmit").disabled=true; $("#wdErr").textContent='';
         wdDlg.showModal();
     });
@@ -1755,16 +1852,18 @@ ${JSON.stringify(candidates,null,2)}
 
     /* 탭 전환 */
     function showView(name){
-        $("#viewAdopt").hidden = name!=='adopt'; $("#viewBoard").hidden = name!=='board'; $("#viewShop").hidden = name!=='shop';
+        $("#viewAdopt").hidden = name!=='adopt'; $("#viewBoard").hidden = name!=='board'; $("#viewShop").hidden = name!=='shop'; $("#viewHealth").hidden = name!=='health';
         document.querySelectorAll('.tab[data-view]').forEach(t=>t.classList.toggle('on',t.dataset.view===name));
         history.replaceState(null,'',name==='adopt'? location.pathname+location.search : '#'+name);
         if(name==='board') renderPosts();
         if(name==='shop') renderShop(true);
+        if(name==='health') renderPets();
     }
     async function refreshViews(){
         await renderList();
         if(!$("#viewBoard").hidden) await renderPosts();
         if(!$("#viewShop").hidden) await renderShop(true);
+        if(!$("#viewHealth").hidden) await renderPets();
     }
 
     /* 글 목록 */
@@ -2094,6 +2193,101 @@ ${JSON.stringify(candidates,null,2)}
     $("#myGoSelling").addEventListener('click',()=>openShopList('mine'));
     $("#myGoShopInbox").addEventListener('click',()=>{ myDlg.close(); openInbox('shop') });
 
+    /* 건강체크: 내 반려동물 */
+    const PETS = API_BASE + '/pets';
+    const petForm = (payload,file)=>{ const fd=new FormData(); fd.append('pet',JSON.stringify(payload)); if(file) fd.append('image',file); return fd };
+    const Pets = {
+        list:()=>req(PETS),
+        create:(payload,file)=>req(PETS,{method:'POST',body:petForm(payload,file)}),
+        update:(id,payload,file)=>req(`${PETS}/${id}`,{method:'PUT',body:petForm(payload,file)}),
+        remove:(id)=>req(`${PETS}/${id}`,{method:'DELETE'})
+    };
+    const ppDlg=$("#petProfileDialog"), ppForm=$("#ppForm"), ppFile=$("#ppFile");
+    let pets=[], ppEditing=null, petSeq=0;
+
+    function petAge(birthYear){
+        if(!birthYear) return null;
+        const age=new Date().getFullYear()-birthYear;
+        return age<=0? `1살 미만 (${birthYear}년생)` : `${age}살 (${birthYear}년생)`;
+    }
+    function petAvatar(box,p){
+        box.innerHTML='';
+        if(p?.imageName){ const im=el('img'); im.src=buildUploadUrl(p.imageName); im.alt=''; im.onerror=()=>{ box.innerHTML=''; box.textContent=(p.name||'?').slice(0,1) }; box.append(im) }
+        else box.textContent=(p?.name||'?').slice(0,1);
+    }
+    function petCard(p){
+        const li=el('li','pet-card'), ava=el('div','pet-ava'); petAvatar(ava,p);
+        const main=el('div'); main.style.minWidth='0';
+        const name=el('div','pet-name'); name.append(el('span',null,p.name), el('span','badge '+(p.species==='고양이'?'cat':'wait'),p.species));
+        const neut = p.neutered==null? null : p.neutered? '중성화 O' : '중성화 X';
+        // 항목 중간에서 줄이 바뀌지 않게 항목마다 감싼다
+        const factList=[p.breed, p.gender, neut, petAge(p.birthYear), p.weightKg!=null? `${Number(p.weightKg)}kg` : null].filter(Boolean);
+        const facts=el('div','pet-facts', factList.length? null : '기본 정보만 등록됨');
+        factList.forEach((f,i)=>{ if(i) facts.append(' · '); facts.append(el('span',null,f)) });
+        main.append(name,facts);
+        if(p.notes) main.append(el('div','pet-notes',p.notes));
+        const act=el('div','pet-actions'), eb=el('button','btn','수정'), db=el('button','btn','삭제');
+        eb.type=db.type='button';
+        eb.addEventListener('click',()=>openPetForm(p));
+        db.addEventListener('click',async()=>{
+            if(!confirm(`'${p.name}' 정보를 삭제할까요? 사진도 함께 삭제됩니다.`)) return;
+            try{ await Pets.remove(p.petId); showToast('삭제되었습니다.'); await renderPets() }catch(err){ alert(err.message||err) }
+        });
+        act.append(eb,db);
+        li.append(ava,main,act);
+        return li;
+    }
+    async function renderPets(){
+        const seq=++petSeq, list=$("#petList");
+        $("#petLoggedOut").hidden=!!me; $("#petNew").hidden=!me;
+        if(!me){ list.innerHTML=''; $("#petEmpty").hidden=true; return }
+        try{
+            const rows=await Pets.list();
+            if(seq!==petSeq) return;
+            pets=rows; list.innerHTML='';
+            rows.forEach(p=>list.appendChild(petCard(p)));
+            $("#petEmpty").hidden=rows.length>0;
+        }catch(err){ if(seq===petSeq){ list.innerHTML=''; $("#petEmpty").hidden=true; showToast(err.message||'반려동물 정보를 불러오지 못했습니다.') } }
+    }
+
+    function renderPetPreview(){
+        const f=ppFile.files[0], box=$("#ppPreview");
+        if(f){ box.innerHTML=''; const im=el('img'); im.src=URL.createObjectURL(f); im.alt=''; box.append(im); $("#ppRemove").checked=false; return }
+        petAvatar(box, $("#ppRemove").checked? {name:$("#ppName").value} : {...ppEditing, name:$("#ppName").value||ppEditing?.name});
+    }
+    function openPetForm(p){
+        if(!requireLogin()) return;
+        ppEditing=p||null; ppForm.reset(); $("#ppErr").textContent='';
+        $("#ppTitle").textContent = p? '반려동물 정보 수정' : '반려동물 등록';
+        $("#ppId").value=p?.petId??''; $("#ppName").value=p?.name??''; $("#ppSpecies").value=p?.species||'개';
+        $("#ppBreed").value=p?.breed??''; $("#ppGender").value=p?.gender??''; $("#ppNeutered").value=p?.neutered==null? '' : String(p.neutered);
+        $("#ppBirth").value=p?.birthYear??''; $("#ppWeight").value=p?.weightKg!=null? Number(p.weightKg) : ''; $("#ppNotes").value=p?.notes??'';
+        const year=new Date().getFullYear(); $("#ppBirth").min=year-40; $("#ppBirth").max=year;
+        $("#ppRemoveRow").hidden=!p?.imageName;
+        renderPetPreview();
+        ppDlg.showModal();
+    }
+    ppFile.addEventListener('change',renderPetPreview);
+    $("#ppRemove").addEventListener('change',()=>{ if($("#ppRemove").checked) ppFile.value=''; renderPetPreview() });
+    $("#ppName").addEventListener('input',()=>{ if(!ppFile.files[0]) renderPetPreview() });
+    $("#ppCancel").addEventListener('click',()=>ppDlg.close());
+    ppForm.addEventListener('submit',async e=>{
+        e.preventDefault();
+        const id=$("#ppId").value, num=v=>v===''? null : Number(v);
+        const payload={ name:$("#ppName").value.trim(), species:$("#ppSpecies").value, breed:$("#ppBreed").value.trim(), gender:$("#ppGender").value,
+                        neutered: $("#ppNeutered").value===''? null : $("#ppNeutered").value==='true',
+                        birthYear:num($("#ppBirth").value), weightKg:num($("#ppWeight").value), notes:$("#ppNotes").value.trim(), removeImage:$("#ppRemove").checked };
+        $("#ppSave").disabled=true; $("#ppErr").textContent='';
+        try{
+            if(id) await Pets.update(id,payload,ppFile.files[0]); else await Pets.create(payload,ppFile.files[0]);
+            ppDlg.close(); showToast(id? '수정되었습니다.' : `${payload.name}를(을) 등록했어요.`); await renderPets();
+        }catch(err){ $("#ppErr").textContent=err.message||String(err) } finally{ $("#ppSave").disabled=false }
+    });
+    $("#petNew").addEventListener('click',()=>openPetForm());
+    $("#petEmptyNew").addEventListener('click',()=>openPetForm());
+    $("#petLogin").addEventListener('click',()=>openAuth('login'));
+    $("#myGoPets").addEventListener('click',()=>{ myDlg.close(); showView('health'); window.scrollTo(0,0) });
+
     /* 초기 구동 */
     document.addEventListener('DOMContentLoaded',async()=>{
         $("#btnNew").addEventListener("click",()=>openDialog());
@@ -2113,6 +2307,7 @@ ${JSON.stringify(candidates,null,2)}
         bindShop();
         if(location.hash==='#board') showView('board');
         if(location.hash==='#shop') showView('shop');
+        if(location.hash==='#health') showView('health');
         if(['#terms','#privacy','#policy'].includes(location.hash)) openTerms(location.hash.slice(1));
         loadShelterRegions().catch(()=>{}); loadShelter(true); loadShelterStats();
         await renderList(); await loadCharts(); startAutoRefresh();
