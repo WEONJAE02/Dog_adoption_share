@@ -426,6 +426,23 @@
         .hc-row .t{display:flex; gap:8px; align-items:center; font-weight:700; flex-wrap:wrap}
         .hc-row .s{color:var(--muted); font-size:13px; margin-top:3px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
 
+        /* 추천 주치의 (샘플) */
+        .vet-region{display:flex; flex-wrap:wrap; gap:8px; align-items:center; margin:0 0 10px; font-size:13px; color:var(--muted)}
+        .vet-region select{background:#fff; border:1px solid var(--field); padding:7px 10px; border-radius:10px; color:var(--text)}
+        .vet-list, .hr-sec .vet-list{list-style:none; margin:10px 0 0; padding:0; display:flex; flex-direction:column; gap:10px}
+        .vet-card{border:1px solid var(--line); border-radius:14px; padding:14px; display:grid; grid-template-columns:44px 1fr auto; gap:12px; align-items:start}
+        .vet-card .my-ava{width:44px; height:44px; font-size:17px}
+        .vet-card .nm{font-weight:800; font-size:15px; display:flex; flex-wrap:wrap; gap:6px; align-items:center}
+        .vet-card .cl{color:var(--muted); font-size:13px; margin-top:2px}
+        .vet-card .in{font-size:13px; margin-top:6px; line-height:1.5}
+        .vet-card .rs{display:flex; flex-wrap:wrap; gap:6px; margin-top:8px}
+        .vet-card .rs span{font-size:12px; padding:3px 8px; border-radius:999px; background:#eef4ff; color:#1f4fd8}
+        .vet-score{text-align:center; min-width:52px}
+        .vet-score b{display:block; font-size:22px; color:var(--brand); line-height:1}
+        .vet-score small{color:var(--muted); font-size:11px}
+        .vet-rank{position:relative}
+        .vet-rank::before{content:attr(data-rank); position:absolute; left:-6px; top:-6px; width:20px; height:20px; border-radius:50%; background:var(--text); color:#fff; font-size:11px; font-weight:700; display:flex; align-items:center; justify-content:center}
+
         .toast{position:fixed; left:50%; transform:translateX(-50%); bottom:26px; background:#1f2430; color:#fff; padding:10px 14px; border-radius:10px; font-size:13px; display:none}
         .toast.show{display:block}
 
@@ -1049,6 +1066,17 @@
         <div class="hr-sec"><h4>보이는 것</h4><p id="hrSummary"></p><ul id="hrFindings" style="margin-top:6px"></ul></div>
         <div class="hr-sec"><h4>의심되는 원인</h4><div class="chips" id="hrCauses"></div></div>
         <div class="hr-sec"><h4>추천 진료 분야</h4><p><span class="badge wait" id="hrSpecialty" style="font-size:14px"></span></p></div>
+        <div class="hr-sec" id="hrVetSec">
+            <h4>추천 주치의 <span class="badge" style="background:#eef1f6; color:#4b5260; font-weight:600">샘플</span></h4>
+            <p class="hc-alert" id="vetEmergency" hidden style="margin-bottom:10px">응급이면 추천을 기다리지 말고 가장 가까운 24시간 동물병원에 먼저 전화하세요.</p>
+            <div class="vet-region">
+                <label for="vetSido">내 지역</label>
+                <select id="vetSido"><option value="">지역 선택 안 함</option></select>
+                <select id="vetSigungu" aria-label="시군구"><option value="">시군구 전체</option></select>
+            </div>
+            <div class="hr-sample">가상의 수의사·병원 데이터예요. 실제 병원이 아니에요. 진료 분야, 지역, 해당 분야 진료 건수, 평점으로 점수를 매겨 순위를 정해요.</div>
+            <ul id="vetList" class="vet-list"></ul>
+        </div>
         <div class="hr-sec"><h4>병원 가기 전 집에서</h4><ul id="hrHome"></ul></div>
         <div class="hr-sec"><h4>병원에서 물어볼 것</h4><ul id="hrQuestions"></ul></div>
         <div class="hr-sec" id="hrRetakeBox" hidden><h4>다시 찍으면 좋아요</h4><p id="hrRetake"></p></div>
@@ -2568,6 +2596,8 @@ ${JSON.stringify(candidates,null,2)}
         $("#hrSpecialty").textContent=r.specialty||'일반';
         fillList($("#hrHome"),res.homeCare); fillList($("#hrQuestions"),res.questionsForVet);
         $("#hrRetakeBox").hidden = res.imageQuality!=='POOR' || !res.retakeTip; $("#hrRetake").textContent=res.retakeTip||'';
+        $("#vetEmergency").hidden = r.urgency!=='EMERGENCY';
+        loadVets();
         if(!hrDlg.open) hrDlg.showModal();
         hrDlg.querySelector('.hr-body').scrollTop=0;
     }
@@ -2576,6 +2606,53 @@ ${JSON.stringify(candidates,null,2)}
         if(!hcCur || !confirm('이 체크 기록을 삭제할까요? 올린 사진도 함께 삭제됩니다.')) return;
         try{ await req(`${HC}/${hcCur.checkId}`,{method:'DELETE'}); hrDlg.close(); showToast('삭제되었습니다.'); renderChecks() }catch(err){ alert(err.message||err) }
     });
+
+    /* 추천 주치의 (샘플 데이터) */
+    const VETS = API_BASE + '/vets';
+    let vetRegions=null, vetSeq=0;
+    const loadVetRegion = ()=>{ try{ return JSON.parse(localStorage.getItem('vetRegion'))||{} }catch{ return {} } };
+    const saveVetRegion = v=>{ try{ localStorage.setItem('vetRegion',JSON.stringify(v)) }catch{} };
+    function fillSigungu(){
+        const sel=$("#vetSigungu"); sel.innerHTML=''; sel.add(new Option('시군구 전체',''));
+        (vetRegions?.[$("#vetSido").value]||[]).forEach(g=>sel.add(new Option(g,g)));
+        sel.disabled=!$("#vetSido").value;
+    }
+    async function ensureVetRegions(){
+        if(vetRegions) return;
+        vetRegions=await req(`${VETS}/regions`);
+        const sel=$("#vetSido"); Object.keys(vetRegions).forEach(sd=>sel.add(new Option(sd,sd)));
+        const saved=loadVetRegion();
+        if(saved.sido && vetRegions[saved.sido]){ sel.value=saved.sido; fillSigungu(); if(vetRegions[saved.sido].includes(saved.sigungu)) $("#vetSigungu").value=saved.sigungu }
+        else fillSigungu();
+    }
+    function vetCard(v,i){
+        const li=el('li','vet-card'), ava=el('div','my-ava vet-rank',v.name.slice(0,1)); ava.dataset.rank=String(i+1);
+        const m=el('div'); m.style.minWidth='0';
+        const nm=el('div','nm'); nm.append(el('span',null,`${v.name} 수의사`), el('span','badge wait',v.specialty));
+        v.subSpecialties.filter(x=>x!=='일반').forEach(x=>nm.append(el('span','pill',x)));
+        if(v.open24h) nm.append(el('span','badge keep','24시간'));
+        m.append(nm, el('div','cl',`${v.clinicName} · ${shortRegion(v.sido)} ${v.sigungu} · 경력 ${v.careerYears}년 · ★ ${Number(v.rating).toFixed(1)} (${v.reviewCount.toLocaleString('ko-KR')})`));
+        if(v.intro) m.append(el('div','in',v.intro));
+        const rs=el('div','rs'); v.reasons.forEach(x=>rs.append(el('span',null,x))); m.append(rs);
+        const sc=el('div','vet-score'); sc.append(el('b',null,String(v.score)), el('small',null,'추천 점수'));
+        li.append(ava,m,sc); return li;
+    }
+    async function loadVets(){
+        if(!hcCur) return;
+        const seq=++vetSeq, list=$("#vetList");
+        list.innerHTML=''; list.append(el('li','sub','추천 주치의를 찾는 중…'));
+        try{
+            await ensureVetRegions();
+            const q=new URLSearchParams({specialty:hcCur.specialty||'일반', sido:$("#vetSido").value, sigungu:$("#vetSigungu").value, urgency:hcCur.urgency});
+            const rows=await req(`${VETS}/recommend?${q}`);
+            if(seq!==vetSeq) return;
+            list.innerHTML='';
+            rows.forEach((v,i)=>list.append(vetCard(v,i)));
+            if(!rows.length) list.append(el('li','sub','이 분야의 샘플 주치의가 없어요.'));
+        }catch(err){ if(seq===vetSeq){ list.innerHTML=''; list.append(el('li','sub',err.message||'추천 주치의를 불러오지 못했어요.')) } }
+    }
+    $("#vetSido").addEventListener('change',()=>{ fillSigungu(); saveVetRegion({sido:$("#vetSido").value, sigungu:''}); loadVets() });
+    $("#vetSigungu").addEventListener('change',()=>{ saveVetRegion({sido:$("#vetSido").value, sigungu:$("#vetSigungu").value}); loadVets() });
 
     /* 최근 기록 */
     async function renderChecks(){
