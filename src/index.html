@@ -234,7 +234,14 @@
         .my-card{border:1px solid var(--line); border-radius:14px; padding:14px 16px}
         .my-head{display:flex; align-items:center; gap:14px}
         .my-ava{width:52px; height:52px; border-radius:50%; background:#e6efff; color:#1f4fd8; display:flex; align-items:center; justify-content:center; font-weight:800; font-size:20px; flex:none}
-        .my-counts{display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:10px}
+        .my-counts{display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:10px}
+        .my-counts.shop{grid-template-columns:repeat(3,minmax(0,1fr))}
+        .my-sec{font-weight:700; font-size:14px; margin:4px 0 -4px}
+        /* 누르면 해당 목록으로 이동하는 카드 */
+        button.my-card{all:unset; box-sizing:border-box; border:1px solid var(--line); border-radius:14px; padding:14px 16px; cursor:pointer; display:block}
+        button.my-card:hover{background:var(--panel-2); border-color:#cfd6e2}
+        button.my-card:focus-visible{outline:2px solid var(--brand); outline-offset:2px}
+        button.my-card .go{color:var(--brand); font-size:12px; margin-top:4px}
         .my-counts .v{font-size:22px; font-weight:800; margin-top:2px}
         .my-danger{border:1px solid #f3c6c2; background:#fff7f6; border-radius:14px; padding:14px 16px; display:flex; align-items:center; gap:14px}
         .btn.danger{background:#d93025; color:#fff; font-weight:700}
@@ -247,7 +254,7 @@
         .rp fieldset label{flex-direction:row; align-items:center; gap:10px; font-size:14px}
         .rp fieldset input{width:18px; height:18px; margin:0; padding:0; accent-color:#2b65ff}
         .hidden-note{margin:0 0 12px; padding:10px 12px; border-radius:10px; background:#fdeaea; color:#8a2b24; font-size:13px; line-height:1.6}
-        @media (max-width:900px){ .my-counts{grid-template-columns:repeat(2,minmax(0,1fr))} }
+        @media (max-width:900px){ .my-counts,.my-counts.shop{grid-template-columns:repeat(2,minmax(0,1fr))} }
 
         /* 탭 */
         .tabs{display:flex; gap:6px; margin-right:auto}
@@ -957,8 +964,12 @@
             <div class="my-card"><div class="sub" style="margin:0">커뮤니티 글</div><div class="v" id="myPosts">0</div></div>
             <div class="my-card"><div class="sub" style="margin:0">댓글</div><div class="v" id="myComments">0</div></div>
             <div class="my-card"><div class="sub" style="margin:0">입양 문의</div><div class="v" id="myInquiries">0</div></div>
-            <div class="my-card"><div class="sub" style="margin:0">판매 상품</div><div class="v" id="myShopItems">0</div></div>
-            <div class="my-card"><div class="sub" style="margin:0">거래 문의</div><div class="v" id="myShopInquiries">0</div></div>
+        </div>
+        <div class="my-sec">Shop</div>
+        <div class="my-counts shop">
+            <button type="button" class="my-card" id="myGoLiked"><div class="sub" style="margin:0">관심 상품</div><div class="v" id="myShopLikes">0</div><div class="go">목록 보기 ›</div></button>
+            <button type="button" class="my-card" id="myGoSelling"><div class="sub" style="margin:0">판매 상품</div><div class="v" id="myShopItems">0</div><div class="go">목록 보기 ›</div></button>
+            <button type="button" class="my-card" id="myGoShopInbox"><div class="sub" style="margin:0">거래 문의</div><div class="v" id="myShopInquiries">0</div><div class="go">문의함 보기 ›</div></button>
         </div>
         <div class="my-card" style="font-size:14px">
             <div style="font-weight:700; margin-bottom:8px">약관 및 정책</div>
@@ -1502,7 +1513,7 @@ ${JSON.stringify(candidates,null,2)}
             $("#myAva").textContent=myProfile.nickname.slice(0,1); $("#myNick").textContent=myProfile.nickname;
             $("#myMeta").textContent=[providerName(myProfile.provider), myProfile.email, `가입일 ${fmtDate(myProfile.createdAt)}`].filter(Boolean).join(' · ');
             $("#myNickInput").value='';
-            const c=myProfile.counts; $("#myDogs").textContent=c.dogs; $("#myPosts").textContent=c.posts; $("#myComments").textContent=c.comments; $("#myInquiries").textContent=c.inquiries; $("#myShopItems").textContent=c.shopItems??0; $("#myShopInquiries").textContent=c.shopInquiries??0;
+            const c=myProfile.counts; $("#myDogs").textContent=c.dogs; $("#myPosts").textContent=c.posts; $("#myComments").textContent=c.comments; $("#myInquiries").textContent=c.inquiries; $("#myShopItems").textContent=c.shopItems??0; $("#myShopLikes").textContent=c.shopLikes??0; $("#myShopInquiries").textContent=c.shopInquiries??0;
             if(!myDlg.open) myDlg.showModal();
         }catch(err){ alert(err.message||err) }
     }
@@ -1639,14 +1650,15 @@ ${JSON.stringify(candidates,null,2)}
     document.querySelectorAll('#inboxDialog .tab').forEach(t=>t.addEventListener('click',()=>{
         ibBox=t.dataset.box; document.querySelectorAll('#inboxDialog .tab').forEach(x=>x.classList.toggle('on',x===t)); loadInbox();
     }));
-    document.querySelectorAll('#ibKind .seg-btn').forEach(b=>b.addEventListener('click',()=>{
-        ibKind=b.dataset.kind; document.querySelectorAll('#ibKind .seg-btn').forEach(x=>x.classList.toggle('on',x===b)); loadInbox();
-    }));
+    function setInboxKind(kind){ ibKind=kind; document.querySelectorAll('#ibKind .seg-btn').forEach(x=>x.classList.toggle('on',x.dataset.kind===kind)) }
+    function openInbox(kind){ if(!requireLogin()) return; setInboxKind(kind); if(!ibDlg.open) ibDlg.showModal(); loadInbox() }
+    document.querySelectorAll('#ibKind .seg-btn').forEach(b=>b.addEventListener('click',()=>{ setInboxKind(b.dataset.kind); loadInbox() }));
     // 답변을 기다리는 문의가 있는 쪽을 먼저 연다
     $("#btnInbox").addEventListener('click',async()=>{
         if(!requireLogin()) return;
-        try{ const s=await req(`${INQ}/summary`); if(!s.pendingAdoption && s.pendingShop) document.querySelector('#ibKind [data-kind=shop]').click(); }catch{}
-        ibDlg.showModal(); loadInbox();
+        let kind=ibKind;
+        try{ const s=await req(`${INQ}/summary`); if(!s.pendingAdoption && s.pendingShop) kind='shop' }catch{}
+        openInbox(kind);
     });
     $("#ibClose").addEventListener('click',()=>ibDlg.close());
 
@@ -2070,6 +2082,17 @@ ${JSON.stringify(candidates,null,2)}
             m.statuses.forEach(st=>$("#spStatus").add(new Option(st,st)));
         }).catch(()=>{});
     }
+
+    /* 내 정보에서 Shop 목록·문의함으로 바로 이동 (다른 조건은 풀고 해당 목록 전체를 보여준다) */
+    function openShopList(filter){
+        myDlg.close();
+        shopCat=''; document.querySelectorAll('#shopCats .chip').forEach((x,i)=>{ x.classList.toggle('on',i===0); x.setAttribute('aria-pressed',String(i===0)) });
+        $("#sq").value=''; $("#sAvail").checked=false; $("#sFilter").value=filter;
+        showView('shop'); window.scrollTo(0,0);
+    }
+    $("#myGoLiked").addEventListener('click',()=>openShopList('liked'));
+    $("#myGoSelling").addEventListener('click',()=>openShopList('mine'));
+    $("#myGoShopInbox").addEventListener('click',()=>{ myDlg.close(); openInbox('shop') });
 
     /* 초기 구동 */
     document.addEventListener('DOMContentLoaded',async()=>{
