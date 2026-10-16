@@ -47,6 +47,16 @@ public class ImageStorage {
         return fileName;
     }
 
+    // ✅ 읽기 (업로드 폴더 밖의 경로는 거부)
+    public byte[] read(String fileName) throws IOException {
+        Path uploadPath = Paths.get(uploadDir).toAbsolutePath().normalize();
+        Path target = uploadPath.resolve(fileName).normalize();
+        if (!target.startsWith(uploadPath)) {
+            throw new IOException("잘못된 파일 경로입니다.");
+        }
+        return Files.readAllBytes(target);
+    }
+
     // ✅ 삭제 (파일이 없거나 실패해도 요청은 계속 진행)
     public void delete(String fileName) {
         try {

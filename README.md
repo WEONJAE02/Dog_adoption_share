@@ -34,8 +34,8 @@
   - 사진은 브라우저에서 긴 변 1024px JPEG로 줄여서 올립니다
   - 응급 증상(호흡 곤란, 경련 등)을 고르면 분석 결과와 상관없이 서버가 "바로 병원"으로 올립니다
   - 하루 10번 제한 (`app.health.daily-limit`). 기록을 지워도 횟수는 줄지 않습니다
-  - **지금은 샘플 분석기**: 사진을 실제로 분석하지 않고 부위별 예시 결과를 보여줍니다 (화면에 "샘플"로 표시)
-- 다음 단계: AI 분석 연결 → 분야별 주치의 추천 → 기록 비교
+  - **AI 분석 (Claude)**: `ANTHROPIC_API_KEY`가 있으면 장면 사진과 반려동물 정보를 Claude(`claude-opus-5-5`)에 보내 정해진 형식(구조화 출력)으로 결과를 받습니다. 키가 없으면 샘플 분석기로 동작하고 비용이 들지 않습니다 (화면에 "샘플"로 표시)
+- 다음 단계: 분야별 주치의 추천 → 기록 비교
 
 ### AI 기능 (OpenAI)
 - 유기견 정보 기반 입양 홍보 문구 생성
@@ -88,6 +88,8 @@ cp .env.example .env.local
 | `DB_USERNAME`, `DB_PASSWORD` | 필수 | MySQL 계정 (위 Docker 기준 `root` / 정한 비밀번호) |
 | `KAKAO_CLIENT_ID`, `KAKAO_CLIENT_SECRET` | 선택 | 카카오 REST API 키, 클라이언트 시크릿 |
 | `NAVER_CLIENT_ID`, `NAVER_CLIENT_SECRET` | 선택 | 네이버 애플리케이션 Client ID / Secret |
+| `ANTHROPIC_API_KEY` | 선택 | 건강체크 AI 분석용 Claude API 키. 비워 두면 샘플 결과만 나옵니다. 사용한 만큼 과금되니 [Anthropic 콘솔](https://console.anthropic.com)에서 월 사용 한도를 걸어 두세요 |
+| `HEALTH_AI_MODEL`, `HEALTH_DAILY_LIMIT` | 선택 | 건강체크 모델(기본 `claude-opus-5-5`), 회원당 하루 횟수(기본 10) |
 | `ANIMAL_API_KEY` | 선택 | 공공데이터포털 "국가동물보호정보시스템 구조동물 조회 서비스" 인증키 (Decoding) |
 | `DB_URL`, `UPLOAD_DIR`, `FRONTEND_URL` | 선택 | 기본값 대신 다른 DB, 업로드 폴더, 프론트 주소를 쓸 때 |
 
