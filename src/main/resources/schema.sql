@@ -211,3 +211,21 @@ CREATE TABLE IF NOT EXISTS health_check_usage (
     INDEX idx_usage_user_time (user_id, created_at),
     FOREIGN KEY (user_id) REFERENCES users (user_id)
 );
+
+-- 주치의 추천용 샘플 수의사 (가상 인물·가상 병원). 실제 병원 데이터가 아니다
+CREATE TABLE IF NOT EXISTS vet (
+    vet_id          BIGINT AUTO_INCREMENT PRIMARY KEY,
+    name            VARCHAR(20)  NOT NULL,
+    clinic_name     VARCHAR(50)  NOT NULL,
+    sido            VARCHAR(20)  NOT NULL,
+    sigungu         VARCHAR(20)  NOT NULL,
+    specialty       VARCHAR(20)  NOT NULL,
+    sub_specialties VARCHAR(100),
+    career_years    INT          NOT NULL,
+    cases_count     INT          NOT NULL,
+    rating          DECIMAL(2,1) NOT NULL,
+    review_count    INT          NOT NULL,
+    open_24h        TINYINT(1)   NOT NULL DEFAULT 0,
+    intro           VARCHAR(300),
+    is_sample       TINYINT(1)   NOT NULL DEFAULT 1
+);

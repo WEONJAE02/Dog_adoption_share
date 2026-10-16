@@ -35,7 +35,10 @@
   - 응급 증상(호흡 곤란, 경련 등)을 고르면 분석 결과와 상관없이 서버가 "바로 병원"으로 올립니다
   - 하루 10번 제한 (`app.health.daily-limit`). 기록을 지워도 횟수는 줄지 않습니다
   - **AI 분석 (Claude)**: `ANTHROPIC_API_KEY`가 있으면 장면 사진과 반려동물 정보를 Claude(`claude-opus-5-5`)에 보내 정해진 형식(구조화 출력)으로 결과를 받습니다. 키가 없으면 샘플 분석기로 동작하고 비용이 들지 않습니다 (화면에 "샘플"로 표시)
-- 다음 단계: 분야별 주치의 추천 → 기록 비교
+- **추천 주치의 (샘플 데이터)**: 결과의 진료 분야와 내 지역(시도·시군구), 긴급도로 샘플 수의사 26명 중 상위 3명을 추천하고 이유를 함께 보여줍니다. AI는 진료 분야만 정하고, 순위는 코드의 점수로 정합니다
+  - 점수(최대 100): 주 분야 일치 50 / 함께 보는 분야 25, 같은 시도 10 + 같은 시군구 10, 해당 분야 진료 건수 최대 15, 평점 최대 10, 응급일 때 24시간 진료 5
+  - 수의사·병원은 모두 가상 데이터("펫룸 ○○")이며 화면에 "샘플"로 표시합니다
+- 다음 단계: 공공데이터 실제 동물병원 위치 → 기록 비교
 
 ### AI 기능 (OpenAI)
 - 유기견 정보 기반 입양 홍보 문구 생성
@@ -146,6 +149,7 @@ http://localhost:5500/index.html
 | 내 반려동물 | GET / POST / PUT / DELETE | `/pets`, `/pets/{id}` (multipart: `pet` JSON + `image`) | 필요 (본인만) |
 | 건강체크 | GET | `/health-checks/meta`, `/health-checks?petId=`, `/health-checks/{id}` | 필요 (본인만) |
 | 건강체크 | POST / DELETE | `/health-checks` (multipart: `check` JSON + `frames`), `/health-checks/{id}` | 필요 (본인만) |
+| 주치의 추천 | GET | `/vets/recommend?specialty=&sido=&sigungu=&urgency=`, `/vets/regions` | - |
 | 구매 문의 | GET / POST | `/inquiries/shop/received`, `/inquiries/shop/sent`, `/inquiries/shop/{id}/reply` | 필요 |
 
 ---
