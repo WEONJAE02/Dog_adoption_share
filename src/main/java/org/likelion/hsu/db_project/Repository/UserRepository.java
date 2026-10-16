@@ -89,7 +89,10 @@ public class UserRepository {
         counts.put("posts", count("SELECT COUNT(*) FROM board_post WHERE user_id = ?", userId));
         counts.put("comments", count("SELECT COUNT(*) FROM board_comment WHERE user_id = ? AND deleted = 0", userId));
         counts.put("inquiries", count("SELECT COUNT(*) FROM adoption_inquiry WHERE sender_id = ? OR receiver_id = ?", userId, userId));
+        counts.put("pets", count("SELECT COUNT(*) FROM my_pet WHERE user_id = ?", userId));
         counts.put("shopItems", count("SELECT COUNT(*) FROM shop_item WHERE user_id = ?", userId));
+        // 숨겨진 상품은 관심 목록에도 안 보이므로 세지 않는다 (내 상품은 관심을 누를 수 없음)
+        counts.put("shopLikes", count("SELECT COUNT(*) FROM shop_item_like l JOIN shop_item s ON s.item_id = l.item_id WHERE l.user_id = ? AND s.hidden = 0", userId));
         counts.put("shopInquiries", count("SELECT COUNT(*) FROM shop_inquiry WHERE sender_id = ? OR receiver_id = ?", userId, userId));
         return counts;
     }
