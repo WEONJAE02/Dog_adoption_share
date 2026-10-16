@@ -30,6 +30,7 @@ public class MyPetService {
 
     private final MyPetRepository petRepository;
     private final ImageStorage imageStorage;
+    private final HealthCheckService healthCheckService;
 
     public List<MyPetResponseDto> getPets(Long userId) {
         return petRepository.findByUserId(userId).stream().map(this::toDto).toList();
@@ -72,10 +73,11 @@ public class MyPetService {
         return toDto(findMyPet(petId, userId));
     }
 
-    // ✅ 삭제 (사진 포함)
+    // ✅ 삭제 (사진, 건강체크 기록 포함)
     @Transactional
     public void deletePet(Long petId, Long userId) {
         MyPet pet = findMyPet(petId, userId);
+        healthCheckService.deleteAllByPet(petId);
         petRepository.delete(petId);
         if (pet.getImageName() != null) {
             imageStorage.delete(pet.getImageName());

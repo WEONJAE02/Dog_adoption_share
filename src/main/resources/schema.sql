@@ -175,3 +175,39 @@ CREATE TABLE IF NOT EXISTS my_pet (
     updated_at DATETIME,
     FOREIGN KEY (user_id) REFERENCES users (user_id)
 );
+
+-- 건강체크 (사진·영상 프레임 → 분석 결과). result_json 에 분석 결과 전체를 보관
+CREATE TABLE IF NOT EXISTS health_check (
+    check_id    BIGINT AUTO_INCREMENT PRIMARY KEY,
+    pet_id      BIGINT        NOT NULL,
+    user_id     BIGINT        NOT NULL,
+    body_part   VARCHAR(20)   NOT NULL,
+    source      VARCHAR(10)   NOT NULL,
+    symptoms    VARCHAR(500),
+    memo        VARCHAR(1000),
+    urgency     VARCHAR(20)   NOT NULL,
+    specialty   VARCHAR(20),
+    summary     VARCHAR(1000),
+    result_json TEXT          NOT NULL,
+    analyzer    VARCHAR(50)   NOT NULL,
+    created_at  DATETIME      NOT NULL,
+    FOREIGN KEY (pet_id) REFERENCES my_pet (pet_id),
+    FOREIGN KEY (user_id) REFERENCES users (user_id)
+);
+
+CREATE TABLE IF NOT EXISTS health_check_frame (
+    id        BIGINT AUTO_INCREMENT PRIMARY KEY,
+    check_id  BIGINT       NOT NULL,
+    seq       INT          NOT NULL,
+    file_name VARCHAR(255) NOT NULL,
+    FOREIGN KEY (check_id) REFERENCES health_check (check_id)
+);
+
+-- 건강체크 사용 횟수 (하루 제한용). 체크 기록을 지워도 남아서 제한을 우회할 수 없다. 회원 탈퇴 시에만 삭제
+CREATE TABLE IF NOT EXISTS health_check_usage (
+    id         BIGINT AUTO_INCREMENT PRIMARY KEY,
+    user_id    BIGINT   NOT NULL,
+    created_at DATETIME NOT NULL,
+    INDEX idx_usage_user_time (user_id, created_at),
+    FOREIGN KEY (user_id) REFERENCES users (user_id)
+);

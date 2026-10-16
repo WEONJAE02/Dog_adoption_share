@@ -30,7 +30,12 @@
 
 ### 건강체크 (개발 중)
 - **내 반려동물**: 이름·종류(개/고양이)·품종·성별·중성화·태어난 해·몸무게·특이사항(지병, 알러지 등)·사진 1장 등록. 1인 최대 10마리, 본인만 조회·수정
-- 다음 단계: 사진·영상으로 부위별 체크 → AI 긴급도·소견·진료 분야 → 분야별 주치의 추천 → 기록 비교
+- **건강체크**: 반려동물·부위 선택 → 영상(브라우저에서 장면 8장 추출) 또는 사진(최대 5장) → 증상·메모 → 긴급도(바로 병원/빠른 진료/지켜보기)·소견·추천 진료 분야·집에서 할 일·병원에서 물어볼 것
+  - 사진은 브라우저에서 긴 변 1024px JPEG로 줄여서 올립니다
+  - 응급 증상(호흡 곤란, 경련 등)을 고르면 분석 결과와 상관없이 서버가 "바로 병원"으로 올립니다
+  - 하루 10번 제한 (`app.health.daily-limit`). 기록을 지워도 횟수는 줄지 않습니다
+  - **지금은 샘플 분석기**: 사진을 실제로 분석하지 않고 부위별 예시 결과를 보여줍니다 (화면에 "샘플"로 표시)
+- 다음 단계: AI 분석 연결 → 분야별 주치의 추천 → 기록 비교
 
 ### AI 기능 (OpenAI)
 - 유기견 정보 기반 입양 홍보 문구 생성
@@ -137,6 +142,8 @@ http://localhost:5500/index.html
 | Shop | PUT / POST / DELETE | `/shop/items/{id}/status`, `/shop/items/{id}/like` | 필요 |
 | 구매 문의 | POST | `/shop/items/{id}/inquiries` | 필요 |
 | 내 반려동물 | GET / POST / PUT / DELETE | `/pets`, `/pets/{id}` (multipart: `pet` JSON + `image`) | 필요 (본인만) |
+| 건강체크 | GET | `/health-checks/meta`, `/health-checks?petId=`, `/health-checks/{id}` | 필요 (본인만) |
+| 건강체크 | POST / DELETE | `/health-checks` (multipart: `check` JSON + `frames`), `/health-checks/{id}` | 필요 (본인만) |
 | 구매 문의 | GET / POST | `/inquiries/shop/received`, `/inquiries/shop/sent`, `/inquiries/shop/{id}/reply` | 필요 |
 
 ---
