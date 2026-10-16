@@ -376,6 +376,56 @@
         .unit input{width:100%; padding-right:34px}
         .unit::after{content:attr(data-unit); position:absolute; right:12px; bottom:11px; color:var(--muted); font-size:13px; pointer-events:none}
 
+        /* 건강체크: 체크 창 · 결과 · 기록 */
+        .hc-sec{margin:34px 0 0}
+        .hc-sec h3{margin:0 0 4px; font-size:18px}
+        .hc-step{display:flex; flex-direction:column; gap:8px; font-size:13px; grid-column:1 / -1}
+        .hc-step > .t{font-weight:700; font-size:14px}
+        .hc-step > .t small{font-weight:400; color:var(--muted); margin-left:6px}
+        .chips{display:flex; flex-wrap:wrap; gap:8px}
+        .chips input{position:absolute; opacity:0; pointer-events:none}
+        .chips label{display:inline-flex; cursor:pointer; padding:8px 14px; border-radius:999px; border:1px solid var(--line); background:#fff; font-size:14px; color:var(--text)}
+        .chips input:checked + label{background:var(--text); border-color:var(--text); color:#fff; font-weight:700}
+        .chips input:focus-visible + label{outline:2px solid var(--brand); outline-offset:2px}
+        .chips.sym input:checked + label{background:#e6efff; border-color:#9db8ff; color:#1f4fd8}
+        .chips.sym input.danger:checked + label{background:#fdeaea; border-color:#f0a5a0; color:#b3261e}
+        .hc-drop{border:1px dashed var(--field); border-radius:14px; padding:16px; display:flex; flex-direction:column; gap:10px; background:var(--panel-2)}
+        .hc-drop .hint{color:var(--muted); font-size:12px; line-height:1.6}
+        .frames{display:grid; grid-template-columns:repeat(auto-fill,minmax(92px,1fr)); gap:8px}
+        .frame{all:unset; position:relative; cursor:pointer; border-radius:10px; overflow:hidden; border:2px solid transparent; background:#fff; aspect-ratio:1}
+        .frame img{width:100%; height:100%; object-fit:cover; display:block}
+        .frame .n{position:absolute; left:6px; top:6px; background:rgba(0,0,0,.55); color:#fff; font-size:11px; padding:1px 6px; border-radius:6px}
+        .frame.off img{opacity:.25}
+        .frame.off::after{content:'제외'; position:absolute; inset:0; display:flex; align-items:center; justify-content:center; color:#b3261e; font-weight:700; font-size:13px}
+        .frame:focus-visible{outline:2px solid var(--brand); outline-offset:2px}
+        .frame.hit{border-color:#f08a24}
+        .hc-alert{padding:10px 12px; border-radius:10px; background:#fdeaea; color:#8a2b24; font-size:13px; line-height:1.6}
+        .hc-busy{position:absolute; inset:0; background:rgba(255,255,255,.88); display:flex; flex-direction:column; align-items:center; justify-content:center; gap:12px; font-weight:700; z-index:2}
+        .spin{width:34px; height:34px; border-radius:50%; border:4px solid #dfe4ec; border-top-color:var(--brand); animation:spin 1s linear infinite}
+        @keyframes spin{to{transform:rotate(360deg)}}
+        @media (prefers-reduced-motion: reduce){ .spin{animation-duration:3s} }
+        .urg{display:flex; gap:14px; align-items:flex-start; padding:16px 18px; border-radius:14px}
+        .urg .ic{flex:none; width:40px; height:40px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:900; color:#fff; font-size:18px}
+        .urg b{display:block; font-size:18px; margin-bottom:4px}
+        .urg.EMERGENCY{background:#fdeaea; color:#7a1f19} .urg.EMERGENCY .ic{background:#d93025}
+        .urg.SOON{background:#fff4e0; color:#6b4300} .urg.SOON .ic{background:#e8890c}
+        .urg.MONITOR{background:#e9f7ef; color:#185c33} .urg.MONITOR .ic{background:#2e9e57}
+        .badge.EMERGENCY{background:#fdeaea; color:#b3261e} .badge.SOON{background:#fff4e0; color:#a35f00} .badge.MONITOR{background:#e3f6e6; color:#1c7a33}
+        .hr-body{padding:18px; display:flex; flex-direction:column; gap:16px; flex:1 1 auto; min-height:0; overflow:auto}
+        .hr-sec h4{margin:0 0 8px; font-size:15px}
+        .hr-sec ul{margin:0; padding-left:20px; line-height:1.7; font-size:14px}
+        .hr-sec p{margin:0; line-height:1.7; font-size:14px}
+        .hr-meta{color:var(--muted); font-size:13px}
+        .hr-sample{padding:10px 12px; border-radius:10px; background:#eef1f6; color:#4b5260; font-size:13px; line-height:1.6}
+        .hr-note{color:var(--muted); font-size:12px; line-height:1.6; border-top:1px solid var(--line); padding-top:12px}
+        .hc-list{list-style:none; margin:14px 0 0; padding:0; display:flex; flex-direction:column; gap:10px}
+        .hc-row{display:flex; gap:14px; align-items:center; background:var(--panel); border:1px solid var(--line); border-radius:16px; padding:12px 14px; cursor:pointer}
+        .hc-row:hover{background:var(--panel-2)}
+        .hc-row img{width:56px; height:56px; object-fit:cover; border-radius:10px; flex:none; background:var(--soft)}
+        .hc-row .m{flex:1; min-width:0}
+        .hc-row .t{display:flex; gap:8px; align-items:center; font-weight:700; flex-wrap:wrap}
+        .hc-row .s{color:var(--muted); font-size:13px; margin-top:3px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
+
         .toast{position:fixed; left:50%; transform:translateX(-50%); bottom:26px; background:#1f2430; color:#fff; padding:10px 14px; border-radius:10px; font-size:13px; display:none}
         .toast.show{display:block}
 
@@ -559,7 +609,10 @@
                 <h2>내 반려동물</h2>
                 <p>나이·몸무게·지병 같은 기본 정보를 등록해 두면 건강체크에서 바로 불러와요.</p>
             </div>
-            <button id="petNew" class="tool-btn primary" hidden>반려동물 등록</button>
+            <div style="display:flex; gap:8px">
+                <button id="petNew" class="tool-btn" hidden>반려동물 등록</button>
+                <button id="hcStart" class="tool-btn primary" hidden>건강체크 시작</button>
+            </div>
         </div>
         <div id="petLoggedOut" class="pet-empty" hidden>
             <b>로그인하고 반려동물을 등록해 보세요</b>
@@ -572,6 +625,12 @@
             <div><button type="button" class="tool-btn primary" id="petEmptyNew">첫 반려동물 등록하기</button></div>
         </div>
         <ul id="petList" class="pet-grid"></ul>
+        <section class="hc-sec" id="hcHistory" hidden>
+            <h3>최근 체크 기록</h3>
+            <div class="sub" style="margin:0">결과는 참고용이며 진단이 아니에요.</div>
+            <ul id="hcList" class="hc-list"></ul>
+            <div id="hcEmpty" class="post-empty" hidden>아직 체크 기록이 없어요. "건강체크 시작"으로 첫 체크를 해 보세요.</div>
+        </section>
     </div>
 
     <footer class="site-foot">
@@ -939,6 +998,63 @@
             <button id="ppSave" value="default" class="btn go">저장</button>
         </footer>
     </form>
+</dialog>
+
+<!-- 건강체크: 새 체크 -->
+<dialog id="hcDialog" class="modal" style="width:min(820px,96vw)">
+    <form id="hcForm" method="dialog" style="position:relative">
+        <header>건강체크</header>
+        <div class="body">
+            <label class="hc-step"><span class="t">1. 누구를 체크할까요?</span><select id="hcPet" required></select></label>
+            <div class="hc-step"><span class="t">2. 어디가 걱정되나요?</span><div class="chips" id="hcParts" role="radiogroup" aria-label="부위"></div></div>
+            <div class="hc-step">
+                <span class="t">3. 영상이나 사진을 올려 주세요<small>영상은 10초 안팎, 사진은 최대 5장</small></span>
+                <div class="hc-drop">
+                    <div class="chips" role="radiogroup" aria-label="올릴 종류">
+                        <input type="radio" name="hcSrc" id="hcSrcVideo" value="video" checked><label for="hcSrcVideo">영상</label>
+                        <input type="radio" name="hcSrc" id="hcSrcPhoto" value="photo"><label for="hcSrcPhoto">사진</label>
+                    </div>
+                    <input id="hcFile" type="file" accept="video/*"/>
+                    <div class="hint" id="hcSrcHint">밝은 곳에서 걱정되는 부위가 화면 가운데 오도록 찍어 주세요. 걸음걸이는 옆에서 3~4걸음 걷는 모습을 찍으면 좋아요.</div>
+                    <div class="hint" id="hcFrameHint" hidden></div>
+                    <div class="frames" id="hcFrames"></div>
+                </div>
+            </div>
+            <div class="hc-step"><span class="t">4. 함께 보이는 증상이 있나요?<small>선택</small></span><div class="chips sym" id="hcSyms"></div>
+                <div class="hc-alert" id="hcEmergency" hidden></div>
+            </div>
+            <label class="hc-step"><span class="t">5. 메모<small>선택 · 언제부터, 얼마나 자주 등</small></span>
+                <textarea id="hcMemo" rows="3" maxlength="1000" placeholder="예: 이틀 전부터 왼쪽 눈을 자꾸 비벼요." style="background:#fff; border:1px solid var(--field); padding:10px 12px; border-radius:10px"></textarea>
+            </label>
+            <div class="hr-sample field" id="hcSampleNote" hidden>지금은 AI 연결 전이라 <b>샘플 결과</b>가 나와요. 사진을 실제로 분석하지는 않아요.</div>
+            <div id="hcErr" class="auth-err field"></div>
+        </div>
+        <footer>
+            <span class="sub" id="hcQuota" style="margin:0 auto 0 0"></span>
+            <button type="button" class="btn" id="hcCancel">취소</button>
+            <button id="hcSubmit" value="default" class="btn go">분석하기</button>
+        </footer>
+        <div class="hc-busy" id="hcBusy" hidden><div class="spin" aria-hidden="true"></div><div id="hcBusyText">분석하는 중이에요…</div></div>
+    </form>
+</dialog>
+
+<!-- 건강체크: 결과 -->
+<dialog id="hrDialog" class="detail" style="width:min(760px,96vw)">
+    <header class="pv-head" style="justify-content:space-between"><span id="hrTitle">체크 결과</span><button type="button" class="btn" id="hrClose">닫기</button></header>
+    <div class="hr-body">
+        <div class="hr-sample" id="hrSample" hidden>AI 연결 전이라 <b>샘플 결과</b>예요. 사진을 실제로 분석하지 않고 부위별로 정해진 예시를 보여줘요.</div>
+        <div class="urg" id="hrUrg"><div class="ic" id="hrUrgIc" aria-hidden="true"></div><div><b id="hrUrgLabel"></b><span id="hrUrgReason"></span></div></div>
+        <div class="hr-meta" id="hrMeta"></div>
+        <div class="frames" id="hrFrames"></div>
+        <div class="hr-sec"><h4>보이는 것</h4><p id="hrSummary"></p><ul id="hrFindings" style="margin-top:6px"></ul></div>
+        <div class="hr-sec"><h4>의심되는 원인</h4><div class="chips" id="hrCauses"></div></div>
+        <div class="hr-sec"><h4>추천 진료 분야</h4><p><span class="badge wait" id="hrSpecialty" style="font-size:14px"></span></p></div>
+        <div class="hr-sec"><h4>병원 가기 전 집에서</h4><ul id="hrHome"></ul></div>
+        <div class="hr-sec"><h4>병원에서 물어볼 것</h4><ul id="hrQuestions"></ul></div>
+        <div class="hr-sec" id="hrRetakeBox" hidden><h4>다시 찍으면 좋아요</h4><p id="hrRetake"></p></div>
+        <div class="hr-note">이 결과는 참고용이며 수의사의 진단을 대신하지 않아요. 숨쉬기 힘들어함, 경련, 의식 저하, 멈추지 않는 출혈 같은 응급 신호가 있으면 결과와 상관없이 바로 동물병원에 연락하세요.</div>
+    </div>
+    <footer><button id="hrDel" class="btn">기록 삭제</button><button id="hrClose2" class="btn go">확인</button></footer>
 </dialog>
 
 <template id="itemTmpl">
@@ -2233,20 +2349,23 @@ ${JSON.stringify(candidates,null,2)}
             if(!confirm(`'${p.name}' 정보를 삭제할까요? 사진도 함께 삭제됩니다.`)) return;
             try{ await Pets.remove(p.petId); showToast('삭제되었습니다.'); await renderPets() }catch(err){ alert(err.message||err) }
         });
-        act.append(eb,db);
+        const cb=el('button','btn go','체크하기'); cb.type='button';
+        cb.addEventListener('click',()=>openHealthCheck(p.petId));
+        act.append(cb,eb,db);
         li.append(ava,main,act);
         return li;
     }
     async function renderPets(){
         const seq=++petSeq, list=$("#petList");
-        $("#petLoggedOut").hidden=!!me; $("#petNew").hidden=!me;
-        if(!me){ list.innerHTML=''; $("#petEmpty").hidden=true; return }
+        $("#petLoggedOut").hidden=!!me; $("#petNew").hidden=!me; $("#hcHistory").hidden=!me;
+        if(!me){ list.innerHTML=''; $("#petEmpty").hidden=true; $("#hcStart").hidden=true; return }
         try{
             const rows=await Pets.list();
             if(seq!==petSeq) return;
             pets=rows; list.innerHTML='';
             rows.forEach(p=>list.appendChild(petCard(p)));
-            $("#petEmpty").hidden=rows.length>0;
+            $("#petEmpty").hidden=rows.length>0; $("#hcStart").hidden=!rows.length;
+            renderChecks();
         }catch(err){ if(seq===petSeq){ list.innerHTML=''; $("#petEmpty").hidden=true; showToast(err.message||'반려동물 정보를 불러오지 못했습니다.') } }
     }
 
@@ -2287,6 +2406,198 @@ ${JSON.stringify(candidates,null,2)}
     $("#petEmptyNew").addEventListener('click',()=>openPetForm());
     $("#petLogin").addEventListener('click',()=>openAuth('login'));
     $("#myGoPets").addEventListener('click',()=>{ myDlg.close(); showView('health'); window.scrollTo(0,0) });
+
+    /* 건강체크: 촬영·업로드 → 결과 */
+    const HC = API_BASE + '/health-checks';
+    const URGENCY = { EMERGENCY:{label:'바로 병원에 가세요', short:'바로 병원', ic:'!'},
+                      SOON:{label:'2~3일 안에 병원에 가 보세요', short:'빠른 진료', ic:'↑'},
+                      MONITOR:{label:'집에서 지켜봐도 괜찮아요', short:'지켜보기', ic:'✓'} };
+    const MAX_FRAMES=8, MAX_PHOTOS=5, MAX_VIDEO_SEC=30, FRAME_EDGE=1024;
+    const hcDlg=$("#hcDialog"), hcForm=$("#hcForm"), hcFile=$("#hcFile"), hrDlg=$("#hrDialog");
+    let hcMeta=null, hcFrames=[], hcCur=null, hcLoadSeq=0;
+
+    // 이벤트 한 번 기다리기 (영상이 응답하지 않으면 시간 초과)
+    const once=(target,ev,ms=8000)=>new Promise((ok,fail)=>{
+        const t=setTimeout(()=>{ cleanup(); fail(new Error('영상을 읽는 데 시간이 너무 오래 걸려요.')) },ms);
+        const on=()=>{ cleanup(); ok() }, err=()=>{ cleanup(); fail(new Error('이 영상은 브라우저에서 열 수 없어요. MP4로 저장하거나 사진으로 올려 주세요.')) };
+        const cleanup=()=>{ clearTimeout(t); target.removeEventListener(ev,on); target.removeEventListener('error',err) };
+        target.addEventListener(ev,on); target.addEventListener('error',err);
+    });
+    // 긴 변을 1024px 이하로 줄여 JPEG로 만든다 (서버·AI로 보내는 크기를 줄이려고)
+    function toJpeg(src,w,h,name){
+        const k=Math.min(1, FRAME_EDGE/Math.max(w,h)), c=document.createElement('canvas');
+        c.width=Math.round(w*k); c.height=Math.round(h*k);
+        c.getContext('2d').drawImage(src,0,0,c.width,c.height);
+        return new Promise((ok,fail)=>c.toBlob(b=>b? ok(new File([b],name,{type:'image/jpeg'})) : fail(new Error('이미지를 만들지 못했어요.')),'image/jpeg',0.85));
+    }
+    // 영상에서 고르게 count장을 뽑는다
+    async function extractVideoFrames(file,count=MAX_FRAMES){
+        const url=URL.createObjectURL(file), v=document.createElement('video');
+        v.muted=true; v.playsInline=true; v.preload='auto'; v.src=url;
+        try{
+            await once(v,'loadeddata');
+            let dur=v.duration;
+            if(!isFinite(dur)){ v.currentTime=1e7; await once(v,'seeked'); dur=v.duration }   // 길이 정보가 없는 webm 대응
+            if(!isFinite(dur) || dur<=0 || !v.videoWidth) throw new Error('영상 길이나 크기를 읽지 못했어요. 다른 영상이나 사진으로 시도해 주세요.');
+            if(dur>MAX_VIDEO_SEC) throw new Error(`영상이 너무 길어요(${Math.round(dur)}초). ${MAX_VIDEO_SEC}초 이내로 잘라서 올려 주세요.`);
+            const out=[];
+            for(let i=0;i<count;i++){
+                v.currentTime=Math.min(dur*(i+0.5)/count, Math.max(dur-0.05,0));
+                await once(v,'seeked');
+                out.push(await toJpeg(v,v.videoWidth,v.videoHeight,`frame-${i+1}.jpg`));
+            }
+            return out;
+        }finally{ URL.revokeObjectURL(url); v.removeAttribute('src'); v.load() }
+    }
+    async function shrinkPhotos(files){
+        if(files.length>MAX_PHOTOS) throw new Error(`사진은 최대 ${MAX_PHOTOS}장까지 올릴 수 있어요.`);
+        const out=[];
+        for(const [i,f] of files.entries()){
+            let bmp;
+            try{ bmp=await createImageBitmap(f) }catch{ throw new Error(`'${f.name}'을(를) 읽지 못했어요. JPG나 PNG로 올려 주세요.`) }
+            out.push(await toJpeg(bmp,bmp.width,bmp.height,`photo-${i+1}.jpg`)); bmp.close();
+        }
+        return out;
+    }
+
+    const hcSource=()=>document.querySelector('input[name=hcSrc]:checked').value;
+    function renderHcFrames(){
+        const box=$("#hcFrames"), on=hcFrames.filter(f=>f.keep).length; box.innerHTML='';
+        hcFrames.forEach((f,i)=>{
+            const b=el('button','frame'+(f.keep?'':' off')); b.type='button';
+            b.setAttribute('aria-pressed',String(!f.keep)); b.title=f.keep? '눌러서 이 장면 빼기' : '눌러서 다시 넣기';
+            const im=el('img'); im.src=f.url; im.alt=`장면 ${i+1}`;
+            b.append(im, el('span','n',String(i+1)));
+            b.addEventListener('click',()=>{ f.keep=!f.keep; renderHcFrames() });
+            box.append(b);
+        });
+        const hint=$("#hcFrameHint"); hint.hidden=!hcFrames.length;
+        hint.textContent = hcSource()==='video'
+            ? `영상에서 ${hcFrames.length}장을 뽑았어요. 흐리거나 상관없는 장면은 눌러서 빼 주세요. (보낼 장면 ${on}장)`
+            : `사진 ${on}장을 보내요. 눌러서 뺄 수 있어요.`;
+    }
+    function clearHcFrames(){ hcFrames.forEach(f=>URL.revokeObjectURL(f.url)); hcFrames=[]; renderHcFrames() }
+    async function loadHcFiles(){
+        const seq=++hcLoadSeq, files=[...hcFile.files]; $("#hcErr").textContent='';
+        clearHcFrames(); if(!files.length) return;
+        $("#hcFrameHint").hidden=false; $("#hcFrameHint").textContent= hcSource()==='video'? '영상에서 장면을 뽑는 중…' : '사진을 준비하는 중…';
+        try{
+            const out = hcSource()==='video'? await extractVideoFrames(files[0]) : await shrinkPhotos(files);
+            if(seq!==hcLoadSeq) return;
+            hcFrames=out.map(file=>({file, url:URL.createObjectURL(file), keep:true}));
+            renderHcFrames();
+        }catch(err){ if(seq!==hcLoadSeq) return; hcFile.value=''; $("#hcFrameHint").hidden=true; $("#hcErr").textContent=err.message||String(err) }
+    }
+    function syncHcSource(){
+        const video=hcSource()==='video';
+        hcFile.accept= video? 'video/*' : 'image/png,image/jpeg,image/gif,image/webp';
+        hcFile.multiple=!video; hcFile.value=''; hcLoadSeq++; clearHcFrames();
+    }
+    function checkEmergency(){
+        const picked=[...document.querySelectorAll('#hcSyms input:checked')].map(i=>i.value).filter(v=>hcMeta?.emergencySymptoms.includes(v));
+        const box=$("#hcEmergency"); box.hidden=!picked.length;
+        box.textContent=`응급 신호(${picked.join(', ')})예요. 체크를 기다리지 말고 지금 바로 가까운 동물병원에 연락하세요.`;
+    }
+    function buildHcChoices(){
+        const parts=$("#hcParts"); parts.innerHTML='';
+        hcMeta.bodyParts.forEach((b,i)=>{
+            const id='hcPart'+i, inp=el('input'); inp.type='radio'; inp.name='hcPart'; inp.id=id; inp.value=b;
+            const lb=el('label',null,b); lb.htmlFor=id; parts.append(inp,lb);
+        });
+        const syms=$("#hcSyms"); syms.innerHTML='';
+        hcMeta.symptoms.forEach((sy,i)=>{
+            const id='hcSym'+i, inp=el('input'); inp.type='checkbox'; inp.id=id; inp.value=sy;
+            if(hcMeta.emergencySymptoms.includes(sy)) inp.className='danger';
+            inp.addEventListener('change',checkEmergency);
+            const lb=el('label',null,sy); lb.htmlFor=id; syms.append(inp,lb);
+        });
+    }
+    async function openHealthCheck(petId){
+        if(!requireLogin()) return;
+        try{ hcMeta=await req(`${HC}/meta`) }catch(err){ alert(err.message||err); return }
+        if(!pets.length){ showToast('먼저 반려동물을 등록해 주세요.'); openPetForm(); return }
+        hcForm.reset(); $("#hcErr").textContent=''; $("#hcEmergency").hidden=true; $("#hcBusy").hidden=true;
+        buildHcChoices(); syncHcSource();
+        const sel=$("#hcPet"); sel.innerHTML='';
+        pets.forEach(p=>sel.add(new Option(`${p.name} (${p.species}${p.breed?' · '+p.breed:''})`, p.petId)));
+        if(petId) sel.value=petId;
+        $("#hcSampleNote").hidden = hcMeta.analyzer!=='sample';
+        const left=hcMeta.dailyLimit-hcMeta.usedToday;
+        $("#hcQuota").textContent=`오늘 ${left}번 더 할 수 있어요`; $("#hcSubmit").disabled = left<=0;
+        if(left<=0) $("#hcErr").textContent=`오늘 체크 횟수(${hcMeta.dailyLimit}번)를 다 썼어요. 내일 다시 시도해 주세요.`;
+        hcDlg.showModal();
+    }
+    document.querySelectorAll('input[name=hcSrc]').forEach(r=>r.addEventListener('change',syncHcSource));
+    hcFile.addEventListener('change',loadHcFiles);
+    $("#hcCancel").addEventListener('click',()=>hcDlg.close());
+    hcDlg.addEventListener('close',()=>{ hcLoadSeq++; clearHcFrames() });
+    hcDlg.addEventListener('cancel',e=>{ if(!$("#hcBusy").hidden) e.preventDefault() });   // 분석 중에는 Esc로 닫지 않음
+    hcForm.addEventListener('submit',async e=>{
+        e.preventDefault();
+        const part=document.querySelector('input[name=hcPart]:checked')?.value, keep=hcFrames.filter(f=>f.keep);
+        if(!part){ $("#hcErr").textContent='체크할 부위를 골라 주세요.'; return }
+        if(!keep.length){ $("#hcErr").textContent= hcFrames.length? '보낼 장면을 1장 이상 남겨 주세요.' : '영상이나 사진을 올려 주세요.'; return }
+        const payload={ petId:Number($("#hcPet").value), bodyPart:part, source:hcSource(),
+                        symptoms:[...document.querySelectorAll('#hcSyms input:checked')].map(i=>i.value), memo:$("#hcMemo").value.trim() };
+        const fd=new FormData(); fd.append('check',JSON.stringify(payload)); keep.forEach(f=>fd.append('frames',f.file));
+        $("#hcErr").textContent=''; $("#hcBusy").hidden=false; $("#hcSubmit").disabled=true;
+        $("#hcBusyText").textContent = hcMeta.analyzer==='sample'? '결과를 만드는 중이에요…' : `장면 ${keep.length}장을 분석하는 중이에요… (최대 1분)`;
+        try{
+            const r=await req(HC,{method:'POST',body:fd});
+            hcDlg.close(); showCheckResult(r); renderChecks();
+        }catch(err){ $("#hcErr").textContent=err.message||String(err) }
+        finally{ $("#hcBusy").hidden=true; $("#hcSubmit").disabled=false }
+    });
+
+    /* 결과 */
+    function fillList(box,items){ box.innerHTML=''; (items||[]).forEach(t=>box.append(el('li',null,t))) }
+    function showCheckResult(r){
+        hcCur=r; const res=r.result, u=URGENCY[r.urgency]||URGENCY.SOON;
+        $("#hrTitle").textContent=`${r.petName} · ${r.bodyPart} 체크 결과`;
+        $("#hrSample").hidden = r.analyzer!=='sample';
+        $("#hrUrg").className='urg '+r.urgency; $("#hrUrgIc").textContent=u.ic; $("#hrUrgLabel").textContent=u.label; $("#hrUrgReason").textContent=res.urgencyReason||'';
+        $("#hrMeta").textContent=[fmtDateTime(r.createdAt), r.source==='video'?'영상':'사진', r.symptoms.length? '증상: '+r.symptoms.join(', ') : null, r.memo].filter(Boolean).join(' · ');
+        const hits=new Set((res.findings||[]).map(f=>f.frame)), fb=$("#hrFrames"); fb.innerHTML='';
+        r.frames.forEach((name,i)=>{ const a=el('a','frame'+(hits.has(i+1)?' hit':'')); a.href=buildUploadUrl(name); a.target='_blank'; a.rel='noopener';
+            const im=el('img'); im.src=buildUploadUrl(name); im.alt=`장면 ${i+1}`; a.append(im, el('span','n',String(i+1))); fb.append(a) });
+        $("#hrSummary").textContent=res.summary||'';
+        fillList($("#hrFindings"), (res.findings||[]).map(f=>`장면 ${f.frame}: ${f.observation}`));
+        const cz=$("#hrCauses"); cz.innerHTML=''; (res.possibleCauses||[]).forEach(c=>cz.append(el('span','pill',c)));
+        $("#hrSpecialty").textContent=r.specialty||'일반';
+        fillList($("#hrHome"),res.homeCare); fillList($("#hrQuestions"),res.questionsForVet);
+        $("#hrRetakeBox").hidden = res.imageQuality!=='POOR' || !res.retakeTip; $("#hrRetake").textContent=res.retakeTip||'';
+        if(!hrDlg.open) hrDlg.showModal();
+        hrDlg.querySelector('.hr-body').scrollTop=0;
+    }
+    [$("#hrClose"),$("#hrClose2")].forEach(b=>b.addEventListener('click',()=>hrDlg.close()));
+    $("#hrDel").addEventListener('click',async()=>{
+        if(!hcCur || !confirm('이 체크 기록을 삭제할까요? 올린 사진도 함께 삭제됩니다.')) return;
+        try{ await req(`${HC}/${hcCur.checkId}`,{method:'DELETE'}); hrDlg.close(); showToast('삭제되었습니다.'); renderChecks() }catch(err){ alert(err.message||err) }
+    });
+
+    /* 최근 기록 */
+    async function renderChecks(){
+        if(!me) return;
+        const list=$("#hcList");
+        try{
+            const rows=await req(HC);
+            list.innerHTML='';
+            rows.forEach(c=>{
+                const li=el('li','hc-row'), im=el('img'); im.alt=''; im.src=c.thumbnail? buildUploadUrl(c.thumbnail) : NO_IMG; im.onerror=()=>{ im.onerror=null; im.src=NO_IMG };
+                const m=el('div','m'), t=el('div','t');
+                t.append(el('span',null,`${c.petName} · ${c.bodyPart}`), el('span','badge '+c.urgency,(URGENCY[c.urgency]||URGENCY.SOON).short));
+                if(c.specialty) t.append(el('span','badge wait',c.specialty));
+                if(c.analyzer==='sample') t.append(el('span','badge',  '샘플'));
+                m.append(t, el('div','s',`${fmtDateTime(c.createdAt)} · ${c.summary||''}`));
+                li.append(im,m); li.tabIndex=0; li.setAttribute('role','button');
+                const open=async()=>{ try{ showCheckResult(await req(`${HC}/${c.checkId}`)) }catch(err){ alert(err.message||err) } };
+                li.addEventListener('click',open); li.addEventListener('keydown',e=>{ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); open() } });
+                list.append(li);
+            });
+            $("#hcEmpty").hidden=rows.length>0;
+        }catch{ list.innerHTML='' }
+    }
+    $("#hcStart").addEventListener('click',()=>openHealthCheck());
 
     /* 초기 구동 */
     document.addEventListener('DOMContentLoaded',async()=>{
